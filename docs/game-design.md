@@ -51,15 +51,28 @@
 
 ## 汉字动画资产
 
-本轮开始把汉字动画拆成独立资产表，文件为 `src/hanziAssets.js`。主逻辑只负责触发 `idle / drag / drop / attack / merge / sleep / enemyWalk / hit / death`，每个字的变形参数从资产表采样。
+汉字单位不再使用系统字体渲染。字体缩放、倾斜和描边无法复刻录屏里的手绘字变形效果，因此本轮把字形拆成两层资产：
+
+- `src/hanziAssets.js`：每个字的身份、纸片颜色、墨色、倾角、动作关键帧和挂件。
+- `src/vectorHanzi.js`：每个字的 SVG-like 矢量笔画。横、竖、撇、捺、弯钩都是独立 Canvas 路径，允许逐笔画错位、拉伸、压扁和加粗。
+
+主逻辑只负责触发 `idle / drag / drop / attack / merge / sleep / enemyWalk / hit / death`，每个字的整体变形参数从资产表采样，实际字形由矢量笔画绘制。
 
 每个汉字资产包含：
 
 - `role`：`blade / spear / bow / cavalry / char / general / enemy / goal / tool`
 - `paper / border / ink`：纸片底色、边框、墨色
-- `fontScale / baseline / tilt`：字形大小、基线和常态倾角
+- `fontScale / baseline / tilt`：沿用为矢量字形缩放、基线和常态倾角参数，不再代表真实字体
 - `attachment`：刀芒、枪尖、弓弦、骑兵速度线、将领金环、铲子等挂件
 - `motions`：逐帧关键帧，使用 `scaleX / scaleY / skewX / rotate / x / y / glyphScaleX / glyphScaleY / glow / alpha`
+
+当前矢量笔画覆盖：
+
+- `刀 / 枪 / 弓 / 骑`：兵种牌，不使用字体；攻击时字形可随兵器动作产生笔画拉伸。
+- `赵 / 云 / 张 / 飞 / 黄 / 忠`：将领字牌，不使用字体；休眠时笔画灰化、轻微下沉。
+- `赵云 / 张飞 / 黄忠`：由两个单字矢量资产并排绘制，不使用双字字体。
+- `兵 / 贼 / 卒 / 寇`：敌人字，不使用字体；行走和死亡动画直接作用在笔画上。
+- `斗`：目标字，不使用字体；地图两侧和开局展示均可由矢量字绘制。
 
 当前字形身份：
 

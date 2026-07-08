@@ -1,4 +1,5 @@
 import { ENEMY_GLYPHS, combinePoses, getHanziAsset, sampleMotion } from "./hanziAssets.js";
+import { drawVectorHanzi, hasVectorHanzi } from "./vectorHanzi.js";
 
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
@@ -762,24 +763,26 @@ function drawGlyphLayer(text, x, y, size, color, pose = {}) {
   ctx.transform(1, 0, pose.skewX ?? 0, 1, 0, 0);
   ctx.rotate(pose.rotate ?? 0);
   ctx.scale(pose.scaleX ?? 1, pose.scaleY ?? 1);
-  ctx.font = `900 ${size}px "KaiTi", "STKaiti", "Microsoft YaHei", serif`;
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  if (pose.stroke) {
-    ctx.lineWidth = Math.max(1, size * 0.035);
-    ctx.strokeStyle = pose.stroke;
-    ctx.strokeText(text, 0, 0);
-  }
-  const jitter = pose.jitter ?? 0;
-  if (jitter > 0) {
-    ctx.globalAlpha *= 0.22;
-    ctx.fillStyle = color;
-    ctx.fillText(text, -size * 0.016 * jitter, size * 0.012 * jitter);
-    ctx.fillText(text, size * 0.012 * jitter, -size * 0.01 * jitter);
-    ctx.globalAlpha /= 0.22;
-  }
-  ctx.fillStyle = color;
-  ctx.fillText(text, 0, 0);
+  const drawn = drawVectorHanzi(ctx, text, size, color, {
+    jitter: pose.jitter ?? 0,
+    stroke: pose.stroke,
+    breathe: Math.abs((pose.glyphScaleX ?? 1) - (pose.glyphScaleY ?? 1)) + Math.abs(pose.rotate ?? 0),
+    attack: pose.glow ?? 0,
+    merge: Math.max(0, ((pose.glyphScaleX ?? 1) - 1) * 0.8)
+  });
+  if (!drawn) drawInkSigil(size, color);
+  ctx.restore();
+}
+
+function drawInkSigil(size, color) {
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.lineWidth = Math.max(2, size * 0.12);
+  line(-size * 0.24, -size * 0.34, size * 0.22, -size * 0.28, color, ctx.lineWidth);
+  line(-size * 0.12, -size * 0.08, size * 0.28, size * 0.04, color, ctx.lineWidth * 0.86);
+  line(size * 0.08, -size * 0.38, -size * 0.16, size * 0.34, color, ctx.lineWidth);
   ctx.restore();
 }
 
@@ -1482,6 +1485,13 @@ function drawBag(x, y, size) {
 }
 
 function drawCalligraphy(text, x, y, size, color) {
+  if (hasVectorHanzi(text)) {
+    ctx.save();
+    ctx.translate(x, y);
+    drawVectorHanzi(ctx, text, size, color, { jitter: 0.45, breathe: 0.28 });
+    ctx.restore();
+    return;
+  }
   ctx.save();
   ctx.fillStyle = color;
   ctx.font = `900 ${size}px "KaiTi", "STKaiti", "Microsoft YaHei", serif`;
