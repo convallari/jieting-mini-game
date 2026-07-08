@@ -1,3 +1,7 @@
+import { GLYPH_MASKS } from "./glyphMasks.js";
+
+const MASK_GLYPHS = new Set(["刀", "枪", "弓", "骑", "斗"]);
+
 const GLYPH_STROKES = {
   "刀": [
     s(31, 34, q(52, 25, 76, 30), 11),
@@ -186,6 +190,11 @@ export function drawVectorHanzi(ctx, text, size, color, options = {}) {
 }
 
 function drawSingleGlyph(ctx, char, strokes, size, color, options, glyphIndex) {
+  if (MASK_GLYPHS.has(char) && GLYPH_MASKS[char]) {
+    drawMaskGlyph(ctx, GLYPH_MASKS[char], size, color, options, glyphIndex);
+    return;
+  }
+
   const scale = size / 100;
   const jitter = options.jitter ?? 0;
   const breathe = options.breathe ?? 0;
@@ -235,6 +244,85 @@ function drawSingleGlyph(ctx, char, strokes, size, color, options, glyphIndex) {
     };
     drawStroke(ctx, strokes[i], scale, color, strokeWarp);
   }
+}
+
+const decodedMaskCache = new Map();
+const maskCanvasCache = new Map();
+
+function drawMaskGlyph(ctx, mask, size, color, options, glyphIndex) {
+  const decoded = decodeMask(mask);
+  const jitter = options.jitter ?? 0;
+  const breathe = options.breathe ?? 0;
+  const attack = options.attack ?? 0;
+  const merge = options.merge ?? 0;
+  const seed = glyphIndex * 11.23;
+  const boxW = Math.max(1, decoded.maxX - decoded.minX + 1);
+  const boxH = Math.max(1, decoded.maxY - decoded.minY + 1);
+  const target = size * (options.maskScale ?? 0.84);
+  const cell = target / Math.max(boxW, boxH);
+  const sprite = getMaskCanvas(decoded, color);
+  const drawW = sprite.canvas.width * cell;
+  const drawH = sprite.canvas.height * cell;
+  const stretchX = 1 + attack * 0.025 + merge * 0.025;
+  const stretchY = 1 - attack * 0.015 + merge * 0.015;
+
+  ctx.save();
+  ctx.scale(stretchX, stretchY);
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  if (jitter > 0) {
+    ctx.save();
+    ctx.globalAlpha *= Math.min(0.16, 0.07 + jitter * 0.045);
+    ctx.drawImage(sprite.canvas, -drawW / 2 + Math.sin(seed) * size * 0.018 * jitter, -drawH / 2 + Math.cos(seed) * size * 0.012 * jitter, drawW, drawH);
+    ctx.restore();
+  }
+  ctx.save();
+  ctx.globalAlpha *= 0.18 + breathe * 0.08 + attack * 0.14;
+  ctx.drawImage(sprite.canvas, -drawW * 0.54, -drawH * 0.54 + cell * 0.55, drawW * 1.08, drawH * 1.08);
+  ctx.restore();
+  ctx.drawImage(sprite.canvas, -drawW / 2, -drawH / 2, drawW, drawH);
+  ctx.restore();
+}
+
+function getMaskCanvas(decoded, color) {
+  const key = `${decoded.cacheKey}:${color}`;
+  if (maskCanvasCache.has(key)) return maskCanvasCache.get(key);
+  const pad = 3;
+  const canvas = document.createElement("canvas");
+  canvas.width = decoded.maxX - decoded.minX + 1 + pad * 2;
+  canvas.height = decoded.maxY - decoded.minY + 1 + pad * 2;
+  const buffer = canvas.getContext("2d");
+  buffer.fillStyle = color;
+  for (const [x, y] of decoded.cells) {
+    buffer.fillRect(x - decoded.minX + pad, y - decoded.minY + pad, 1.35, 1.35);
+  }
+  const sprite = { canvas };
+  maskCanvasCache.set(key, sprite);
+  return sprite;
+}
+
+function decodeMask(mask) {
+  if (decodedMaskCache.has(mask)) return decodedMaskCache.get(mask);
+  const cells = [];
+  let minX = mask.size;
+  let minY = mask.size;
+  let maxX = 0;
+  let maxY = 0;
+  for (let y = 0; y < mask.rows.length; y++) {
+    const bits = BigInt(`0x${mask.rows[y]}`);
+    for (let x = 0; x < mask.size; x++) {
+      const shift = BigInt(mask.size - x - 1);
+      if (((bits >> shift) & 1n) === 0n) continue;
+      cells.push([x, y]);
+      minX = Math.min(minX, x);
+      minY = Math.min(minY, y);
+      maxX = Math.max(maxX, x);
+      maxY = Math.max(maxY, y);
+    }
+  }
+  const decoded = cells.length ? { cells, minX, minY, maxX, maxY, cacheKey: mask.rows.join("") } : { cells, minX: 0, minY: 0, maxX: mask.size - 1, maxY: mask.size - 1, cacheKey: mask.rows.join("") };
+  decodedMaskCache.set(mask, decoded);
+  return decoded;
 }
 
 function drawStroke(ctx, stroke, scale, color, warp = {}) {
