@@ -771,8 +771,9 @@ function drawGlyphLayer(text, x, y, size, color, pose = {}) {
     jitter: pose.jitter ?? 0,
     stroke: pose.stroke,
     breathe: Math.abs((pose.glyphScaleX ?? 1) - (pose.glyphScaleY ?? 1)) + Math.abs(pose.rotate ?? 0),
-    attack: (pose.glow ?? 0) * 0.24,
-    merge: Math.max(0, ((pose.glyphScaleX ?? 1) - 1) * 0.8)
+    attack: pose.glow ?? 0,
+    merge: Math.max(0, ((pose.glyphScaleX ?? 1) - 1) * 0.8),
+    phase: performance.now() * 0.001
   });
   if (!drawn) drawInkSigil(size, color);
   ctx.restore();

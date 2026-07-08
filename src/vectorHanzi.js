@@ -2,6 +2,14 @@ import { GLYPH_MASKS } from "./glyphMasks.js";
 
 const MASK_GLYPHS = new Set(["刀", "枪", "弓", "骑", "斗"]);
 
+const MASK_RIGS = {
+  "刀": { wave: 0.42, attackShift: 0.12, attackBend: 0.1, squash: 0.1, trail: 0.18 },
+  "枪": { wave: 0.2, attackShift: 0.18, attackBend: -0.04, squash: 0.08, trail: 0.24 },
+  "弓": { wave: 0.5, attackShift: 0.08, attackBend: 0.16, squash: 0.06, trail: 0.16 },
+  "骑": { wave: 0.36, attackShift: 0.14, attackBend: 0.08, squash: 0.11, trail: 0.22 },
+  "斗": { wave: 0.24, attackShift: 0.05, attackBend: 0.13, squash: 0.05, trail: 0.08 }
+};
+
 const GLYPH_STROKES = {
   "刀": [
     s(31, 34, q(52, 25, 76, 30), 11),
@@ -191,7 +199,7 @@ export function drawVectorHanzi(ctx, text, size, color, options = {}) {
 
 function drawSingleGlyph(ctx, char, strokes, size, color, options, glyphIndex) {
   if (MASK_GLYPHS.has(char) && GLYPH_MASKS[char]) {
-    drawMaskGlyph(ctx, GLYPH_MASKS[char], size, color, options, glyphIndex);
+    drawMaskGlyph(ctx, char, GLYPH_MASKS[char], size, color, options, glyphIndex);
     return;
   }
 
@@ -249,13 +257,16 @@ function drawSingleGlyph(ctx, char, strokes, size, color, options, glyphIndex) {
 const decodedMaskCache = new Map();
 const maskCanvasCache = new Map();
 
-function drawMaskGlyph(ctx, mask, size, color, options, glyphIndex) {
+function drawMaskGlyph(ctx, char, mask, size, color, options, glyphIndex) {
   const decoded = decodeMask(mask);
   const jitter = options.jitter ?? 0;
   const breathe = options.breathe ?? 0;
+  const idleWave = 0.14 + breathe * 1.8;
   const attack = options.attack ?? 0;
   const merge = options.merge ?? 0;
+  const phase = (options.phase ?? 0) + glyphIndex * 0.37;
   const seed = glyphIndex * 11.23;
+  const rig = MASK_RIGS[char] ?? MASK_RIGS["刀"];
   const boxW = Math.max(1, decoded.maxX - decoded.minX + 1);
   const boxH = Math.max(1, decoded.maxY - decoded.minY + 1);
   const target = size * (options.maskScale ?? 0.84);
@@ -263,8 +274,8 @@ function drawMaskGlyph(ctx, mask, size, color, options, glyphIndex) {
   const sprite = getMaskCanvas(decoded, color);
   const drawW = sprite.canvas.width * cell;
   const drawH = sprite.canvas.height * cell;
-  const stretchX = 1 + attack * 0.025 + merge * 0.025;
-  const stretchY = 1 - attack * 0.015 + merge * 0.015;
+  const stretchX = 1 + attack * 0.018 + merge * 0.025;
+  const stretchY = 1 - attack * (rig.squash ?? 0.06) * 0.45 + merge * 0.015;
 
   ctx.save();
   ctx.scale(stretchX, stretchY);
@@ -277,11 +288,57 @@ function drawMaskGlyph(ctx, mask, size, color, options, glyphIndex) {
     ctx.restore();
   }
   ctx.save();
-  ctx.globalAlpha *= 0.18 + breathe * 0.08 + attack * 0.14;
-  ctx.drawImage(sprite.canvas, -drawW * 0.54, -drawH * 0.54 + cell * 0.55, drawW * 1.08, drawH * 1.08);
+  ctx.globalAlpha *= 0.16 + idleWave * 0.06 + attack * 0.14;
+  drawWarpedMask(ctx, sprite.canvas, drawW * 1.08, drawH * 1.08, {
+    breathe: idleWave * 0.55,
+    attack: attack * 0.55,
+    phase,
+    rig,
+    dx: 0,
+    dy: cell * 0.55
+  });
   ctx.restore();
-  ctx.drawImage(sprite.canvas, -drawW / 2, -drawH / 2, drawW, drawH);
+  if (attack > 0.08 && rig.trail) {
+    ctx.save();
+    ctx.globalAlpha *= Math.min(0.24, attack * 0.22);
+    drawWarpedMask(ctx, sprite.canvas, drawW, drawH, {
+      breathe,
+      attack,
+      phase,
+      rig,
+      dx: size * rig.trail * attack,
+      dy: -size * 0.02 * attack,
+      smear: true
+    });
+    ctx.restore();
+  }
+  drawWarpedMask(ctx, sprite.canvas, drawW, drawH, { breathe: idleWave, attack, phase, rig, dx: 0, dy: 0 });
   ctx.restore();
+}
+
+function drawWarpedMask(ctx, canvas, drawW, drawH, params) {
+  const rows = canvas.height;
+  const rowH = drawH / rows;
+  const attack = params.attack ?? 0;
+  const breathe = params.breathe ?? 0;
+  const phase = params.phase ?? 0;
+  const rig = params.rig ?? MASK_RIGS["刀"];
+  const dx = params.dx ?? 0;
+  const dy = params.dy ?? 0;
+  for (let row = 0; row < rows; row++) {
+    const n = rows <= 1 ? 0.5 : row / (rows - 1);
+    const centered = n - 0.5;
+    const wave = Math.sin(phase * 6.2 + n * Math.PI * 2.2) * breathe * drawW * (rig.wave ?? 0.25) * 0.08;
+    const bend = centered * centered * Math.sign(centered || 1) * attack * drawW * (rig.attackBend ?? 0.08);
+    const throwX = attack * drawW * (rig.attackShift ?? 0.08) * (0.18 + n * 0.82);
+    const squashY = attack * drawH * (rig.squash ?? 0.06) * (0.5 - Math.abs(centered));
+    const rowScale = 1 + attack * 0.08 * Math.sin(n * Math.PI);
+    const smearScale = params.smear ? 1 + attack * 0.22 * n : rowScale;
+    const destW = drawW * smearScale;
+    const destX = -destW / 2 + dx + wave + bend + throwX;
+    const destY = -drawH / 2 + dy + row * rowH + squashY;
+    ctx.drawImage(canvas, 0, row, canvas.width, 1, destX, destY, destW, rowH + 0.7);
+  }
 }
 
 function getMaskCanvas(decoded, color) {
