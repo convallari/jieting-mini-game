@@ -1,3 +1,5 @@
+import { ENEMY_GLYPHS, combinePoses, getHanziAsset, sampleMotion } from "./hanziAssets.js";
+
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
@@ -67,6 +69,9 @@ function createState() {
     enemies: [],
     projectiles: [],
     particles: [],
+    strokes: [],
+    ghosts: [],
+    absorbs: [],
     floats: [],
     pulses: [],
     shakes: [],
@@ -86,6 +91,11 @@ function makeUnit(token, level = 1) {
     level,
     type: isWeapon ? "weapon" : isGeneral ? "general" : token === "shovel" ? "shovel" : "char",
     attackTimer: 0,
+    action: "idle",
+    actionAge: 0,
+    actionLife: 1,
+    actionDx: 0,
+    actionDy: 0,
     placedAt: performance.now(),
     wobble: Math.random() * Math.PI * 2
   };
@@ -170,6 +180,7 @@ function update(dt, time) {
 
   updateEnemies(dt);
   updateUnits(dt);
+  if (state.drag?.unit) updateUnitAction(state.drag.unit, dt);
   updateProjectiles(dt);
 }
 
@@ -181,19 +192,30 @@ function spawnEnemy() {
     speed: 0.42 + state.wave * 0.018 + Math.random() * 0.08,
     hp,
     maxHp: hp,
+    glyph: ENEMY_GLYPHS[Math.floor(Math.random() * ENEMY_GLYPHS.length)],
+    lane: rand(-0.16, 0.16),
     wobble: Math.random() * 10,
     hitFlash: 0,
+    hitAge: 99,
+    hitDx: 0,
+    hitDy: 0,
+    spawnAge: 0,
     dead: false
   });
 }
 
 function updateEnemies(dt) {
   for (const enemy of state.enemies) {
-    if (enemy.dead) continue;
+    if (enemy.dying) continue;
+    enemy.spawnAge += dt;
     enemy.t += enemy.speed * dt;
     enemy.hitFlash = Math.max(0, enemy.hitFlash - dt);
+    enemy.hitAge += dt;
     if (enemy.t >= pathCells.length - 1) {
-      enemy.dead = true;
+      enemy.dying = true;
+      enemy.deathAge = 0;
+      const pos = enemyPosition(enemy);
+      enemyDeathFx(pos.x, pos.y, enemy);
       state.douHp -= 1;
       shake(0.13, 3.4);
       floatText("斗 -1", layout.boardX + layout.boardW - 22, layout.boardY + layout.boardH - layout.cell * 1.3, "#d12d25", 18);
@@ -203,11 +225,15 @@ function updateEnemies(dt) {
       }
     }
   }
-  state.enemies = state.enemies.filter((enemy) => !enemy.dead);
+  for (const enemy of state.enemies) {
+    if (enemy.dying) enemy.deathAge += dt;
+  }
+  state.enemies = state.enemies.filter((enemy) => !enemy.dead && (!enemy.dying || enemy.deathAge < 0.34));
 }
 
 function updateUnits(dt) {
   for (const [key, unit] of state.board) {
+    updateUnitAction(unit, dt);
     unit.attackTimer -= dt;
     if (unit.type === "char" || unit.type === "shovel") continue;
     if (unit.attackTimer > 0) continue;
@@ -216,6 +242,9 @@ function updateUnits(dt) {
     if (!target) continue;
     unit.attackTimer = getUnitCooldown(unit);
     fireAt(unit, pos, target);
+  }
+  for (const unit of state.camp) {
+    if (unit) updateUnitAction(unit, dt);
   }
 }
 
@@ -231,7 +260,7 @@ function updateProjectiles(dt) {
 }
 
 function updateParticles(dt) {
-  for (const item of [...state.particles, ...state.floats, ...state.pulses, ...state.shakes, ...state.recruits, ...state.messages]) {
+  for (const item of [...state.particles, ...state.strokes, ...state.ghosts, ...state.absorbs, ...state.floats, ...state.pulses, ...state.shakes, ...state.recruits, ...state.messages]) {
     item.age += dt;
   }
   for (const p of state.particles) {
@@ -240,6 +269,9 @@ function updateParticles(dt) {
     p.vy += 90 * dt;
   }
   state.particles = state.particles.filter((p) => p.age < p.life);
+  state.strokes = state.strokes.filter((s) => s.age < s.life);
+  state.ghosts = state.ghosts.filter((g) => g.age < g.life);
+  state.absorbs = state.absorbs.filter((a) => a.age < a.life);
   state.floats = state.floats.filter((f) => f.age < f.life);
   state.pulses = state.pulses.filter((p) => p.age < p.life);
   state.shakes = state.shakes.filter((s) => s.age < s.life);
@@ -251,12 +283,37 @@ function updateBuns(dt) {
   state.displayedBuns += (state.buns - state.displayedBuns) * Math.min(1, dt * 9);
 }
 
+function updateUnitAction(unit, dt) {
+  if (!unit.action || unit.action === "idle") return;
+  unit.actionAge += dt;
+  if (unit.actionAge >= unit.actionLife) {
+    unit.action = "idle";
+    unit.actionAge = 0;
+    unit.actionLife = 1;
+    unit.actionDx = 0;
+    unit.actionDy = 0;
+  }
+}
+
+function setUnitAction(unit, action, life, dx = 0, dy = 0) {
+  unit.action = action;
+  unit.actionAge = 0;
+  unit.actionLife = life;
+  unit.actionDx = dx;
+  unit.actionDy = dy;
+}
+
 function fireAt(unit, cell, enemy) {
   const from = cellCenter(cell.r, cell.c);
   const to = enemyPosition(enemy);
   const damage = Math.round(getUnitDamage(unit));
+  const len = Math.max(1, Math.hypot(to.x - from.x, to.y - from.y));
+  const dx = (to.x - from.x) / len;
+  const dy = (to.y - from.y) / len;
+  setUnitAction(unit, "attack", unit.type === "general" ? 0.44 : 0.34, dx, dy);
+  strokeTrail(from.x, from.y, to.x, to.y, unit.type === "general" ? "#f4c84c" : "#17120f", unit.type === "general" ? 0.26 : 0.18);
   if (weapons[unit.token]?.kind === "melee") {
-    state.projectiles.push({ sx: from.x, sy: from.y, tx: to.x, ty: to.y, x: from.x, y: from.y, age: 0, life: 0.1, arc: 0, damage, target: enemy.id, kind: "slash", done: false });
+    state.projectiles.push({ sx: from.x, sy: from.y, tx: to.x, ty: to.y, x: from.x, y: from.y, age: 0, life: 0.12, arc: 0, damage, target: enemy.id, kind: "slash", done: false });
   } else {
     state.projectiles.push({ sx: from.x, sy: from.y, tx: to.x, ty: to.y, x: from.x, y: from.y, age: 0, life: unit.type === "general" ? 0.18 : 0.24, arc: unit.type === "general" ? 16 : 10, damage, target: enemy.id, kind: unit.type === "general" ? "gold" : "arrow", done: false });
   }
@@ -265,16 +322,21 @@ function fireAt(unit, cell, enemy) {
 function hitEnemy(projectile) {
   const enemy = state.enemies.find((item) => item.id === projectile.target);
   projectile.done = true;
-  if (!enemy) return;
+  if (!enemy || enemy.dying) return;
   enemy.hp -= projectile.damage;
-  enemy.hitFlash = 0.08;
+  enemy.hitFlash = 0.1;
+  enemy.hitAge = 0;
+  const hitLen = Math.max(1, Math.hypot(projectile.tx - projectile.sx, projectile.ty - projectile.sy));
+  enemy.hitDx = (projectile.tx - projectile.sx) / hitLen;
+  enemy.hitDy = (projectile.ty - projectile.sy) / hitLen;
   const pos = enemyPosition(enemy);
-  burst(pos.x, pos.y, projectile.kind === "gold" ? "#f6cd55" : "#2d2019", 8);
+  inkSplash(pos.x, pos.y, projectile.kind === "gold" ? "#f6cd55" : "#2d2019", projectile.kind === "gold" ? 14 : 10);
   floatText(`-${projectile.damage}`, pos.x, pos.y - 10, "#b92825", 15);
   if (enemy.hp <= 0) {
-    enemy.dead = true;
+    enemy.dying = true;
+    enemy.deathAge = 0;
+    enemyDeathFx(pos.x, pos.y, enemy);
     dropBun(pos.x, pos.y);
-    burst(pos.x, pos.y, "#ffffff", 10);
   }
 }
 
@@ -327,6 +389,16 @@ function enemyPosition(enemy) {
   };
 }
 
+function currentPathSegment(enemy) {
+  const index = Math.min(pathCells.length - 2, Math.floor(enemy.t));
+  const a = pathCells[index];
+  const b = pathCells[index + 1];
+  const dx = b[1] - a[1];
+  const dy = b[0] - a[0];
+  const len = Math.max(1, Math.hypot(dx, dy));
+  return { dir: { x: dx / len, y: dy / len } };
+}
+
 function draw(time) {
   const shakeOffset = getShake(time);
   ctx.clearRect(0, 0, layout.w, layout.h);
@@ -341,6 +413,7 @@ function draw(time) {
   drawBoard(time);
   drawEnemies(time);
   drawUnits(time);
+  drawAbsorbEvents(time);
   drawProjectiles();
   drawEffects();
   drawCamp(time);
@@ -499,16 +572,37 @@ function drawDropHighlight(time) {
 
 function drawEnemies(time) {
   for (const enemy of state.enemies) {
+    if (enemy.dying) continue;
     const pos = enemyPosition(enemy);
-    const bob = Math.sin(time * 9 + enemy.wobble) * 2.5;
+    const asset = getHanziAsset(enemy.glyph);
+    const segment = currentPathSegment(enemy);
+    const walkPose = sampleMotion(asset, "enemyWalk", (enemy.t * 0.9 + enemy.wobble) % 1);
+    const hitPose = enemy.hitAge < 0.22 ? sampleMotion(asset, "hit", enemy.hitAge / 0.22) : null;
+    const deathPose = enemy.dying ? sampleMotion(asset, "death", enemy.deathAge / 0.34) : null;
+    const pose = combinePoses(walkPose, hitPose, deathPose);
+    const laneX = -segment.dir.y * enemy.lane * layout.cell;
+    const laneY = segment.dir.x * enemy.lane * layout.cell;
     ctx.save();
-    ctx.translate(pos.x, pos.y + bob);
-    ctx.scale(enemy.hitFlash > 0 ? 1.13 : 1, enemy.hitFlash > 0 ? 0.9 : 1);
-    ctx.fillStyle = enemy.hitFlash > 0 ? "#fff" : "#19130f";
-    drawCalligraphy("兵", 0, 9, layout.cell * 0.75, ctx.fillStyle);
-    ctx.fillStyle = "#d93632";
-    const hpRatio = Math.max(0, enemy.hp / enemy.maxHp);
-    roundRect(-layout.cell * 0.34, -layout.cell * 0.44, layout.cell * 0.68 * hpRatio, 4, 2, true, false);
+    ctx.translate(pos.x + laneX + pose.x - enemy.hitDx * (enemy.hitAge < 0.2 ? 5 : 0), pos.y + laneY + pose.y - enemy.hitDy * (enemy.hitAge < 0.2 ? 5 : 0));
+    ctx.rotate(pose.rotate + segment.dir.x * 0.025);
+    ctx.transform(1, 0, pose.skewX, 1, 0, 0);
+    ctx.scale(pose.scaleX, pose.scaleY);
+    ctx.globalAlpha = pose.alpha;
+    const ink = enemy.hitFlash > 0 ? "#fff" : asset.ink;
+    drawGlyphLayer(enemy.glyph, 0, 9, layout.cell * asset.fontScale, ink, {
+      scaleX: pose.glyphScaleX,
+      scaleY: pose.glyphScaleY,
+      skewX: pose.glyphSkewX,
+      rotate: pose.glyphRotate,
+      jitter: 1.1,
+      stroke: "rgba(255,242,218,0.4)"
+    });
+    drawEnemyFeet((enemy.t * Math.PI * 2.2) + enemy.wobble, layout.cell * 0.35);
+    if (!enemy.dying) {
+      ctx.fillStyle = "#d93632";
+      const hpRatio = Math.max(0, enemy.hp / enemy.maxHp);
+      roundRect(-layout.cell * 0.34, -layout.cell * 0.44, layout.cell * 0.68 * hpRatio, 4, 2, true, false);
+    }
     ctx.restore();
   }
 }
@@ -584,6 +678,31 @@ function drawDrag(time) {
 }
 
 function drawEffects() {
+  for (const g of state.ghosts) {
+    const k = g.age / g.life;
+    const asset = getHanziAsset(g.glyph);
+    const pose = sampleMotion(asset, "death", k);
+    ctx.save();
+    ctx.globalAlpha = pose.alpha;
+    ctx.translate(g.x + g.vx * k + pose.x, g.y + g.vy * k + pose.y);
+    ctx.rotate(g.rotate + pose.rotate);
+    ctx.transform(1, 0, pose.skewX, 1, 0, 0);
+    ctx.scale(pose.scaleX, pose.scaleY);
+    drawGlyphLayer(g.glyph, 0, 0, g.size, asset.ink, {
+      scaleX: pose.glyphScaleX,
+      scaleY: pose.glyphScaleY,
+      jitter: 1.4,
+      stroke: "rgba(255,255,255,0.35)"
+    });
+    ctx.restore();
+  }
+  for (const s of state.strokes) {
+    const k = s.age / s.life;
+    ctx.save();
+    ctx.globalAlpha = (1 - k) * s.alpha;
+    line(lerp(s.x1, s.x2, k * 0.15), lerp(s.y1, s.y2, k * 0.15), s.x2, s.y2, s.color, s.width * (1 - k * 0.5));
+    ctx.restore();
+  }
   for (const p of state.particles) {
     const k = p.age / p.life;
     ctx.save();
@@ -616,6 +735,92 @@ function drawEffects() {
   }
 }
 
+function drawAbsorbEvents(time) {
+  for (const a of state.absorbs) {
+    const k = a.age / a.life;
+    const asset = getHanziAsset(a.glyph);
+    const x = lerp(a.sx, a.tx, easeInOut(k));
+    const y = lerp(a.sy, a.ty, easeInOut(k)) - Math.sin(k * Math.PI) * 8;
+    ctx.save();
+    ctx.globalAlpha = 1 - Math.max(0, k - 0.72) / 0.28;
+    ctx.translate(x, y);
+    ctx.rotate(a.rotate * (1 - k) + Math.sin(time * 20 + a.phase) * 0.03 * (1 - k));
+    ctx.scale(1 - k * 0.18, 1 - k * 0.18);
+    ctx.fillStyle = asset.paper ?? "#fff5ce";
+    roundRect(-a.size / 2, -a.size / 2, a.size, a.size, 4, true, false);
+    ctx.strokeStyle = "#d6ad33";
+    ctx.lineWidth = 2;
+    roundRect(-a.size / 2, -a.size / 2, a.size, a.size, 4, false, true);
+    drawGlyphLayer(a.glyph, 0, a.size * asset.baseline, a.size * asset.fontScale, asset.ink, { scaleX: 1 + k * 0.08, scaleY: 1 - k * 0.04, jitter: 0.7 });
+    ctx.restore();
+  }
+}
+
+function drawGlyphLayer(text, x, y, size, color, pose = {}) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.transform(1, 0, pose.skewX ?? 0, 1, 0, 0);
+  ctx.rotate(pose.rotate ?? 0);
+  ctx.scale(pose.scaleX ?? 1, pose.scaleY ?? 1);
+  ctx.font = `900 ${size}px "KaiTi", "STKaiti", "Microsoft YaHei", serif`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  if (pose.stroke) {
+    ctx.lineWidth = Math.max(1, size * 0.035);
+    ctx.strokeStyle = pose.stroke;
+    ctx.strokeText(text, 0, 0);
+  }
+  const jitter = pose.jitter ?? 0;
+  if (jitter > 0) {
+    ctx.globalAlpha *= 0.22;
+    ctx.fillStyle = color;
+    ctx.fillText(text, -size * 0.016 * jitter, size * 0.012 * jitter);
+    ctx.fillText(text, size * 0.012 * jitter, -size * 0.01 * jitter);
+    ctx.globalAlpha /= 0.22;
+  }
+  ctx.fillStyle = color;
+  ctx.fillText(text, 0, 0);
+  ctx.restore();
+}
+
+function drawAttachment(asset, cx, cy, s, time, pose, layer) {
+  const type = asset.attachment;
+  if (!type) return;
+  ctx.save();
+  ctx.globalAlpha = 0.58 + pose.glow * 0.35;
+  if (type === "blade" && layer === "over") {
+    line(cx + s * 0.1, cy - s * 0.26, cx + s * (0.28 + pose.glow * 0.16), cy - s * 0.02, "#dce7e9", Math.max(2, s * 0.06));
+    line(cx - s * 0.22, cy - s * 0.14, cx + s * 0.22, cy + s * 0.2, "#201b18", Math.max(2, s * 0.04));
+  } else if (type === "spear" && layer === "over") {
+    line(cx - s * 0.3, cy + s * 0.24, cx + s * (0.25 + pose.glow * 0.16), cy - s * 0.25, "#5d3f2c", Math.max(2, s * 0.04));
+    circle(cx + s * (0.25 + pose.glow * 0.16), cy - s * 0.25, Math.max(2, s * 0.035), true, false, "#c93d2f");
+  } else if (type === "bow" && layer === "under") {
+    ctx.strokeStyle = "#1c1714";
+    ctx.lineWidth = Math.max(1.5, s * 0.04);
+    ctx.beginPath();
+    ctx.arc(cx + s * 0.08, cy + s * 0.08, s * 0.3, -1.22, 1.18);
+    ctx.stroke();
+    line(cx - s * 0.18, cy + s * 0.08, cx + s * (0.26 + pose.glow * 0.1), cy, "#1c1714", Math.max(1.5, s * 0.03));
+  } else if (type === "speed" && layer === "under") {
+    for (let i = 0; i < 3; i++) line(cx - s * (0.34 + i * 0.08), cy + s * (0.2 - i * 0.12), cx - s * (0.16 + i * 0.08), cy + s * (0.16 - i * 0.12), "#3b2b21", Math.max(1.4, s * 0.025));
+  } else if (type === "general-ring" && layer === "under") {
+    ctx.strokeStyle = "#d29b22";
+    ctx.lineWidth = Math.max(2, s * 0.035);
+    ctx.beginPath();
+    ctx.arc(cx, cy, s * (0.35 + pose.glow * 0.05), time * 2, time * 2 + Math.PI * 1.35);
+    ctx.stroke();
+  } else if (type === "shovel" && layer === "tool") {
+    drawShovel(cx, cy, s * 0.62);
+  }
+  ctx.restore();
+}
+
+function drawEnemyFeet(phase, width) {
+  const a = Math.sin(phase) * width * 0.16;
+  line(-width * 0.25, 22, -width * 0.42 - a, 28, "rgba(31,24,18,0.68)", 2);
+  line(width * 0.2, 22, width * 0.36 + a, 28, "rgba(31,24,18,0.68)", 2);
+}
+
 function drawMessages() {
   for (const [index, m] of state.messages.entries()) {
     const k = m.age / m.life;
@@ -646,36 +851,60 @@ function drawEnd() {
 
 function drawUnitCard(unit, cx, cy, size, time, dragging) {
   const token = unit.token;
+  const glyph = displayGlyph(unit);
+  const asset = getHanziAsset(unit.type === "shovel" ? "铲" : glyph);
   const k = Math.min(1, (performance.now() - unit.placedAt) / 260);
   const appear = 0.65 + easeOutBack(k) * 0.35;
-  const pulse = dragging ? 1.14 : 1 + Math.sin(time * 3 + unit.wobble) * 0.012;
+  const asleep = unit.type === "char" && isOnBoard(unit) && !isCharPairReady(unit);
+  const idleName = asleep ? "sleep" : "idle";
+  const idlePose = sampleMotion(asset, idleName, ((time * 0.85 + unit.wobble) % 1 + 1) % 1);
+  const actionPose = unit.action && unit.action !== "idle" ? sampleMotion(asset, unit.action, unit.actionAge / unit.actionLife) : null;
+  const dragPose = dragging ? sampleMotion(asset, "drag", 0.72) : null;
+  const pose = combinePoses(idlePose, actionPose, dragPose);
+  const pulse = 1 + Math.sin(time * 3 + unit.wobble) * 0.006;
   const s = size * appear * pulse;
+  cx += pose.x;
+  cy += pose.y;
   const x = cx - s / 2;
   const y = cy - s / 2;
   ctx.save();
   ctx.translate(cx, cy);
-  ctx.rotate((dragging ? -0.05 : Math.sin(time * 2 + unit.wobble) * 0.015));
+  ctx.rotate(asset.tilt + pose.rotate + (dragging ? -0.025 : 0));
+  ctx.transform(1, 0, pose.skewX, 1, 0, 0);
+  ctx.scale(pose.scaleX, pose.scaleY);
   ctx.translate(-cx, -cy);
   ctx.shadowColor = dragging ? "rgba(0,0,0,0.35)" : "rgba(0,0,0,0.12)";
-  ctx.shadowBlur = dragging ? 16 : 4;
+  ctx.shadowBlur = dragging ? 16 : 4 + pose.shadow * 8 + pose.glow * 8;
   ctx.shadowOffsetY = dragging ? 8 : 2;
 
-  let fill = "#faf5e9";
-  if (unit.type === "general") fill = "#fff0b8";
-  if (unit.type === "char") fill = "#f9f5d8";
-  if (unit.type === "shovel") fill = "#e8f0ef";
-  if (unit.type === "weapon" && weapons[token]) fill = weapons[token].color;
-  ctx.fillStyle = fill;
+  ctx.globalAlpha = pose.alpha;
+  ctx.fillStyle = asset.paper ?? "#faf5e9";
   roundRect(x, y, s, s, 4, true, false);
-  ctx.strokeStyle = unit.type === "general" ? "#d7ad35" : "#756b61";
+  ctx.strokeStyle = asset.border ?? (unit.type === "general" ? "#d7ad35" : "#756b61");
   ctx.lineWidth = unit.type === "general" ? 3 : 2;
   roundRect(x, y, s, s, 4, false, true);
+  if (pose.glow > 0.05) {
+    ctx.save();
+    ctx.globalAlpha = pose.glow * 0.55;
+    ctx.strokeStyle = asset.role === "general" ? "#f3c44e" : "#fff1a8";
+    ctx.lineWidth = 3;
+    roundRect(x - 3, y - 3, s + 6, s + 6, 7, false, true);
+    ctx.restore();
+  }
 
   if (unit.type === "shovel") {
-    drawShovel(cx, cy, s * 0.62);
+    drawAttachment(asset, cx, cy, s, time, pose, "tool");
   } else {
-    const asleep = unit.type === "char" && isOnBoard(unit) && !isCharPairReady(unit);
-    drawCalligraphy(displayGlyph(unit), cx, cy + s * 0.19, unit.type === "general" ? s * 0.42 : s * 0.58, asleep ? "#857a70" : "#0f0d0b");
+    drawAttachment(asset, cx, cy, s, time, pose, "under");
+    drawGlyphLayer(glyph, cx + pose.glyphX, cy + s * asset.baseline + pose.glyphY, s * asset.fontScale, asleep ? "#857a70" : asset.ink, {
+      scaleX: pose.glyphScaleX,
+      scaleY: pose.glyphScaleY,
+      skewX: pose.glyphSkewX,
+      rotate: pose.glyphRotate,
+      jitter: asleep ? 0.18 : asset.jitter,
+      stroke: unit.type === "general" ? "rgba(128,79,19,0.26)" : "rgba(255,255,255,0.18)"
+    });
+    drawAttachment(asset, cx, cy, s, time, pose, "over");
     if (asleep) drawCentered("休", cx, cy - s * 0.22, s * 0.2, "#a8823d", "900");
   }
   if (unit.type !== "shovel") {
@@ -768,6 +997,7 @@ canvas.addEventListener("pointerup", pointerUp);
 canvas.addEventListener("pointercancel", pointerUp);
 
 function startDrag(unit, source, p) {
+  setUnitAction(unit, "drag", 0.18, 0, -1);
   state.drag = {
     unit,
     source,
@@ -797,13 +1027,16 @@ function canDropOn(target, unit) {
 function dropOnCamp(unit, i) {
   const existing = state.camp[i];
   if (existing && canMerge(existing, unit)) {
+    absorbFx(existing, unit, campSlotCenter(i), state.drag ? { x: state.drag.x, y: state.drag.y } : campSlotCenter(i));
     state.camp[i] = mergedUnit(existing, unit);
     mergeFx(campSlotCenter(i));
     return true;
   }
   state.camp[i] = unit;
+  setUnitAction(unit, "drop", 0.22, 0, 1);
   if (existing) restoreToSource(existing);
   settleFx(campSlotCenter(i));
+  scanGeneralPairs();
   return true;
 }
 
@@ -816,6 +1049,7 @@ function dropOnBoard(unit, r, c) {
   }
   const existing = state.board.get(key);
   if (existing && canMerge(existing, unit)) {
+    absorbFx(existing, unit, cellCenter(r, c), state.drag ? { x: state.drag.x, y: state.drag.y } : cellCenter(r, c));
     state.board.set(key, mergedUnit(existing, unit));
     mergeFx(cellCenter(r, c));
     scanGeneralPairs();
@@ -823,6 +1057,7 @@ function dropOnBoard(unit, r, c) {
   }
   state.board.set(key, unit);
   unit.placedAt = performance.now();
+  setUnitAction(unit, "drop", 0.22, 0, 1);
   if (existing) restoreToSource(existing);
   settleFx(cellCenter(r, c));
   scanGeneralPairs();
@@ -848,10 +1083,27 @@ function canMerge(a, b) {
 function mergedUnit(a, b) {
   const unit = makeUnit(a.token, Math.max(a.level, b.level) + 1);
   unit.placedAt = performance.now();
+  setUnitAction(unit, "merge", 0.48, 0, -1);
   return unit;
 }
 
 function scanGeneralPairs() {
+  for (let i = 0; i < CAMP_SIZE - 1; i++) {
+    const a = state.camp[i];
+    const b = state.camp[i + 1];
+    if (!a || !b) continue;
+    const pair = charPairs.find((item) => a.token === item.first && b.token === item.second);
+    if (!pair) continue;
+    const general = makeUnit(pair.general, Math.max(a.level, b.level));
+    setUnitAction(general, "merge", 0.56, 0, -1);
+    absorbFx(a, b, campSlotCenter(i), campSlotCenter(i + 1));
+    state.camp[i] = general;
+    state.camp[i + 1] = null;
+    mergeFx(campSlotCenter(i));
+    floatText(pair.general, campSlotCenter(i).x, campSlotCenter(i).y - layout.slot * 0.5, "#d19622", 22);
+    toast(`${pair.general}待命`, "#f3c037");
+    return;
+  }
   for (let r = 0; r < BOARD_ROWS; r++) {
     for (let c = 0; c < BOARD_COLS - 1; c++) {
       const aKey = `${r},${c}`;
@@ -863,6 +1115,8 @@ function scanGeneralPairs() {
       if (!pair) continue;
       const level = Math.max(a.level, b.level);
       const general = makeUnit(pair.general, level);
+      setUnitAction(general, "merge", 0.56, 0, -1);
+      absorbFx(a, b, cellCenter(r, c), cellCenter(r, c + 1));
       state.board.set(aKey, general);
       state.board.delete(bKey);
       mergeFx(cellCenter(r, c));
@@ -885,6 +1139,7 @@ function recruit() {
     state.camp[i] = makeUnit(token, Math.random() < 0.12 && token !== "shovel" ? 2 : 1);
     state.recruits.push({ i, age: -i * 0.06, life: 0.28 + i * 0.06 });
   }
+  scanGeneralPairs();
   toast("征兵完成", "#f3c037");
 }
 
@@ -955,6 +1210,38 @@ function settleFx(pos) {
 function mergeFx(pos) {
   pulseAt(pos.x, pos.y, "#f6cd55", layout.cell * 0.72);
   burst(pos.x, pos.y, "#f3c037", 14);
+  state.strokes.push({
+    x1: pos.x - layout.cell * 0.42,
+    y1: pos.y + layout.cell * 0.22,
+    x2: pos.x + layout.cell * 0.48,
+    y2: pos.y - layout.cell * 0.18,
+    color: "#f8d34d",
+    width: layout.cell * 0.12,
+    alpha: 0.74,
+    age: 0,
+    life: 0.32
+  });
+  shake(0.07, 1.2);
+}
+
+function absorbFx(a, b, aPos, bPos) {
+  const tx = (aPos.x + bPos.x) / 2;
+  const ty = (aPos.y + bPos.y) / 2;
+  const size = Math.min(layout.cell || 42, layout.slot || layout.cell || 42) * 0.82;
+  for (const [unit, pos, sign] of [[a, aPos, -1], [b, bPos, 1]]) {
+    state.absorbs.push({
+      glyph: displayGlyph(unit),
+      sx: pos.x,
+      sy: pos.y,
+      tx,
+      ty,
+      size,
+      rotate: sign * rand(0.06, 0.12),
+      phase: Math.random() * Math.PI * 2,
+      age: 0,
+      life: 0.18
+    });
+  }
 }
 
 function cultivateFx(pos) {
@@ -973,6 +1260,58 @@ function cultivateFx(pos) {
     });
   }
   toast("开垦完成", "#f3c037");
+}
+
+function strokeTrail(x1, y1, x2, y2, color, alpha = 0.18) {
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  state.strokes.push({
+    x1: x1 + dx * 0.08,
+    y1: y1 + dy * 0.08,
+    x2: x1 + dx * 0.44,
+    y2: y1 + dy * 0.44,
+    color,
+    width: layout.cell * 0.1,
+    alpha,
+    age: 0,
+    life: 0.2
+  });
+}
+
+function inkSplash(x, y, color, count) {
+  burst(x, y, color, count);
+  for (let i = 0; i < 3; i++) {
+    const a = rand(-Math.PI, Math.PI);
+    const len = rand(layout.cell * 0.14, layout.cell * 0.36);
+    state.strokes.push({
+      x1: x + Math.cos(a) * 3,
+      y1: y + Math.sin(a) * 3,
+      x2: x + Math.cos(a) * len,
+      y2: y + Math.sin(a) * len,
+      color,
+      width: rand(3, 6),
+      alpha: 0.42,
+      age: 0,
+      life: rand(0.18, 0.34)
+    });
+  }
+}
+
+function enemyDeathFx(x, y, enemy) {
+  inkSplash(x, y, "#1c1713", 16);
+  inkSplash(x, y, "#f3efe3", 7);
+  state.ghosts.push({
+    glyph: enemy.glyph,
+    x,
+    y,
+    vx: -enemy.hitDx * 16 + rand(-8, 8),
+    vy: -enemy.hitDy * 16 - 12,
+    rotate: rand(-0.12, 0.12),
+    size: layout.cell * getHanziAsset(enemy.glyph).fontScale,
+    age: 0,
+    life: 0.34
+  });
+  state.pulses.push({ x, y, color: "#f7e4bb", r: layout.cell * 0.64, age: 0, life: 0.26 });
 }
 
 function burst(x, y, color, count) {
