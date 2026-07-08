@@ -7,6 +7,7 @@ const requiredFiles = [
   "src/hanziAssets.js",
   "src/vectorHanzi.js",
   "src/styles.css",
+  "tools/make-animation-references.mjs",
   "docs/game-design.md"
 ];
 
@@ -22,5 +23,8 @@ if (assetSyntax.status !== 0) process.exit(assetSyntax.status ?? 1);
 
 const vectorSyntax = spawnSync("node", ["--check", "src/vectorHanzi.js"], { stdio: "inherit" });
 if (vectorSyntax.status !== 0) process.exit(vectorSyntax.status ?? 1);
+
+const animationReferenceSyntax = spawnSync("node", ["--check", "tools/make-animation-references.mjs"], { stdio: "inherit" });
+if (animationReferenceSyntax.status !== 0) process.exit(animationReferenceSyntax.status ?? 1);
 
 console.log("Project files and JavaScript syntax look good.");

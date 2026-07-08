@@ -312,7 +312,7 @@ function fireAt(unit, cell, enemy) {
   const dx = (to.x - from.x) / len;
   const dy = (to.y - from.y) / len;
   setUnitAction(unit, "attack", unit.type === "general" ? 0.44 : 0.34, dx, dy);
-  strokeTrail(from.x, from.y, to.x, to.y, unit.type === "general" ? "#f4c84c" : "#17120f", unit.type === "general" ? 0.26 : 0.18);
+  strokeTrail(from.x, from.y, to.x, to.y, unit.type === "general" ? "#f4c84c" : "#17120f", unit.type === "general" ? 0.26 : 0.18, unit.type === "general" ? "gold" : weapons[unit.token]?.kind ?? "char");
   if (weapons[unit.token]?.kind === "melee") {
     state.projectiles.push({ sx: from.x, sy: from.y, tx: to.x, ty: to.y, x: from.x, y: from.y, age: 0, life: 0.12, arc: 0, damage, target: enemy.id, kind: "slash", done: false });
   } else {
@@ -595,7 +595,7 @@ function drawEnemies(time) {
       scaleY: pose.glyphScaleY,
       skewX: pose.glyphSkewX,
       rotate: pose.glyphRotate,
-      jitter: 1.1,
+      jitter: enemy.hitFlash > 0 ? 0.65 : 0.22,
       stroke: "rgba(255,242,218,0.4)"
     });
     drawEnemyFeet((enemy.t * Math.PI * 2.2) + enemy.wobble, layout.cell * 0.35);
@@ -701,7 +701,11 @@ function drawEffects() {
     const k = s.age / s.life;
     ctx.save();
     ctx.globalAlpha = (1 - k) * s.alpha;
-    line(lerp(s.x1, s.x2, k * 0.15), lerp(s.y1, s.y2, k * 0.15), s.x2, s.y2, s.color, s.width * (1 - k * 0.5));
+    const sx = lerp(s.x1, s.x2, k * 0.18);
+    const sy = lerp(s.y1, s.y2, k * 0.18);
+    line(sx, sy, s.x2, s.y2, s.color, s.width * (1 - k * 0.5));
+    if (s.glint) line(sx, sy - 1.5, s.x2 - (s.x2 - sx) * 0.14, s.y2 - (s.y2 - sy) * 0.14 - 1.5, "rgba(255,248,226,0.75)", Math.max(1, s.width * 0.32) * (1 - k * 0.4));
+    if (s.tip) drawStrokeTip(s, k);
     ctx.restore();
   }
   for (const p of state.particles) {
@@ -767,7 +771,7 @@ function drawGlyphLayer(text, x, y, size, color, pose = {}) {
     jitter: pose.jitter ?? 0,
     stroke: pose.stroke,
     breathe: Math.abs((pose.glyphScaleX ?? 1) - (pose.glyphScaleY ?? 1)) + Math.abs(pose.rotate ?? 0),
-    attack: pose.glow ?? 0,
+    attack: (pose.glow ?? 0) * 0.24,
     merge: Math.max(0, ((pose.glyphScaleX ?? 1) - 1) * 0.8)
   });
   if (!drawn) drawInkSigil(size, color);
@@ -1265,20 +1269,48 @@ function cultivateFx(pos) {
   toast("开垦完成", "#f3c037");
 }
 
-function strokeTrail(x1, y1, x2, y2, color, alpha = 0.18) {
+function strokeTrail(x1, y1, x2, y2, color, alpha = 0.18, kind = "char") {
   const dx = x2 - x1;
   const dy = y2 - y1;
+  const len = Math.max(1, Math.hypot(dx, dy));
+  const nx = dx / len;
+  const ny = dy / len;
+  const end = kind === "melee" ? 0.36 : 0.74;
+  const start = kind === "melee" ? 0.08 : 0.02;
   state.strokes.push({
-    x1: x1 + dx * 0.08,
-    y1: y1 + dy * 0.08,
-    x2: x1 + dx * 0.44,
-    y2: y1 + dy * 0.44,
+    x1: x1 + dx * start,
+    y1: y1 + dy * start,
+    x2: x1 + dx * end,
+    y2: y1 + dy * end,
     color,
-    width: layout.cell * 0.1,
+    width: layout.cell * (kind === "gold" ? 0.12 : kind === "melee" ? 0.11 : 0.085),
     alpha,
+    glint: kind !== "melee",
+    tip: kind !== "melee",
+    nx,
+    ny,
     age: 0,
-    life: 0.2
+    life: kind === "melee" ? 0.16 : 0.22
   });
+}
+
+function drawStrokeTip(s, k) {
+  const size = s.width * (1.25 - k * 0.35);
+  const px = s.x2;
+  const py = s.y2;
+  const nx = s.nx ?? 1;
+  const ny = s.ny ?? 0;
+  const ox = -ny;
+  const oy = nx;
+  ctx.save();
+  ctx.fillStyle = s.color;
+  ctx.beginPath();
+  ctx.moveTo(px + nx * size * 1.6, py + ny * size * 1.6);
+  ctx.lineTo(px - nx * size * 0.8 + ox * size * 0.62, py - ny * size * 0.8 + oy * size * 0.62);
+  ctx.lineTo(px - nx * size * 0.5 - ox * size * 0.62, py - ny * size * 0.5 - oy * size * 0.62);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
 }
 
 function inkSplash(x, y, color, count) {

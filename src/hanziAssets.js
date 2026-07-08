@@ -101,7 +101,7 @@ const glyphOverrides = {
   "黄忠": { role: "general", fontScale: 0.42, baseline: 0.16, tilt: -0.02, paper: "#fff0b8", border: "#d7ad35", ink: "#8a641c", attachment: "general-ring" },
   "兵": { role: "enemy", fontScale: 0.8, baseline: 0.16, tilt: -0.02, ink: "#17120f" },
   "卒": { role: "enemy", fontScale: 0.78, baseline: 0.16, tilt: 0.025, ink: "#201713" },
-  "贼": { role: "enemy", fontScale: 0.7, baseline: 0.15, tilt: -0.035, ink: "#24150f" },
+  "贼": { role: "enemy", fontScale: 0.63, baseline: 0.15, tilt: -0.035, ink: "#24150f" },
   "寇": { role: "enemy", fontScale: 0.68, baseline: 0.15, tilt: 0.02, ink: "#24150f" },
   "斗": { role: "goal", fontScale: 0.9, baseline: 0.15, tilt: 0, ink: "#18110e" },
   "铲": { role: "tool", fontScale: 0.55, baseline: 0.14, tilt: -0.04, paper: "#e8f0ef", ink: "#26323a", attachment: "shovel" }
