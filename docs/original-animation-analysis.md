@@ -214,3 +214,24 @@
 - `弓` 还需要从原片中单独切更高分辨率的同一枚字连续帧，当前只是按 contact sheet 的姿态重绘。
 - `枪` 的遮挡层形状还可以继续贴近原片中“像长枪横扫”的黑色块，而不是普通线段。
 - `骑` 原片右上速度线与字本体有局部遮挡关系，当前仍是画在字上的简化层。
+
+## 2026-07-09 动画实验台
+
+新增独立页面 `/animation-lab.html`，用于在接入正式战斗前逐帧对照原片裁帧和当前渲染。
+
+参考资产生成脚本：
+
+- `tools/build-animation-lab-references.py`
+
+输出资产：
+
+- `public/reference-glyphs/*-sheet.png`：每个字 48 帧 spritesheet。
+- `public/reference-glyphs/*-contact.png`：每个字的 12 帧采样图。
+- `public/reference-glyphs/manifest.json`：裁剪来源和尺寸记录。
+
+当前裁剪来源：
+
+- `枪`：`v2-board-qiang-dao-gong`，保留前半段粗黑遮挡和后半段清晰竖枪。
+- `刀`：改用 `v1-board-weapon-cluster` 右上刀格；原先用 `v2-board-qiang-dao-gong` 会截到几乎静态的刀，不适合作为刀攻击参考。
+- `弓`：`v2-top-dao-gong-qi` 左下弓格，能看到明显离散姿势切换。
+- `骑`：`v2-top-dao-gong-qi` 右下骑格，能看到局部斜向遮挡/速度线。
