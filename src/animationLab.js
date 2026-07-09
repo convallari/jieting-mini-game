@@ -8,6 +8,7 @@ const state = {
   manifest: null,
   images: new Map()
 };
+const BASE_URL = import.meta.env.BASE_URL || "/";
 
 const refCanvas = document.getElementById("reference");
 const refCtx = refCanvas.getContext("2d");
@@ -138,7 +139,7 @@ function loadImage(src) {
 }
 
 async function loadReferenceImage(fileName) {
-  const candidates = [`/reference-glyphs/${fileName}`, `/public/reference-glyphs/${fileName}`];
+  const candidates = assetCandidates(fileName);
   let lastError = null;
   for (const src of candidates) {
     try {
@@ -151,11 +152,20 @@ async function loadReferenceImage(fileName) {
 }
 
 function setReferenceImage(image, fileName) {
-  const candidates = [`/reference-glyphs/${fileName}`, `/public/reference-glyphs/${fileName}`];
+  const candidates = assetCandidates(fileName);
   let index = 0;
   image.onerror = () => {
     index += 1;
     if (index < candidates.length) image.src = candidates[index];
   };
   image.src = candidates[index];
+}
+
+function assetCandidates(fileName) {
+  return [
+    `${BASE_URL}reference-glyphs/${fileName}`,
+    `${BASE_URL}public/reference-glyphs/${fileName}`,
+    `/reference-glyphs/${fileName}`,
+    `/public/reference-glyphs/${fileName}`
+  ];
 }

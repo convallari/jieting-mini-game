@@ -22,6 +22,7 @@ const RHYTHM = {
 };
 
 const cache = new Map();
+const BASE_URL = import.meta.env.BASE_URL || "/";
 
 export function preloadWeaponGlyphSprites() {
   for (const key of Object.values(TOKEN_TO_REFERENCE_KEY)) loadSprite(key);
@@ -58,7 +59,12 @@ function loadSprite(key) {
   const item = REFERENCE_GLYPHS.glyphs[key];
   const image = new Image();
   const gameSheet = item.gameSheet ?? item.sheet.replace("-sheet.png", "-game-sheet.png");
-  const candidates = [`/reference-glyphs/${gameSheet}`, `/public/reference-glyphs/${gameSheet}`];
+  const candidates = [
+    `${BASE_URL}reference-glyphs/${gameSheet}`,
+    `${BASE_URL}public/reference-glyphs/${gameSheet}`,
+    `/reference-glyphs/${gameSheet}`,
+    `/public/reference-glyphs/${gameSheet}`
+  ];
   const sprite = { image, loaded: false, failed: false, index: 0 };
   image.onload = () => {
     sprite.loaded = true;

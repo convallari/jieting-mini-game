@@ -9,6 +9,7 @@ const requiredFiles = [
   "src/vectorHanzi.js",
   "src/weaponGlyphSprites.js",
   "src/styles.css",
+  "vite.config.js",
   "tools/build-glyph-masks.py",
   "tools/build-game-glyph-sprites.py",
   "tools/make-animation-references.mjs",
@@ -36,5 +37,8 @@ if (weaponSpriteSyntax.status !== 0) process.exit(weaponSpriteSyntax.status ?? 1
 
 const animationReferenceSyntax = spawnSync("node", ["--check", "tools/make-animation-references.mjs"], { stdio: "inherit" });
 if (animationReferenceSyntax.status !== 0) process.exit(animationReferenceSyntax.status ?? 1);
+
+const viteConfigSyntax = spawnSync("node", ["--check", "vite.config.js"], { stdio: "inherit" });
+if (viteConfigSyntax.status !== 0) process.exit(viteConfigSyntax.status ?? 1);
 
 console.log("Project files and JavaScript syntax look good.");
