@@ -31,9 +31,9 @@ const initialCultivated = new Set([
 ]);
 
 const weapons = {
-  dao: { glyph: "刀", name: "刀", range: 1, cooldown: 0.62, damage: 16, color: "#f3e7c6", kind: "melee" },
-  qiang: { glyph: "枪", name: "枪", range: 2, cooldown: 0.74, damage: 14, color: "#e8f0d4", kind: "stab" },
-  gong: { glyph: "弓", name: "弓", range: 3, cooldown: 0.92, damage: 13, color: "#eef0ff", kind: "arrow" },
+  dao: { glyph: "刀", name: "刀", range: 1.5, cooldown: 0.62, damage: 16, color: "#f3e7c6", kind: "melee" },
+  qiang: { glyph: "枪", name: "枪", range: 2.5, cooldown: 0.74, damage: 14, color: "#e8f0d4", kind: "stab" },
+  gong: { glyph: "弓", name: "弓", range: 3.5, cooldown: 0.92, damage: 13, color: "#eef0ff", kind: "arrow" },
   ji: { glyph: "骑", name: "骑", range: 1.5, cooldown: 0.82, damage: 18, color: "#f4dfd5", kind: "dash" }
 };
 
