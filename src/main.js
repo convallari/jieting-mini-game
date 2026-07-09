@@ -31,10 +31,10 @@ const initialCultivated = new Set([
 ]);
 
 const weapons = {
-  dao: { glyph: "刀", name: "刀", range: 1.18, cooldown: 0.62, damage: 16, color: "#f3e7c6", kind: "melee" },
-  qiang: { glyph: "枪", name: "枪", range: 1.72, cooldown: 0.74, damage: 14, color: "#e8f0d4", kind: "stab" },
-  gong: { glyph: "弓", name: "弓", range: 3.35, cooldown: 0.92, damage: 13, color: "#eef0ff", kind: "arrow" },
-  ji: { glyph: "骑", name: "骑", range: 1.95, cooldown: 0.82, damage: 18, color: "#f4dfd5", kind: "dash" }
+  dao: { glyph: "刀", name: "刀", range: 1, cooldown: 0.62, damage: 16, color: "#f3e7c6", kind: "melee" },
+  qiang: { glyph: "枪", name: "枪", range: 2, cooldown: 0.74, damage: 14, color: "#e8f0d4", kind: "stab" },
+  gong: { glyph: "弓", name: "弓", range: 3, cooldown: 0.92, damage: 13, color: "#eef0ff", kind: "arrow" },
+  ji: { glyph: "骑", name: "骑", range: 1.5, cooldown: 0.82, damage: 18, color: "#f4dfd5", kind: "dash" }
 };
 
 const charPairs = [
@@ -419,7 +419,7 @@ function findTarget(r, c, range) {
 
 function getUnitRange(unit) {
   if (unit.type === "general") return 3.25 + unit.level * 0.12;
-  return (weapons[unit.token]?.range ?? 1.2) + (unit.level - 1) * 0.18;
+  return weapons[unit.token]?.range ?? 1.2;
 }
 
 function getUnitCooldown(unit) {
@@ -724,10 +724,16 @@ function drawDrag(time) {
   if (d.hover?.kind === "board" && d.unit.type !== "shovel") {
     const target = cellCenter(d.hover.r, d.hover.c);
     ctx.save();
-    ctx.globalAlpha = 0.16;
-    circle(target.x, target.y, getUnitRange(d.unit) * layout.cell, true, false, "#f8f4dd");
+    ctx.globalAlpha = 0.42 + Math.sin(time * 8) * 0.05;
     ctx.setLineDash([6, 7]);
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "#d4ba62";
+    ctx.beginPath();
+    ctx.arc(target.x, target.y, getUnitRange(d.unit) * layout.cell, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.globalAlpha = 0.25;
     line(d.originX, d.originY, d.x, d.y, "#201915", 2);
+    ctx.setLineDash([]);
     ctx.restore();
   }
   drawUnitCard(d.unit, d.x, d.y, layout.cell * 0.92, time, true);
@@ -919,28 +925,20 @@ function drawUnitCard(unit, cx, cy, size, time, dragging) {
   const glyph = displayGlyph(unit);
   const asset = getHanziAsset(unit.type === "shovel" ? "铲" : glyph);
   const k = Math.min(1, (performance.now() - unit.placedAt) / 260);
-  const appear = 0.65 + easeOutBack(k) * 0.35;
+  const appear = dragging ? 1 : 0.65 + easeOutBack(k) * 0.35;
   const asleep = unit.type === "char" && isOnBoard(unit) && !isCharPairReady(unit);
   const idleName = asleep ? "sleep" : "idle";
   const idlePose = sampleMotion(asset, idleName, ((time * 0.85 + unit.wobble) % 1 + 1) % 1);
   const actionProgress = unit.action && unit.action !== "idle" ? unit.actionAge / unit.actionLife : 0;
   const actionPose = unit.action && unit.action !== "idle" ? sampleMotion(asset, unit.action, actionProgress) : null;
-  const dragPose = dragging ? sampleMotion(asset, "drag", 0.72) : null;
+  const dragPose = dragging ? sampleMotion(asset, "drag", 0.45) : null;
   const pose = combinePoses(idlePose, actionPose, dragPose);
-  const pulse = 1 + Math.sin(time * 3 + unit.wobble) * 0.006;
-  const s = size * appear * pulse;
-  cx += pose.x;
-  cy += pose.y;
+  const s = size * appear * (dragging ? 1.03 : 1);
   const x = cx - s / 2;
   const y = cy - s / 2;
   ctx.save();
-  ctx.translate(cx, cy);
-  ctx.rotate(asset.tilt + pose.rotate + (dragging ? -0.025 : 0));
-  ctx.transform(1, 0, pose.skewX, 1, 0, 0);
-  ctx.scale(pose.scaleX, pose.scaleY);
-  ctx.translate(-cx, -cy);
   ctx.shadowColor = dragging ? "rgba(0,0,0,0.35)" : "rgba(0,0,0,0.12)";
-  ctx.shadowBlur = dragging ? 16 : 4 + pose.shadow * 8 + pose.glow * 8;
+  ctx.shadowBlur = dragging ? 10 : 4 + pose.shadow * 3 + pose.glow * 5;
   ctx.shadowOffsetY = dragging ? 8 : 2;
 
   ctx.globalAlpha = pose.alpha;
@@ -961,19 +959,22 @@ function drawUnitCard(unit, cx, cy, size, time, dragging) {
   if (unit.type === "shovel") {
     drawAttachment(asset, cx, cy, s, time, pose, "tool");
   } else {
-    drawAttachment(asset, cx, cy, s, time, pose, "under");
-    drawGlyphLayer(glyph, cx + pose.glyphX, cy + s * asset.baseline + pose.glyphY, s * asset.fontScale, asleep ? "#857a70" : asset.ink, {
-      scaleX: pose.glyphScaleX,
-      scaleY: pose.glyphScaleY,
-      skewX: pose.glyphSkewX,
-      rotate: pose.glyphRotate,
+    const glyphCx = cx + pose.x + pose.glyphX;
+    const glyphCy = cy + pose.y + s * asset.baseline + pose.glyphY;
+    const glyphPose = {
+      scaleX: pose.scaleX * pose.glyphScaleX,
+      scaleY: pose.scaleY * pose.glyphScaleY,
+      skewX: pose.skewX + pose.glyphSkewX,
+      rotate: asset.tilt + pose.rotate + pose.glyphRotate,
       jitter: asleep ? 0.18 : asset.jitter,
       stroke: unit.type === "general" ? "rgba(128,79,19,0.26)" : "rgba(255,255,255,0.18)",
       action: unit.action,
       actionProgress
-    });
+    };
+    drawAttachment(asset, glyphCx, cy + pose.y, s, time, pose, "under");
+    drawGlyphLayer(glyph, glyphCx, glyphCy, s * asset.fontScale, asleep ? "#857a70" : asset.ink, glyphPose);
     if (unit.action === "attack") drawCardAttackOverlay(glyph, cx, cy, s, actionProgress, weapons[unit.token]?.kind ?? asset.role);
-    drawAttachment(asset, cx, cy, s, time, pose, "over");
+    drawAttachment(asset, glyphCx, cy + pose.y, s, time, pose, "over");
     if (asleep) drawCentered("休", cx, cy - s * 0.22, s * 0.2, "#a8823d", "900");
   }
   if (unit.type !== "shovel") {
@@ -1054,6 +1055,7 @@ function isCharPairReady(unit) {
 }
 
 function pointerDown(event) {
+  event.preventDefault();
   const p = eventPoint(event);
   if (state.mode === "menu") {
     if (hitRect(p, layout.start)) startGame();
@@ -1076,6 +1078,7 @@ function pointerDown(event) {
   if (camp && state.camp[camp.i]) {
     startDrag(state.camp[camp.i], { kind: "camp", i: camp.i }, p);
     state.camp[camp.i] = null;
+    if (canvas.setPointerCapture) canvas.setPointerCapture(event.pointerId);
     return;
   }
   const cell = hitBoard(p);
@@ -1087,10 +1090,12 @@ function pointerDown(event) {
       state.board.delete(key);
     }
   }
+  if (state.drag && canvas.setPointerCapture) canvas.setPointerCapture(event.pointerId);
 }
 
 function pointerMove(event) {
   if (!state.drag) return;
+  event.preventDefault();
   const p = eventPoint(event);
   state.drag.x = p.x;
   state.drag.y = p.y;
@@ -1099,6 +1104,7 @@ function pointerMove(event) {
 
 function pointerUp(event) {
   if (!state.drag) return;
+  event.preventDefault();
   const p = eventPoint(event);
   state.drag.x = p.x;
   state.drag.y = p.y;
@@ -1106,6 +1112,13 @@ function pointerUp(event) {
   const ok = dropDrag();
   if (!ok) restoreDrag();
   state.drag = null;
+  if (canvas.releasePointerCapture) {
+    try {
+      canvas.releasePointerCapture(event.pointerId);
+    } catch {
+      // Pointer capture may already be released by the browser.
+    }
+  }
 }
 
 canvas.addEventListener("pointerdown", pointerDown);
