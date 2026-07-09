@@ -127,6 +127,7 @@
 当前实现要点：
 
 - `drawUnitCard()` 改为资产驱动，纸片、字形、挂件、等级仍在同一张牌中绘制。
+- `刀 / 枪 / 弓 / 骑` 的正式游戏字形动画已改为逐帧透明 sprite：`src/weaponGlyphSprites.js` 预加载 `public/reference-glyphs/*-game-sheet.png`，攻击时按动作进度播放原片裁帧；卡片边框、等级和格子仍由游戏自身绘制。
 - `drawEnemies()` 改为按敌字资产渲染，敌人死亡延迟 `0.34s` 后移除，期间播放 `death` 字散墨残影。
 - 合成时新增 `absorbFx()`，两张参与合成的牌会向中心吸附，然后新牌播放 `merge`。
 - 攻击时新增 `strokeTrail()`，按兵种动作生成短墨线/刀枪弓残影。

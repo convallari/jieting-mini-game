@@ -7,8 +7,10 @@ const requiredFiles = [
   "src/hanziAssets.js",
   "src/glyphMasks.js",
   "src/vectorHanzi.js",
+  "src/weaponGlyphSprites.js",
   "src/styles.css",
   "tools/build-glyph-masks.py",
+  "tools/build-game-glyph-sprites.py",
   "tools/make-animation-references.mjs",
   "docs/game-design.md"
 ];
@@ -28,6 +30,9 @@ if (maskSyntax.status !== 0) process.exit(maskSyntax.status ?? 1);
 
 const vectorSyntax = spawnSync("node", ["--check", "src/vectorHanzi.js"], { stdio: "inherit" });
 if (vectorSyntax.status !== 0) process.exit(vectorSyntax.status ?? 1);
+
+const weaponSpriteSyntax = spawnSync("node", ["--check", "src/weaponGlyphSprites.js"], { stdio: "inherit" });
+if (weaponSpriteSyntax.status !== 0) process.exit(weaponSpriteSyntax.status ?? 1);
 
 const animationReferenceSyntax = spawnSync("node", ["--check", "tools/make-animation-references.mjs"], { stdio: "inherit" });
 if (animationReferenceSyntax.status !== 0) process.exit(animationReferenceSyntax.status ?? 1);

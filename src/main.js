@@ -1,5 +1,6 @@
 import { ENEMY_GLYPHS, combinePoses, getHanziAsset, sampleMotion } from "./hanziAssets.js";
 import { drawVectorHanzi, hasVectorHanzi } from "./vectorHanzi.js";
+import { drawWeaponGlyphSprite, hasWeaponGlyphSprite, preloadWeaponGlyphSprites } from "./weaponGlyphSprites.js";
 
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
@@ -55,6 +56,7 @@ let lastTime = performance.now();
 let pointer = null;
 const debugParams = new URLSearchParams(window.location.search);
 const DEBUG_ATTACK = debugParams.has("debugAttack");
+preloadWeaponGlyphSprites();
 
 function createState() {
   return {
@@ -998,8 +1000,16 @@ function drawUnitCard(unit, cx, cy, size, time, dragging) {
       actionProgress
     };
     drawAttachment(asset, glyphCx, cy + pose.y, s, time, pose, "under");
-    drawGlyphLayer(glyph, glyphCx, glyphCy, s * asset.fontScale, asleep ? "#857a70" : asset.ink, glyphPose);
-    if (unit.action === "attack") drawCardAttackOverlay(glyph, cx, cy, s, actionProgress, weapons[unit.token]?.kind ?? asset.role);
+    const usedSpriteGlyph = unit.type === "weapon" && hasWeaponGlyphSprite(unit.token) && drawWeaponGlyphSprite(ctx, unit.token, cx, cy, s, {
+      action: unit.action,
+      actionProgress,
+      asleep,
+      dragging
+    });
+    if (!usedSpriteGlyph) {
+      drawGlyphLayer(glyph, glyphCx, glyphCy, s * asset.fontScale, asleep ? "#857a70" : asset.ink, glyphPose);
+      if (unit.action === "attack") drawCardAttackOverlay(glyph, cx, cy, s, actionProgress, weapons[unit.token]?.kind ?? asset.role);
+    }
     drawAttachment(asset, glyphCx, cy + pose.y, s, time, pose, "over");
     if (asleep) drawCentered("休", cx, cy - s * 0.22, s * 0.2, "#a8823d", "900");
   }

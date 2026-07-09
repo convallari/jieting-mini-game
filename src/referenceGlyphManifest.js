@@ -16,7 +16,9 @@ export const REFERENCE_GLYPHS = {
       "frameWidth": 224,
       "frameHeight": 224,
       "frames": 96,
-      "note": "单独重传视频，九宫格中心枪格；能清楚观察清晰竖枪、遮挡和突刺变化。"
+      "note": "单独重传视频，九宫格中心枪格；能清楚观察清晰竖枪、遮挡和突刺变化。",
+      "gameSheet": "qiang-game-sheet.png",
+      "gameContact": "qiang-game-contact.png"
     },
     "dao": {
       "label": "刀",
@@ -32,7 +34,9 @@ export const REFERENCE_GLYPHS = {
       "frameWidth": 270,
       "frameHeight": 270,
       "frames": 96,
-      "note": "单独重传视频，九宫格中心刀格；能清楚观察刀形、斩击遮挡和恢复。"
+      "note": "单独重传视频，九宫格中心刀格；能清楚观察刀形、斩击遮挡和恢复。",
+      "gameSheet": "dao-game-sheet.png",
+      "gameContact": "dao-game-contact.png"
     },
     "gong": {
       "label": "弓",
@@ -48,7 +52,9 @@ export const REFERENCE_GLYPHS = {
       "frameWidth": 270,
       "frameHeight": 270,
       "frames": 96,
-      "note": "单独重传视频，九宫格中心弓格；重点观察本体离散姿势切换。"
+      "note": "单独重传视频，九宫格中心弓格；重点观察本体离散姿势切换。",
+      "gameSheet": "gong-game-sheet.png",
+      "gameContact": "gong-game-contact.png"
     },
     "qi": {
       "label": "骑",
@@ -64,7 +70,9 @@ export const REFERENCE_GLYPHS = {
       "frameWidth": 270,
       "frameHeight": 270,
       "frames": 96,
-      "note": "单独重传视频，九宫格中心骑格；重点观察字本体与冲刺残影/遮挡关系。"
+      "note": "单独重传视频，九宫格中心骑格；重点观察字本体与冲刺残影/遮挡关系。",
+      "gameSheet": "qi-game-sheet.png",
+      "gameContact": "qi-game-contact.png"
     }
   }
 };
