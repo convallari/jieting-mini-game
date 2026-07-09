@@ -10,36 +10,6 @@ const MASK_RIGS = {
   "斗": { wave: 0.24, attackShift: 0.05, attackBend: 0.13, squash: 0.05, trail: 0.08 }
 };
 
-const MASK_PARTS = {
-  "刀": [
-    part("横撇", (p) => p.ny < 0.42, { phase: 0, speed: 6.9, idleX: -0.012, idleY: -0.01, attackX: 0.03, attackY: -0.055, scaleX: 0.1, scaleY: -0.06, rotate: -0.1, wave: 0.9, shift: 0.7, bend: 0.7 }),
-    part("竖钩", (p) => p.nx > 0.48, { phase: 0.34, speed: 7.3, idleX: 0.008, idleY: 0.006, attackX: 0.14, attackY: -0.018, scaleX: 0.22, scaleY: -0.16, rotate: 0.08, wave: 1.15, shift: 1.35, bend: 1.25, trail: 1.2 }),
-    part("内点", null, { phase: 0.62, speed: 8.1, idleX: -0.006, idleY: 0.012, attackX: 0.06, attackY: 0.025, scaleX: 0.08, scaleY: 0.02, rotate: 0.04, wave: 0.7, shift: 0.8, bend: 0.65 })
-  ],
-  "枪": [
-    part("木旁竖", (p) => p.nx < 0.34, { phase: 0.18, speed: 6.4, idleX: -0.006, idleY: 0.008, attackX: -0.025, attackY: 0.018, scaleX: -0.04, scaleY: 0.08, rotate: -0.06, wave: 0.55, shift: 0.3, bend: 0.7 }),
-    part("枪尖", (p) => p.nx >= 0.38 && p.ny < 0.38, { phase: 0, speed: 7.8, idleX: 0.014, idleY: -0.012, attackX: 0.22, attackY: -0.07, scaleX: 0.3, scaleY: -0.18, rotate: -0.12, wave: 0.7, shift: 1.65, bend: 0.6, trail: 1.35 }),
-    part("仓身", (p) => p.nx >= 0.34 && p.ny < 0.68, { phase: 0.28, speed: 6.8, idleX: 0.006, idleY: 0.006, attackX: 0.15, attackY: -0.025, scaleX: 0.18, scaleY: -0.1, rotate: 0.04, wave: 0.75, shift: 1.15, bend: 0.9 }),
-    part("底钩", null, { phase: 0.58, speed: 7.1, idleX: -0.004, idleY: 0.014, attackX: 0.08, attackY: 0.04, scaleX: 0.1, scaleY: 0.02, rotate: 0.09, wave: 1, shift: 0.85, bend: 1.2 })
-  ],
-  "弓": [
-    part("上弧", (p) => p.ny < 0.36, { phase: 0.05, speed: 7.2, idleX: 0.012, idleY: -0.012, attackX: 0.06, attackY: -0.05, scaleX: 0.18, scaleY: -0.08, rotate: -0.14, wave: 1.15, shift: 0.75, bend: 1.2 }),
-    part("腰折", (p) => p.ny < 0.66, { phase: 0.35, speed: 7.7, idleX: -0.01, idleY: 0.004, attackX: 0.12, attackY: -0.005, scaleX: 0.24, scaleY: -0.14, rotate: 0.03, wave: 1.35, shift: 1.2, bend: 1.55, trail: 1 }),
-    part("下钩", null, { phase: 0.68, speed: 6.9, idleX: 0.008, idleY: 0.014, attackX: 0.04, attackY: 0.055, scaleX: 0.1, scaleY: 0.04, rotate: 0.16, wave: 1.05, shift: 0.65, bend: 1.1 })
-  ],
-  "骑": [
-    part("马旁", (p) => p.nx < 0.48, { phase: 0.22, speed: 7.5, idleX: -0.012, idleY: 0.012, attackX: -0.02, attackY: 0.025, scaleX: 0.04, scaleY: -0.02, rotate: -0.07, wave: 0.9, shift: 0.45, bend: 0.85 }),
-    part("奇首", (p) => p.nx >= 0.48 && p.ny < 0.4, { phase: 0, speed: 8.2, idleX: 0.014, idleY: -0.012, attackX: 0.12, attackY: -0.055, scaleX: 0.16, scaleY: -0.12, rotate: -0.08, wave: 0.95, shift: 1.05, bend: 0.9 }),
-    part("右身", (p) => p.nx >= 0.48 && p.ny < 0.72, { phase: 0.32, speed: 7.4, idleX: 0.006, idleY: 0.006, attackX: 0.16, attackY: -0.015, scaleX: 0.2, scaleY: -0.14, rotate: 0.06, wave: 1.1, shift: 1.35, bend: 1.25, trail: 1.25 }),
-    part("足钩", null, { phase: 0.62, speed: 8.6, idleX: -0.006, idleY: 0.016, attackX: 0.1, attackY: 0.06, scaleX: 0.18, scaleY: 0.02, rotate: 0.14, wave: 1.2, shift: 0.95, bend: 1.4 })
-  ],
-  "斗": [
-    part("左点", (p) => p.nx < 0.42 && p.ny < 0.76, { phase: 0.45, speed: 6.6, idleX: -0.01, idleY: 0.01, attackX: -0.012, attackY: 0.018, scaleX: 0.04, scaleY: 0.03, rotate: -0.08, wave: 0.65, shift: 0.35, bend: 0.5 }),
-    part("中竖", (p) => p.nx > 0.4 && p.nx < 0.62, { phase: 0, speed: 7.1, idleX: 0.004, idleY: -0.006, attackX: 0.045, attackY: -0.03, scaleX: 0.06, scaleY: -0.05, rotate: 0.05, wave: 0.85, shift: 0.85, bend: 1.35 }),
-    part("底挑", null, { phase: 0.26, speed: 7.8, idleX: 0.01, idleY: 0.01, attackX: 0.055, attackY: 0.015, scaleX: 0.08, scaleY: 0.02, rotate: 0.1, wave: 0.95, shift: 0.75, bend: 1.1 })
-  ]
-};
-
 const GLYPH_STROKES = {
   "刀": [
     s(31, 34, q(52, 25, 76, 30), 11),
@@ -286,7 +256,6 @@ function drawSingleGlyph(ctx, char, strokes, size, color, options, glyphIndex) {
 
 const decodedMaskCache = new Map();
 const maskCanvasCache = new Map();
-const maskPartCache = new Map();
 
 function drawMaskGlyph(ctx, char, mask, size, color, options, glyphIndex) {
   const decoded = decodeMask(mask);
@@ -302,12 +271,11 @@ function drawMaskGlyph(ctx, char, mask, size, color, options, glyphIndex) {
   const boxH = Math.max(1, decoded.maxY - decoded.minY + 1);
   const target = size * (options.maskScale ?? 0.84);
   const cell = target / Math.max(boxW, boxH);
-  const fullSprite = getMaskCanvas(decoded, color);
-  const drawW = fullSprite.canvas.width * cell;
-  const drawH = fullSprite.canvas.height * cell;
+  const sprite = getMaskCanvas(decoded, color);
+  const drawW = sprite.canvas.width * cell;
+  const drawH = sprite.canvas.height * cell;
   const stretchX = 1 + attack * 0.018 + merge * 0.025;
   const stretchY = 1 - attack * (rig.squash ?? 0.06) * 0.45 + merge * 0.015;
-  const parts = getMaskParts(char, decoded);
 
   ctx.save();
   ctx.scale(stretchX, stretchY);
@@ -316,12 +284,12 @@ function drawMaskGlyph(ctx, char, mask, size, color, options, glyphIndex) {
   if (jitter > 0) {
     ctx.save();
     ctx.globalAlpha *= Math.min(0.16, 0.07 + jitter * 0.045);
-    ctx.drawImage(fullSprite.canvas, -drawW / 2 + Math.sin(seed) * size * 0.018 * jitter, -drawH / 2 + Math.cos(seed) * size * 0.012 * jitter, drawW, drawH);
+    ctx.drawImage(sprite.canvas, -drawW / 2 + Math.sin(seed) * size * 0.018 * jitter, -drawH / 2 + Math.cos(seed) * size * 0.012 * jitter, drawW, drawH);
     ctx.restore();
   }
   ctx.save();
   ctx.globalAlpha *= 0.16 + idleWave * 0.06 + attack * 0.14;
-  drawWarpedMask(ctx, fullSprite.canvas, drawW * 1.08, drawH * 1.08, {
+  drawWarpedMask(ctx, sprite.canvas, drawW * 1.08, drawH * 1.08, {
     breathe: idleWave * 0.55,
     attack: attack * 0.55,
     phase,
@@ -333,81 +301,19 @@ function drawMaskGlyph(ctx, char, mask, size, color, options, glyphIndex) {
   if (attack > 0.08 && rig.trail) {
     ctx.save();
     ctx.globalAlpha *= Math.min(0.24, attack * 0.22);
-    for (const partLayer of parts) {
-      const spec = partLayer.spec;
-      if ((spec.trail ?? 0) <= 0) continue;
-      const sprite = getMaskPartCanvas(decoded, partLayer, color);
-      const partRig = partMaskRig(rig, spec);
-      drawWarpedMask(ctx, sprite.canvas, drawW, drawH, {
-        breathe,
-        attack,
-        phase: phase + (spec.phase ?? 0),
-        rig: partRig,
-        dx: size * rig.trail * (spec.trail ?? 1) * attack,
-        dy: -size * 0.025 * attack,
-        smear: true
-      });
-    }
-    ctx.restore();
-  }
-  for (const partLayer of parts) {
-    drawMaskPart(ctx, decoded, partLayer, color, drawW, drawH, cell, {
-      idleWave,
+    drawWarpedMask(ctx, sprite.canvas, drawW, drawH, {
+      breathe,
       attack,
-      merge,
       phase,
       rig,
-      size,
-      seed
+      dx: size * rig.trail * attack,
+      dy: -size * 0.02 * attack,
+      smear: true
     });
+    ctx.restore();
   }
+  drawWarpedMask(ctx, sprite.canvas, drawW, drawH, { breathe: idleWave, attack, phase, rig, dx: 0, dy: 0 });
   ctx.restore();
-}
-
-function drawMaskPart(ctx, decoded, partLayer, color, drawW, drawH, cell, params) {
-  const spec = partLayer.spec;
-  const sprite = getMaskPartCanvas(decoded, partLayer, color);
-  const partRig = partMaskRig(params.rig, spec);
-  const phase = params.phase + (spec.phase ?? 0);
-  const idleBeat = Math.sin(phase * (spec.speed ?? 7) + partLayer.index * 0.73);
-  const attack = params.attack * (spec.attack ?? 1);
-  const breathe = params.idleWave * (spec.breathe ?? 1);
-  const anchorX = (partLayer.cx - (decoded.minX + decoded.maxX) / 2) * cell;
-  const anchorY = (partLayer.cy - (decoded.minY + decoded.maxY) / 2) * cell;
-  const idleX = params.size * (spec.idleX ?? 0) * breathe * idleBeat;
-  const idleY = params.size * (spec.idleY ?? 0) * breathe * Math.cos(phase * ((spec.speed ?? 7) * 0.88));
-  const attackEase = attack > 0 ? easeOutCubic(Math.min(1, attack)) : 0;
-  const dx = idleX + params.size * (spec.attackX ?? 0) * attackEase;
-  const dy = idleY + params.size * (spec.attackY ?? 0) * attackEase;
-  const scaleX = 1 + params.merge * 0.02 + (spec.scaleX ?? 0) * attackEase;
-  const scaleY = 1 + params.merge * 0.015 + (spec.scaleY ?? 0) * attackEase;
-  const rotate = (spec.rotate ?? 0) * attackEase + idleBeat * breathe * 0.015;
-
-  ctx.save();
-  ctx.translate(dx, dy);
-  ctx.translate(anchorX, anchorY);
-  ctx.rotate(rotate);
-  ctx.scale(scaleX, scaleY);
-  ctx.translate(-anchorX, -anchorY);
-  drawWarpedMask(ctx, sprite.canvas, drawW, drawH, {
-    breathe,
-    attack,
-    phase,
-    rig: partRig,
-    dx: 0,
-    dy: 0
-  });
-  ctx.restore();
-}
-
-function partMaskRig(rig, spec) {
-  return {
-    wave: (rig.wave ?? 0.25) * (spec.wave ?? 1),
-    attackShift: (rig.attackShift ?? 0.08) * (spec.shift ?? 1),
-    attackBend: (rig.attackBend ?? 0.08) * (spec.bend ?? 1),
-    squash: (rig.squash ?? 0.06) * (spec.squash ?? 1),
-    trail: (rig.trail ?? 0.1) * (spec.trail ?? 1)
-  };
 }
 
 function drawWarpedMask(ctx, canvas, drawW, drawH, params) {
@@ -452,88 +358,6 @@ function getMaskCanvas(decoded, color) {
   return sprite;
 }
 
-function getMaskPartCanvas(decoded, partLayer, color) {
-  const key = `${decoded.cacheKey}:${partLayer.name}:${color}`;
-  if (maskCanvasCache.has(key)) return maskCanvasCache.get(key);
-  const pad = 3;
-  const canvas = document.createElement("canvas");
-  canvas.width = decoded.maxX - decoded.minX + 1 + pad * 2;
-  canvas.height = decoded.maxY - decoded.minY + 1 + pad * 2;
-  const buffer = canvas.getContext("2d");
-  buffer.fillStyle = color;
-  for (const [x, y] of partLayer.cells) {
-    buffer.fillRect(x - decoded.minX + pad, y - decoded.minY + pad, 1.35, 1.35);
-  }
-  const sprite = { canvas };
-  maskCanvasCache.set(key, sprite);
-  return sprite;
-}
-
-function getMaskParts(char, decoded) {
-  const key = `${char}:${decoded.cacheKey}`;
-  if (maskPartCache.has(key)) return maskPartCache.get(key);
-  const specs = MASK_PARTS[char];
-  if (!specs) {
-    const fallback = [makeMaskPartLayer("whole", 0, decoded.cells, { phase: 0 })];
-    maskPartCache.set(key, fallback);
-    return fallback;
-  }
-  const cellsByPart = specs.map(() => []);
-  const boxW = Math.max(1, decoded.maxX - decoded.minX);
-  const boxH = Math.max(1, decoded.maxY - decoded.minY);
-  for (const [x, y] of decoded.cells) {
-    const p = {
-      x,
-      y,
-      nx: (x - decoded.minX) / boxW,
-      ny: (y - decoded.minY) / boxH
-    };
-    let partIndex = specs.length - 1;
-    for (let i = 0; i < specs.length; i++) {
-      if (!specs[i].test || specs[i].test(p)) {
-        partIndex = i;
-        break;
-      }
-    }
-    cellsByPart[partIndex].push([x, y]);
-  }
-  const parts = specs
-    .map((spec, index) => makeMaskPartLayer(spec.name, index, cellsByPart[index], spec))
-    .filter((item) => item.cells.length > 0);
-  maskPartCache.set(key, parts);
-  return parts;
-}
-
-function makeMaskPartLayer(name, index, cells, spec) {
-  let minX = Infinity;
-  let minY = Infinity;
-  let maxX = -Infinity;
-  let maxY = -Infinity;
-  let sumX = 0;
-  let sumY = 0;
-  for (const [x, y] of cells) {
-    minX = Math.min(minX, x);
-    minY = Math.min(minY, y);
-    maxX = Math.max(maxX, x);
-    maxY = Math.max(maxY, y);
-    sumX += x;
-    sumY += y;
-  }
-  const count = Math.max(1, cells.length);
-  return {
-    name,
-    index,
-    cells,
-    spec,
-    minX,
-    minY,
-    maxX,
-    maxY,
-    cx: sumX / count,
-    cy: sumY / count
-  };
-}
-
 function decodeMask(mask) {
   if (decodedMaskCache.has(mask)) return decodedMaskCache.get(mask);
   const cells = [];
@@ -556,14 +380,6 @@ function decodeMask(mask) {
   const decoded = cells.length ? { cells, minX, minY, maxX, maxY, cacheKey: mask.rows.join("") } : { cells, minX: 0, minY: 0, maxX: mask.size - 1, maxY: mask.size - 1, cacheKey: mask.rows.join("") };
   decodedMaskCache.set(mask, decoded);
   return decoded;
-}
-
-function part(name, test, motion) {
-  return { name, test, ...motion };
-}
-
-function easeOutCubic(t) {
-  return 1 - Math.pow(1 - t, 3);
 }
 
 function drawStroke(ctx, stroke, scale, color, warp = {}) {

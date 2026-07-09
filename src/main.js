@@ -53,8 +53,6 @@ let state = createState();
 let layout = {};
 let lastTime = performance.now();
 let pointer = null;
-const debugParams = new URLSearchParams(window.location.search);
-const DEBUG_ATTACK = debugParams.has("debugAttack");
 
 function createState() {
   return {
@@ -147,61 +145,7 @@ function startGame() {
   state.camp[2] = makeUnit("dao");
   state.camp[3] = makeUnit("gong");
   state.camp[4] = makeUnit("shovel");
-  if (DEBUG_ATTACK) setupDebugAttack();
-  toast(DEBUG_ATTACK ? "攻击动画预览" : "拖动文字到相邻格，可合成将领", "#f3c037");
-}
-
-function setupDebugAttack() {
-  state.buns = 120;
-  state.displayedBuns = 120;
-  state.wave = 3;
-  state.spawnLeft = 0;
-  state.waveTimer = 999;
-  state.camp = new Array(CAMP_SIZE).fill(null);
-  state.board.clear();
-  const previewUnits = [
-    ["2,3", makeUnit("qiang", 3)],
-    ["3,4", makeUnit("dao", 3)],
-    ["5,2", makeUnit("gong", 3)],
-    ["7,3", makeUnit("ji", 3)],
-    ["8,5", makeUnit("赵云", 2)]
-  ];
-  for (const [key, unit] of previewUnits) {
-    unit.attackTimer = 0.05 + Math.random() * 0.08;
-    state.board.set(key, unit);
-  }
-  state.enemies.push({
-    id: idSeq++,
-    t: 3.1,
-    speed: 0.06,
-    hp: 520,
-    maxHp: 520,
-    glyph: "贼",
-    lane: 0,
-    wobble: 0.2,
-    hitFlash: 0,
-    hitAge: 99,
-    hitDx: 0,
-    hitDy: 0,
-    spawnAge: 1,
-    dead: false
-  });
-  state.enemies.push({
-    id: idSeq++,
-    t: 5.25,
-    speed: 0.04,
-    hp: 420,
-    maxHp: 420,
-    glyph: "兵",
-    lane: -0.12,
-    wobble: 1.7,
-    hitFlash: 0,
-    hitAge: 99,
-    hitDx: 0,
-    hitDy: 0,
-    spawnAge: 1,
-    dead: false
-  });
+  toast("拖动文字到相邻格，可合成将领", "#f3c037");
 }
 
 function loop(now) {
