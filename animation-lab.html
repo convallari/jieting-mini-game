@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>汉字动画实验台</title>
+    <script type="module" crossorigin src="./assets/animationLab-B2afk-3w.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/referenceGlyphManifest-B7HccEIa.js">
+    <link rel="stylesheet" crossorigin href="./assets/animationLab-DwFpfcKK.css">
+  </head>
+  <body>
+    <main class="lab-shell">
+      <header class="lab-top">
+        <h1>汉字动画实验台</h1>
+        <a href="./?debugAttack=1">返回游戏</a>
+      </header>
+
+      <section class="switcher" aria-label="选择兵种">
+        <button class="active" data-glyph="qiang">枪</button>
+        <button data-glyph="dao">刀</button>
+        <button data-glyph="gong">弓</button>
+        <button data-glyph="qi">骑</button>
+      </section>
+
+      <section class="comparison" aria-label="逐帧对照">
+        <figure>
+          <figcaption>原片裁帧</figcaption>
+          <canvas id="reference" width="360" height="360"></canvas>
+        </figure>
+        <figure>
+          <figcaption>复刻帧候选</figcaption>
+          <canvas id="candidate" width="360" height="360"></canvas>
+        </figure>
+      </section>
+
+      <section class="controls" aria-label="播放控制">
+        <button id="play">暂停</button>
+        <label>
+          <span id="frameLabel">f001</span>
+          <input id="frame" type="range" min="0" max="47" value="0" />
+        </label>
+      </section>
+
+      <section class="notes">
+        <p id="source"></p>
+        <p id="note"></p>
+      </section>
+
+      <section class="contact">
+        <h2>原片采样</h2>
+        <img id="contact" alt="原片逐帧采样" />
+      </section>
+    </main>
+
+  </body>
+</html>
