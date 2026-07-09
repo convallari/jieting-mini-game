@@ -1,40 +1,44 @@
 from __future__ import annotations
 
 import json
+import subprocess
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 
 
-ROOT = Path("output/reference/animation-frames")
-OUT = Path("public/reference-glyphs")
 FPS = 30
+MAX_FRAMES = 96
+FFMPEG = Path("node_modules/ffmpeg-static/ffmpeg.exe")
+FRAME_ROOT = Path("output/reference/dedicated-glyph-frames")
+OUT = Path("public/reference-glyphs")
+JS_MANIFEST = Path("src/referenceGlyphManifest.js")
 
 
 GLYPHS = {
     "qiang": {
         "label": "枪",
-        "source": "v2-board-qiang-dao-gong",
-        "crop": [0, 0, 76, 74],
-        "note": "前半段主要是粗黑斜向遮挡层，后半段露出清晰竖枪。",
+        "video": "C:/Users/zhangxiaoyu/Desktop/游戏动画/枪.mp4",
+        "crop": [192, 192, 224, 224],
+        "note": "单独重传视频，九宫格中心枪格；能清楚观察清晰竖枪、遮挡和突刺变化。",
     },
     "dao": {
         "label": "刀",
-        "source": "v1-board-weapon-cluster",
-        "crop": [164, 0, 62, 62],
-        "note": "右上刀格在清晰刀形和被黑色斩击/遮挡线覆盖之间切换，适合作为刀攻击参考。",
+        "video": "C:/Users/zhangxiaoyu/Desktop/游戏动画/刀.mp4",
+        "crop": [230, 230, 270, 270],
+        "note": "单独重传视频，九宫格中心刀格；能清楚观察刀形、斩击遮挡和恢复。",
     },
     "gong": {
         "label": "弓",
-        "source": "v2-top-dao-gong-qi",
-        "crop": [0, 78, 74, 74],
-        "note": "本体有离散姿势切换，是最适合做逐帧字形帧的兵种。",
+        "video": "C:/Users/zhangxiaoyu/Desktop/游戏动画/弓.mp4",
+        "crop": [230, 230, 270, 270],
+        "note": "单独重传视频，九宫格中心弓格；重点观察本体离散姿势切换。",
     },
     "qi": {
         "label": "骑",
-        "source": "v2-top-dao-gong-qi",
-        "crop": [148, 78, 74, 74],
-        "note": "字本体相对稳定，主要变化是右上/上半格横向冲刺残影。",
+        "video": "C:/Users/zhangxiaoyu/Desktop/游戏动画/骑.mp4",
+        "crop": [230, 246, 270, 270],
+        "note": "单独重传视频，九宫格中心骑格；重点观察字本体与冲刺残影/遮挡关系。",
     },
 }
 
@@ -51,13 +55,42 @@ def load_font(size: int = 14) -> ImageFont.ImageFont:
 FONT = load_font()
 
 
-def crop_frames(source: str, crop: list[int]) -> list[Image.Image]:
-    source_dir = ROOT / source
-    frames = sorted(source_dir.glob("frame-*.png"))
+def extract_frames(key: str, config: dict) -> list[Path]:
+    if not FFMPEG.exists():
+        raise FileNotFoundError(f"Missing ffmpeg executable: {FFMPEG}")
+    video = Path(config["video"])
+    if not video.exists():
+        raise FileNotFoundError(f"Missing source video: {video}")
+
+    out_dir = FRAME_ROOT / key
+    out_dir.mkdir(parents=True, exist_ok=True)
+    for frame in out_dir.glob("frame-*.png"):
+        frame.unlink()
+
+    x, y, w, h = config["crop"]
+    command = [
+        str(FFMPEG),
+        "-hide_banner",
+        "-y",
+        "-i",
+        str(video),
+        "-vf",
+        f"fps={FPS},crop={w}:{h}:{x}:{y}",
+        "-frames:v",
+        str(MAX_FRAMES),
+        str(out_dir / "frame-%03d.png"),
+    ]
+    result = subprocess.run(command, cwd=Path.cwd())
+    if result.returncode != 0:
+        raise RuntimeError(f"ffmpeg failed for {key}: {result.returncode}")
+    frames = sorted(out_dir.glob("frame-*.png"))
     if not frames:
-        raise FileNotFoundError(f"No frames found in {source_dir}")
-    x, y, w, h = crop
-    return [Image.open(frame).convert("RGBA").crop((x, y, x + w, y + h)) for frame in frames]
+        raise RuntimeError(f"No frames extracted for {key}")
+    return frames
+
+
+def load_frames(paths: list[Path]) -> list[Image.Image]:
+    return [Image.open(path).convert("RGBA") for path in paths]
 
 
 def build_sheet(frames: list[Image.Image]) -> Image.Image:
@@ -70,7 +103,7 @@ def build_sheet(frames: list[Image.Image]) -> Image.Image:
 
 def build_contact(frames: list[Image.Image], label: str) -> Image.Image:
     picks = [round(i * (len(frames) - 1) / 11) for i in range(12)]
-    scale = 1.25
+    scale = 0.82
     thumb_w = round(frames[0].width * scale)
     thumb_h = round(frames[0].height * scale)
     cell_w = thumb_w + 14
@@ -88,16 +121,25 @@ def build_contact(frames: list[Image.Image], label: str) -> Image.Image:
     return sheet
 
 
+def js_string(value: dict) -> str:
+    return json.dumps(value, ensure_ascii=False, indent=2)
+
+
+def write_js_manifest(manifest: dict) -> None:
+    JS_MANIFEST.write_text(f"export const REFERENCE_GLYPHS = {js_string(manifest)};\n", encoding="utf-8")
+
+
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     manifest = {
         "fps": FPS,
-        "description": "Single-glyph reference sheets cropped from original recordings for animation-lab comparison.",
+        "description": "Single-glyph reference sheets cropped from dedicated center-cell recordings for animation-lab comparison.",
         "glyphs": {},
     }
 
     for key, config in GLYPHS.items():
-        frames = crop_frames(config["source"], config["crop"])
+        frame_paths = extract_frames(key, config)
+        frames = load_frames(frame_paths)
         sheet = build_sheet(frames)
         contact = build_contact(frames, config["label"])
         sheet_path = OUT / f"{key}-sheet.png"
@@ -107,10 +149,10 @@ def main() -> None:
         frame_w, frame_h = frames[0].size
         manifest["glyphs"][key] = {
             "label": config["label"],
-            "source": config["source"],
+            "source": Path(config["video"]).name,
             "crop": config["crop"],
-            "sheet": f"/reference-glyphs/{key}-sheet.png",
-            "contact": f"/reference-glyphs/{key}-contact.png",
+            "sheet": f"{key}-sheet.png",
+            "contact": f"{key}-contact.png",
             "frameWidth": frame_w,
             "frameHeight": frame_h,
             "frames": len(frames),
@@ -118,6 +160,7 @@ def main() -> None:
         }
 
     (OUT / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    write_js_manifest(manifest)
     print(f"Wrote {len(GLYPHS)} glyph reference sheets to {OUT}")
 
 

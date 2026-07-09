@@ -1,50 +1,70 @@
 export const REFERENCE_GLYPHS = {
-  fps: 30,
-  description: "Single-glyph reference sheets cropped from original recordings for animation-lab comparison.",
-  glyphs: {
-    qiang: {
-      label: "枪",
-      source: "v2-board-qiang-dao-gong",
-      crop: [0, 0, 76, 74],
-      sheet: "qiang-sheet.png",
-      contact: "qiang-contact.png",
-      frameWidth: 76,
-      frameHeight: 74,
-      frames: 48,
-      note: "前半段主要是粗黑斜向遮挡层，后半段露出清晰竖枪。"
+  "fps": 30,
+  "description": "Single-glyph reference sheets cropped from dedicated center-cell recordings for animation-lab comparison.",
+  "glyphs": {
+    "qiang": {
+      "label": "枪",
+      "source": "枪.mp4",
+      "crop": [
+        192,
+        192,
+        224,
+        224
+      ],
+      "sheet": "qiang-sheet.png",
+      "contact": "qiang-contact.png",
+      "frameWidth": 224,
+      "frameHeight": 224,
+      "frames": 96,
+      "note": "单独重传视频，九宫格中心枪格；能清楚观察清晰竖枪、遮挡和突刺变化。"
     },
-    dao: {
-      label: "刀",
-      source: "v1-board-weapon-cluster",
-      crop: [164, 0, 62, 62],
-      sheet: "dao-sheet.png",
-      contact: "dao-contact.png",
-      frameWidth: 62,
-      frameHeight: 62,
-      frames: 48,
-      note: "右上刀格在清晰刀形和被黑色斩击/遮挡线覆盖之间切换，适合作为刀攻击参考。"
+    "dao": {
+      "label": "刀",
+      "source": "刀.mp4",
+      "crop": [
+        230,
+        230,
+        270,
+        270
+      ],
+      "sheet": "dao-sheet.png",
+      "contact": "dao-contact.png",
+      "frameWidth": 270,
+      "frameHeight": 270,
+      "frames": 96,
+      "note": "单独重传视频，九宫格中心刀格；能清楚观察刀形、斩击遮挡和恢复。"
     },
-    gong: {
-      label: "弓",
-      source: "v2-top-dao-gong-qi",
-      crop: [0, 78, 74, 74],
-      sheet: "gong-sheet.png",
-      contact: "gong-contact.png",
-      frameWidth: 74,
-      frameHeight: 74,
-      frames: 48,
-      note: "本体有离散姿势切换，是最适合做逐帧字形帧的兵种。"
+    "gong": {
+      "label": "弓",
+      "source": "弓.mp4",
+      "crop": [
+        230,
+        230,
+        270,
+        270
+      ],
+      "sheet": "gong-sheet.png",
+      "contact": "gong-contact.png",
+      "frameWidth": 270,
+      "frameHeight": 270,
+      "frames": 96,
+      "note": "单独重传视频，九宫格中心弓格；重点观察本体离散姿势切换。"
     },
-    qi: {
-      label: "骑",
-      source: "v2-top-dao-gong-qi",
-      crop: [148, 78, 74, 74],
-      sheet: "qi-sheet.png",
-      contact: "qi-contact.png",
-      frameWidth: 74,
-      frameHeight: 74,
-      frames: 48,
-      note: "字本体相对稳定，主要变化是右上/上半格横向冲刺残影。"
+    "qi": {
+      "label": "骑",
+      "source": "骑.mp4",
+      "crop": [
+        230,
+        246,
+        270,
+        270
+      ],
+      "sheet": "qi-sheet.png",
+      "contact": "qi-contact.png",
+      "frameWidth": 270,
+      "frameHeight": 270,
+      "frames": 96,
+      "note": "单独重传视频，九宫格中心骑格；重点观察字本体与冲刺残影/遮挡关系。"
     }
   }
 };

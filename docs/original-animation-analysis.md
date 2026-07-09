@@ -235,3 +235,25 @@
 - `刀`：改用 `v1-board-weapon-cluster` 右上刀格；原先用 `v2-board-qiang-dao-gong` 会截到几乎静态的刀，不适合作为刀攻击参考。
 - `弓`：`v2-top-dao-gong-qi` 左下弓格，能看到明显离散姿势切换。
 - `骑`：`v2-top-dao-gong-qi` 右下骑格，能看到局部斜向遮挡/速度线。
+
+## 2026-07-09 专用单字视频更新
+
+用户重新提供了四段单独视频，画面为九宫格且目标字都在中心格。这批素材比旧录屏裁剪更清晰，且干扰更少，因此动画实验台参考资产改为从这些专用视频生成：
+
+- `C:/Users/zhangxiaoyu/Desktop/游戏动画/枪.mp4`
+- `C:/Users/zhangxiaoyu/Desktop/游戏动画/刀.mp4`
+- `C:/Users/zhangxiaoyu/Desktop/游戏动画/弓.mp4`
+- `C:/Users/zhangxiaoyu/Desktop/游戏动画/骑.mp4`
+
+生成策略：
+
+- 每个视频按 30fps 抽取前 96 帧，约 3.2 秒。
+- 直接裁剪九宫格中心卡牌区域，保留边框、等级角标、底部阴影和攻击遮挡线。
+- `tools/build-animation-lab-references.py` 同时更新 `public/reference-glyphs/manifest.json` 和 `src/referenceGlyphManifest.js`，避免实验页配置不同步。
+
+当前中心格裁剪：
+
+- `枪`：`192, 192, 224, 224`，源视频尺寸 `576x600`。
+- `刀`：`230, 230, 270, 270`，源视频尺寸 `720x720`。
+- `弓`：`230, 230, 270, 270`，源视频尺寸 `720x720`。
+- `骑`：`230, 246, 270, 270`，源视频尺寸 `720x752`。
