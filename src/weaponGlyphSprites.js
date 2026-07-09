@@ -14,6 +14,13 @@ const STATIC_FRAMES = {
   qi: 0
 };
 
+const RHYTHM = {
+  dao: { fps: 30, start: 0, frames: 24 },
+  qiang: { fps: 30, start: 0, frames: 24 },
+  gong: { fps: 30, start: 0, frames: 24 },
+  qi: { fps: 30, start: 24, frames: 24 }
+};
+
 const cache = new Map();
 
 export function preloadWeaponGlyphSprites() {
@@ -31,7 +38,7 @@ export function drawWeaponGlyphSprite(ctx, token, cx, cy, cardSize, options = {}
   const sprite = loadSprite(key);
   if (!item || !sprite.loaded) return false;
 
-  const frame = selectFrame(key, item.frames, options.action, options.actionProgress);
+  const frame = selectFrame(key, item.frames, options.action, options.actionAge);
   const sx = frame * item.frameWidth;
   const drawSize = cardSize * (options.dragging ? 1.1 : 1.06);
   const x = cx - drawSize / 2 + (options.offsetX ?? 0);
@@ -69,8 +76,9 @@ function loadSprite(key) {
   return sprite;
 }
 
-function selectFrame(key, frames, action, actionProgress = 0) {
+function selectFrame(key, frames, action, actionAge = 0) {
   if (action !== "attack") return STATIC_FRAMES[key] ?? 0;
-  const k = Math.max(0, Math.min(1, actionProgress));
-  return Math.min(frames - 1, Math.floor(k * frames));
+  const rhythm = RHYTHM[key] ?? { fps: REFERENCE_GLYPHS.fps ?? 30, start: 0, frames: frames };
+  const localFrame = Math.min(rhythm.frames - 1, Math.floor(Math.max(0, actionAge) * rhythm.fps));
+  return Math.min(frames - 1, rhythm.start + localFrame);
 }

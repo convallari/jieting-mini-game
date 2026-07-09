@@ -396,10 +396,10 @@ function fireAt(unit, cell, enemy) {
 
 function getAttackLife(unit, kind) {
   if (unit.type === "general") return 0.44;
-  if (kind === "stab") return 0.62;
-  if (kind === "arrow") return 0.52;
-  if (kind === "dash") return 0.5;
-  if (kind === "melee") return 0.34;
+  if (kind === "stab") return 0.8;
+  if (kind === "arrow") return 0.8;
+  if (kind === "dash") return 0.8;
+  if (kind === "melee") return 0.8;
   return 0.4;
 }
 
@@ -1003,6 +1003,7 @@ function drawUnitCard(unit, cx, cy, size, time, dragging) {
     const usedSpriteGlyph = unit.type === "weapon" && hasWeaponGlyphSprite(unit.token) && drawWeaponGlyphSprite(ctx, unit.token, cx, cy, s, {
       action: unit.action,
       actionProgress,
+      actionAge: unit.actionAge,
       asleep,
       dragging
     });
