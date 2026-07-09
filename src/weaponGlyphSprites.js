@@ -50,15 +50,21 @@ function loadSprite(key) {
   if (cache.has(key)) return cache.get(key);
   const item = REFERENCE_GLYPHS.glyphs[key];
   const image = new Image();
-  const sprite = { image, loaded: false, failed: false };
+  const gameSheet = item.gameSheet ?? item.sheet.replace("-sheet.png", "-game-sheet.png");
+  const candidates = [`/reference-glyphs/${gameSheet}`, `/public/reference-glyphs/${gameSheet}`];
+  const sprite = { image, loaded: false, failed: false, index: 0 };
   image.onload = () => {
     sprite.loaded = true;
   };
   image.onerror = () => {
+    sprite.index += 1;
+    if (sprite.index < candidates.length) {
+      image.src = candidates[sprite.index];
+      return;
+    }
     sprite.failed = true;
   };
-  const gameSheet = item.gameSheet ?? item.sheet.replace("-sheet.png", "-game-sheet.png");
-  image.src = `/reference-glyphs/${gameSheet}`;
+  image.src = candidates[sprite.index];
   cache.set(key, sprite);
   return sprite;
 }
