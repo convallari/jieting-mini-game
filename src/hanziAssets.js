@@ -55,26 +55,29 @@ const baseMotions = {
 const attackMotions = {
   blade: [
     { t: 0, x: 0, scaleX: 1, scaleY: 1, rotate: 0 },
-    { t: 0.26, x: -3, scaleX: 0.94, scaleY: 1.06, rotate: -0.035, glyphScaleX: 0.96, glyphScaleY: 1.05 },
-    { t: 0.5, x: 9, scaleX: 1.18, scaleY: 0.86, rotate: 0.13, glyphScaleX: 1.22, glyphScaleY: 0.82, glow: 0.85 },
-    { t: 1, x: 0, scaleX: 1, scaleY: 1, rotate: 0, glyphScaleX: 1, glyphScaleY: 1, glow: 0 }
+    { t: 0.24, x: -1.2, scaleX: 1, scaleY: 1, rotate: -0.012, glyphScaleX: 1, glyphScaleY: 1 },
+    { t: 0.46, x: 2.2, y: -0.4, scaleX: 1.025, scaleY: 0.985, rotate: 0.028, glyphScaleX: 1.02, glyphScaleY: 0.99, glow: 0.64 },
+    { t: 1, x: 0, y: 0, scaleX: 1, scaleY: 1, rotate: 0, glyphScaleX: 1, glyphScaleY: 1, glow: 0 }
   ],
   spear: [
     { t: 0, x: 0, scaleX: 1, scaleY: 1, rotate: 0 },
-    { t: 0.28, x: -2.5, scaleX: 0.96, scaleY: 1.05, rotate: -0.02 },
-    { t: 0.48, x: 10, scaleX: 1.22, scaleY: 0.84, skewX: 0.06, rotate: 0.055, glyphScaleX: 1.26, glyphScaleY: 0.82, glow: 0.7 },
-    { t: 1, x: 0, scaleX: 1, scaleY: 1, rotate: 0, glow: 0 }
+    { t: 0.2, x: -1.4, scaleX: 1, scaleY: 1, rotate: -0.01 },
+    { t: 0.56, x: 1.6, y: -0.3, scaleX: 1.018, scaleY: 0.992, rotate: 0.012, glow: 0.58 },
+    { t: 0.74, x: 0.6, scaleX: 1, scaleY: 1, rotate: 0, glow: 0.24 },
+    { t: 1, x: 0, y: 0, scaleX: 1, scaleY: 1, rotate: 0, glow: 0 }
   ],
   bow: [
     { t: 0, x: 0, scaleX: 1, scaleY: 1, rotate: 0 },
-    { t: 0.36, x: -4, scaleX: 0.92, scaleY: 1.08, glyphScaleX: 0.92, glyphScaleY: 1.08, rotate: -0.025 },
-    { t: 0.55, x: 5, scaleX: 1.15, scaleY: 0.9, glyphScaleX: 1.16, glyphScaleY: 0.9, rotate: 0.045, glow: 0.72 },
+    { t: 0.3, x: -2.2, scaleX: 0.965, scaleY: 1.035, glyphScaleX: 0.96, glyphScaleY: 1.04, rotate: -0.018 },
+    { t: 0.56, x: -3.2, scaleX: 0.94, scaleY: 1.055, glyphScaleX: 0.92, glyphScaleY: 1.08, rotate: -0.025, glow: 0.46 },
+    { t: 0.72, x: 2.6, scaleX: 1.055, scaleY: 0.965, glyphScaleX: 1.06, glyphScaleY: 0.96, rotate: 0.028, glow: 0.74 },
     { t: 1, x: 0, scaleX: 1, scaleY: 1, glyphScaleX: 1, glyphScaleY: 1, rotate: 0, glow: 0 }
   ],
   cavalry: [
     { t: 0, x: 0, y: 0, scaleX: 1, scaleY: 1, rotate: 0 },
-    { t: 0.22, x: -4, y: 1, scaleX: 0.94, scaleY: 1.05, rotate: -0.06 },
-    { t: 0.5, x: 12, y: -2, scaleX: 1.2, scaleY: 0.88, rotate: 0.1, glyphSkewX: 0.08, glow: 0.8 },
+    { t: 0.18, x: -1.5, y: 0.4, scaleX: 1, scaleY: 1, rotate: -0.018 },
+    { t: 0.45, x: 3.5, y: -0.8, scaleX: 1.035, scaleY: 0.985, rotate: 0.028, glyphSkewX: 0.018, glow: 0.66 },
+    { t: 0.7, x: 1, y: -0.2, scaleX: 1, scaleY: 1, rotate: 0.006, glyphSkewX: 0.006, glow: 0.22 },
     { t: 1, x: 0, y: 0, scaleX: 1, scaleY: 1, rotate: 0, glyphSkewX: 0, glow: 0 }
   ],
   general: [

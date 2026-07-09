@@ -201,6 +201,22 @@ function setupDebugAttack() {
     spawnAge: 1,
     dead: false
   });
+  state.enemies.push({
+    id: idSeq++,
+    t: 6.25,
+    speed: 0.04,
+    hp: 680,
+    maxHp: 680,
+    glyph: "寇",
+    lane: 0.08,
+    wobble: 2.8,
+    hitFlash: 0,
+    hitAge: 99,
+    hitDx: 0,
+    hitDy: 0,
+    spawnAge: 1,
+    dead: false
+  });
 }
 
 function loop(now) {
@@ -366,13 +382,23 @@ function fireAt(unit, cell, enemy) {
   const len = Math.max(1, Math.hypot(to.x - from.x, to.y - from.y));
   const dx = (to.x - from.x) / len;
   const dy = (to.y - from.y) / len;
-  setUnitAction(unit, "attack", unit.type === "general" ? 0.44 : 0.34, dx, dy);
-  strokeTrail(from.x, from.y, to.x, to.y, unit.type === "general" ? "#f4c84c" : "#17120f", unit.type === "general" ? 0.26 : 0.18, unit.type === "general" ? "gold" : weapons[unit.token]?.kind ?? "char");
+  const kind = unit.type === "general" ? "gold" : weapons[unit.token]?.kind ?? "char";
+  setUnitAction(unit, "attack", getAttackLife(unit, kind), dx, dy);
+  strokeTrail(from.x, from.y, to.x, to.y, unit.type === "general" ? "#f4c84c" : "#17120f", unit.type === "general" ? 0.26 : 0.18, kind);
   if (weapons[unit.token]?.kind === "melee") {
     state.projectiles.push({ sx: from.x, sy: from.y, tx: to.x, ty: to.y, x: from.x, y: from.y, age: 0, life: 0.12, arc: 0, damage, target: enemy.id, kind: "slash", done: false });
   } else {
     state.projectiles.push({ sx: from.x, sy: from.y, tx: to.x, ty: to.y, x: from.x, y: from.y, age: 0, life: unit.type === "general" ? 0.18 : 0.24, arc: unit.type === "general" ? 16 : 10, damage, target: enemy.id, kind: unit.type === "general" ? "gold" : "arrow", done: false });
   }
+}
+
+function getAttackLife(unit, kind) {
+  if (unit.type === "general") return 0.44;
+  if (kind === "stab") return 0.62;
+  if (kind === "arrow") return 0.52;
+  if (kind === "dash") return 0.5;
+  if (kind === "melee") return 0.34;
+  return 0.4;
 }
 
 function hitEnemy(projectile) {
@@ -990,38 +1016,49 @@ function drawCardAttackOverlay(glyph, cx, cy, size, progress, kind) {
   const sweep = easeOutCubic(Math.min(1, k * 1.2));
   const x = cx - size / 2;
   const y = cy - size / 2;
+  const band = (start, end) => {
+    if (k <= start || k >= end) return 0;
+    return Math.sin(((k - start) / (end - start)) * Math.PI);
+  };
+  const cover = 1 - smoothstep(0.54, 0.78, k);
+  const release = band(0.5, 0.86);
 
   ctx.save();
   ctx.globalCompositeOperation = "source-over";
-  ctx.globalAlpha = 0.18 + flash * 0.42;
-  line(x + size * 0.08, y + size * (0.78 - sweep * 0.08), x + size * 0.88, y + size * (0.77 + sweep * 0.02), "#e5c236", Math.max(2, size * 0.055));
-  line(x + size * 0.1, y + size * (0.82 - sweep * 0.06), x + size * 0.74, y + size * 0.8, "rgba(255,247,198,0.8)", Math.max(1, size * 0.018));
+  ctx.globalAlpha = 0.12 + flash * 0.38;
+  line(x + size * 0.06, y + size * (0.8 - sweep * 0.06), x + size * 0.9, y + size * (0.78 + sweep * 0.015), "#e5c236", Math.max(2, size * 0.05));
+  line(x + size * 0.1, y + size * (0.84 - sweep * 0.05), x + size * 0.72, y + size * 0.81, "rgba(255,247,198,0.78)", Math.max(1, size * 0.016));
   ctx.restore();
 
   ctx.save();
-  ctx.globalAlpha = flash * (kind === "arrow" ? 0.42 : 0.58);
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
   if (kind === "stab") {
-    const startX = x + size * (-0.18 + sweep * 0.26);
-    const endX = x + size * (0.78 + sweep * 0.18);
-    line(startX, y + size * 0.42, endX, y + size * 0.28, "#15110f", Math.max(3, size * 0.085));
-    line(startX + size * 0.08, y + size * 0.52, endX + size * 0.08, y + size * 0.38, "#15110f", Math.max(2, size * 0.05));
+    ctx.globalAlpha = Math.max(0, cover) * 0.86;
+    line(x - size * 0.12 + sweep * size * 0.1, y + size * 0.43, x + size * (0.72 + sweep * 0.1), y + size * 0.28, "#15110f", Math.max(3, size * 0.095));
+    line(x + size * 0.02 + sweep * size * 0.08, y + size * 0.54, x + size * (0.78 + sweep * 0.08), y + size * 0.39, "#15110f", Math.max(2, size * 0.052));
+    ctx.globalAlpha = release * 0.42;
+    line(x + size * 0.1, y + size * 0.5, x + size * 0.9, y + size * 0.34, "rgba(255,247,220,0.88)", Math.max(1, size * 0.018));
   } else if (kind === "dash") {
+    ctx.globalAlpha = flash * 0.72;
     for (let i = 0; i < 3; i++) {
-      const off = i * size * 0.12;
-      line(x - size * 0.1 + off + sweep * size * 0.22, y + size * (0.3 + i * 0.16), x + size * (0.64 + i * 0.06), y + size * (0.18 + i * 0.12), "#16110f", Math.max(2, size * (0.07 - i * 0.012)));
+      const off = i * size * 0.13;
+      const y0 = y + size * (0.28 + i * 0.08);
+      line(x - size * 0.08 + off + sweep * size * 0.18, y0, x + size * (0.72 + i * 0.06), y0 - size * (0.08 + i * 0.015), "#16110f", Math.max(2, size * (0.072 - i * 0.012)));
     }
   } else if (kind === "arrow" || glyph === "弓") {
+    ctx.globalAlpha = flash * 0.46;
     ctx.strokeStyle = "#15110f";
-    ctx.lineWidth = Math.max(2, size * 0.055);
+    ctx.lineWidth = Math.max(2, size * 0.05);
     ctx.beginPath();
-    ctx.moveTo(x + size * (0.1 + sweep * 0.12), y + size * 0.64);
-    ctx.quadraticCurveTo(x + size * 0.32, y + size * (0.12 + 0.08 * flash), x + size * (0.74 + sweep * 0.1), y + size * 0.25);
+    ctx.moveTo(x + size * (0.12 + sweep * 0.08), y + size * 0.64);
+    ctx.quadraticCurveTo(x + size * 0.33, y + size * (0.14 + 0.07 * flash), x + size * (0.72 + sweep * 0.09), y + size * 0.28);
     ctx.stroke();
-    line(x + size * 0.2, y + size * 0.58, x + size * 0.88, y + size * (0.42 - sweep * 0.08), "#15110f", Math.max(2, size * 0.038));
+    line(x + size * 0.18, y + size * 0.58, x + size * 0.84, y + size * (0.42 - sweep * 0.06), "#15110f", Math.max(2, size * 0.034));
   } else {
-    line(x + size * (0.14 + sweep * 0.08), y + size * 0.72, x + size * (0.82 + sweep * 0.08), y + size * 0.18, "#15110f", Math.max(3, size * 0.075));
+    ctx.globalAlpha = flash * 0.52;
+    line(x + size * (0.42 + sweep * 0.06), y + size * 0.72, x + size * (0.86 + sweep * 0.04), y + size * 0.3, "#15110f", Math.max(3, size * 0.07));
+    line(x + size * (0.54 + sweep * 0.04), y + size * 0.78, x + size * (0.82 + sweep * 0.04), y + size * 0.48, "#15110f", Math.max(2, size * 0.038));
   }
   ctx.restore();
 
@@ -1792,6 +1829,11 @@ function lerp(a, b, t) {
 
 function easeOutCubic(t) {
   return 1 - Math.pow(1 - t, 3);
+}
+
+function smoothstep(edge0, edge1, value) {
+  const t = Math.max(0, Math.min(1, (value - edge0) / (edge1 - edge0)));
+  return t * t * (3 - 2 * t);
 }
 
 function easeInOut(t) {

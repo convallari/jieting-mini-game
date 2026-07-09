@@ -175,28 +175,30 @@ const GLYPH_MOTION = {
 };
 
 const BOW_ATTACK_FRAMES = [
+  GLYPH_STROKES["弓"],
   [
-    s(58, 15, q(34, 19, 30, 43), 9),
-    s(30, 43, q(48, 49, 58, 64), 8),
-    s(58, 64, q(43, 79, 27, 76), 10)
+    s(40, 18, q(61, 13, 75, 28), 9),
+    s(74, 28, q(51, 35, 39, 49), 9),
+    s(39, 49, q(59, 51, 69, 63), 8),
+    s(68, 63, q(50, 79, 31, 75), 10)
   ],
   [
-    s(65, 17, q(31, 17, 27, 45), 10),
-    s(28, 45, q(57, 43, 61, 61), 8),
-    s(61, 61, q(44, 86, 23, 74), 10),
-    s(41, 34, q(50, 47, 42, 61), 5)
+    s(56, 16, q(35, 20, 31, 42), 10),
+    s(31, 42, q(47, 48, 62, 58), 8),
+    s(62, 58, q(45, 80, 25, 73), 10),
+    s(43, 33, q(50, 45, 42, 59), 5)
   ],
   [
-    s(43, 13, q(69, 22, 70, 45), 8),
-    s(70, 45, q(42, 48, 35, 64), 8),
-    s(35, 64, q(56, 69, 64, 83), 8),
-    s(38, 46, q(51, 42, 66, 44), 5)
+    s(67, 18, q(49, 18, 43, 35), 10),
+    s(43, 35, q(62, 43, 66, 55), 8),
+    s(66, 55, q(49, 83, 28, 75), 10),
+    s(49, 37, q(58, 47, 49, 60), 5)
   ],
   [
-    s(39, 18, q(62, 17, 73, 31), 8),
-    s(72, 31, q(49, 39, 43, 53), 9),
-    s(43, 53, q(65, 53, 71, 68), 8),
-    s(70, 68, q(55, 82, 36, 80), 10)
+    s(34, 20, q(55, 15, 71, 29), 9),
+    s(70, 29, q(47, 39, 38, 54), 9),
+    s(38, 54, q(58, 55, 69, 68), 8),
+    s(68, 68, q(51, 82, 33, 78), 10)
   ]
 ];
 
@@ -326,6 +328,8 @@ function drawMaskGlyph(ctx, char, mask, size, color, options, glyphIndex) {
   const breathe = options.breathe ?? 0;
   const idleWave = 0.14 + breathe * 1.8;
   const attack = options.attack ?? 0;
+  const stableWeaponAttack = char === "刀" || char === "枪" || char === "骑";
+  const bodyAttack = stableWeaponAttack ? 0 : attack;
   const merge = options.merge ?? 0;
   const phase = (options.phase ?? 0) + glyphIndex * 0.37;
   const seed = glyphIndex * 11.23;
@@ -337,8 +341,8 @@ function drawMaskGlyph(ctx, char, mask, size, color, options, glyphIndex) {
   const sprite = getMaskCanvas(decoded, color);
   const drawW = sprite.canvas.width * cell;
   const drawH = sprite.canvas.height * cell;
-  const stretchX = 1 + attack * 0.018 + merge * 0.025;
-  const stretchY = 1 - attack * (rig.squash ?? 0.06) * 0.45 + merge * 0.015;
+  const stretchX = 1 + bodyAttack * 0.018 + merge * 0.025;
+  const stretchY = 1 - bodyAttack * (rig.squash ?? 0.06) * 0.45 + merge * 0.015;
 
   ctx.save();
   ctx.scale(stretchX, stretchY);
@@ -351,22 +355,22 @@ function drawMaskGlyph(ctx, char, mask, size, color, options, glyphIndex) {
     ctx.restore();
   }
   ctx.save();
-  ctx.globalAlpha *= 0.16 + idleWave * 0.06 + attack * 0.14;
+  ctx.globalAlpha *= 0.16 + idleWave * 0.06 + bodyAttack * 0.14;
   drawWarpedMask(ctx, sprite.canvas, drawW * 1.08, drawH * 1.08, {
     breathe: idleWave * 0.55,
-    attack: attack * 0.55,
+    attack: bodyAttack * 0.55,
     phase,
     rig,
     dx: 0,
     dy: cell * 0.55
   });
   ctx.restore();
-  if (attack > 0.08 && rig.trail) {
+  if (!stableWeaponAttack && attack > 0.08 && rig.trail) {
     ctx.save();
     ctx.globalAlpha *= Math.min(0.24, attack * 0.22);
     drawWarpedMask(ctx, sprite.canvas, drawW, drawH, {
       breathe,
-      attack,
+      attack: bodyAttack,
       phase,
       rig,
       dx: size * rig.trail * attack,
@@ -375,7 +379,7 @@ function drawMaskGlyph(ctx, char, mask, size, color, options, glyphIndex) {
     });
     ctx.restore();
   }
-  drawWarpedMask(ctx, sprite.canvas, drawW, drawH, { breathe: idleWave, attack, phase, rig, dx: 0, dy: 0 });
+  drawWarpedMask(ctx, sprite.canvas, drawW, drawH, { breathe: idleWave, attack: bodyAttack, phase, rig, dx: 0, dy: 0 });
   ctx.restore();
 }
 
