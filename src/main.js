@@ -53,6 +53,8 @@ let state = createState();
 let layout = {};
 let lastTime = performance.now();
 let pointer = null;
+const debugParams = new URLSearchParams(window.location.search);
+const DEBUG_ATTACK = debugParams.has("debugAttack");
 
 function createState() {
   return {
@@ -145,7 +147,60 @@ function startGame() {
   state.camp[2] = makeUnit("dao");
   state.camp[3] = makeUnit("gong");
   state.camp[4] = makeUnit("shovel");
-  toast("拖动文字到相邻格，可合成将领", "#f3c037");
+  if (DEBUG_ATTACK) setupDebugAttack();
+  toast(DEBUG_ATTACK ? "攻击动画预览" : "拖动文字到相邻格，可合成将领", "#f3c037");
+}
+
+function setupDebugAttack() {
+  state.buns = 120;
+  state.displayedBuns = 120;
+  state.wave = 3;
+  state.spawnLeft = 0;
+  state.waveTimer = 999;
+  state.camp = new Array(CAMP_SIZE).fill(null);
+  state.board.clear();
+  const previewUnits = [
+    ["2,3", makeUnit("qiang", 3)],
+    ["3,4", makeUnit("dao", 3)],
+    ["5,2", makeUnit("gong", 3)],
+    ["7,3", makeUnit("ji", 3)]
+  ];
+  for (const [key, unit] of previewUnits) {
+    unit.attackTimer = 0.04 + Math.random() * 0.08;
+    state.board.set(key, unit);
+  }
+  state.enemies.push({
+    id: idSeq++,
+    t: 3.1,
+    speed: 0.055,
+    hp: 520,
+    maxHp: 520,
+    glyph: "贼",
+    lane: 0,
+    wobble: 0.2,
+    hitFlash: 0,
+    hitAge: 99,
+    hitDx: 0,
+    hitDy: 0,
+    spawnAge: 1,
+    dead: false
+  });
+  state.enemies.push({
+    id: idSeq++,
+    t: 5.35,
+    speed: 0.045,
+    hp: 420,
+    maxHp: 420,
+    glyph: "兵",
+    lane: -0.12,
+    wobble: 1.7,
+    hitFlash: 0,
+    hitAge: 99,
+    hitDx: 0,
+    hitDy: 0,
+    spawnAge: 1,
+    dead: false
+  });
 }
 
 function loop(now) {
@@ -773,7 +828,9 @@ function drawGlyphLayer(text, x, y, size, color, pose = {}) {
     breathe: Math.abs((pose.glyphScaleX ?? 1) - (pose.glyphScaleY ?? 1)) + Math.abs(pose.rotate ?? 0),
     attack: pose.glow ?? 0,
     merge: Math.max(0, ((pose.glyphScaleX ?? 1) - 1) * 0.8),
-    phase: performance.now() * 0.001
+    phase: performance.now() * 0.001,
+    action: pose.action,
+    actionProgress: pose.actionProgress
   });
   if (!drawn) drawInkSigil(size, color);
   ctx.restore();
@@ -866,7 +923,8 @@ function drawUnitCard(unit, cx, cy, size, time, dragging) {
   const asleep = unit.type === "char" && isOnBoard(unit) && !isCharPairReady(unit);
   const idleName = asleep ? "sleep" : "idle";
   const idlePose = sampleMotion(asset, idleName, ((time * 0.85 + unit.wobble) % 1 + 1) % 1);
-  const actionPose = unit.action && unit.action !== "idle" ? sampleMotion(asset, unit.action, unit.actionAge / unit.actionLife) : null;
+  const actionProgress = unit.action && unit.action !== "idle" ? unit.actionAge / unit.actionLife : 0;
+  const actionPose = unit.action && unit.action !== "idle" ? sampleMotion(asset, unit.action, actionProgress) : null;
   const dragPose = dragging ? sampleMotion(asset, "drag", 0.72) : null;
   const pose = combinePoses(idlePose, actionPose, dragPose);
   const pulse = 1 + Math.sin(time * 3 + unit.wobble) * 0.006;
@@ -910,14 +968,65 @@ function drawUnitCard(unit, cx, cy, size, time, dragging) {
       skewX: pose.glyphSkewX,
       rotate: pose.glyphRotate,
       jitter: asleep ? 0.18 : asset.jitter,
-      stroke: unit.type === "general" ? "rgba(128,79,19,0.26)" : "rgba(255,255,255,0.18)"
+      stroke: unit.type === "general" ? "rgba(128,79,19,0.26)" : "rgba(255,255,255,0.18)",
+      action: unit.action,
+      actionProgress
     });
+    if (unit.action === "attack") drawCardAttackOverlay(glyph, cx, cy, s, actionProgress, weapons[unit.token]?.kind ?? asset.role);
     drawAttachment(asset, cx, cy, s, time, pose, "over");
     if (asleep) drawCentered("休", cx, cy - s * 0.22, s * 0.2, "#a8823d", "900");
   }
   if (unit.type !== "shovel") {
     drawText(String(unit.level), x + s - 9, y + 15, Math.max(11, s * 0.22), "#10100f", "900", "center");
   }
+  ctx.restore();
+}
+
+function drawCardAttackOverlay(glyph, cx, cy, size, progress, kind) {
+  const k = Math.max(0, Math.min(1, progress));
+  const flash = Math.sin(Math.PI * k);
+  if (flash <= 0.02) return;
+  const sweep = easeOutCubic(Math.min(1, k * 1.2));
+  const x = cx - size / 2;
+  const y = cy - size / 2;
+
+  ctx.save();
+  ctx.globalCompositeOperation = "source-over";
+  ctx.globalAlpha = 0.18 + flash * 0.42;
+  line(x + size * 0.08, y + size * (0.78 - sweep * 0.08), x + size * 0.88, y + size * (0.77 + sweep * 0.02), "#e5c236", Math.max(2, size * 0.055));
+  line(x + size * 0.1, y + size * (0.82 - sweep * 0.06), x + size * 0.74, y + size * 0.8, "rgba(255,247,198,0.8)", Math.max(1, size * 0.018));
+  ctx.restore();
+
+  ctx.save();
+  ctx.globalAlpha = flash * (kind === "arrow" ? 0.42 : 0.58);
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  if (kind === "stab") {
+    const startX = x + size * (-0.18 + sweep * 0.26);
+    const endX = x + size * (0.78 + sweep * 0.18);
+    line(startX, y + size * 0.42, endX, y + size * 0.28, "#15110f", Math.max(3, size * 0.085));
+    line(startX + size * 0.08, y + size * 0.52, endX + size * 0.08, y + size * 0.38, "#15110f", Math.max(2, size * 0.05));
+  } else if (kind === "dash") {
+    for (let i = 0; i < 3; i++) {
+      const off = i * size * 0.12;
+      line(x - size * 0.1 + off + sweep * size * 0.22, y + size * (0.3 + i * 0.16), x + size * (0.64 + i * 0.06), y + size * (0.18 + i * 0.12), "#16110f", Math.max(2, size * (0.07 - i * 0.012)));
+    }
+  } else if (kind === "arrow" || glyph === "弓") {
+    ctx.strokeStyle = "#15110f";
+    ctx.lineWidth = Math.max(2, size * 0.055);
+    ctx.beginPath();
+    ctx.moveTo(x + size * (0.1 + sweep * 0.12), y + size * 0.64);
+    ctx.quadraticCurveTo(x + size * 0.32, y + size * (0.12 + 0.08 * flash), x + size * (0.74 + sweep * 0.1), y + size * 0.25);
+    ctx.stroke();
+    line(x + size * 0.2, y + size * 0.58, x + size * 0.88, y + size * (0.42 - sweep * 0.08), "#15110f", Math.max(2, size * 0.038));
+  } else {
+    line(x + size * (0.14 + sweep * 0.08), y + size * 0.72, x + size * (0.82 + sweep * 0.08), y + size * 0.18, "#15110f", Math.max(3, size * 0.075));
+  }
+  ctx.restore();
+
+  ctx.save();
+  ctx.globalAlpha = flash * 0.35;
+  line(x + size * 0.22, y + size * 0.2, x + size * 0.72, y + size * 0.12, "rgba(255,255,235,0.85)", Math.max(1, size * 0.025));
   ctx.restore();
 }
 
@@ -1276,6 +1385,8 @@ function strokeTrail(x1, y1, x2, y2, color, alpha = 0.18, kind = "char") {
   const len = Math.max(1, Math.hypot(dx, dy));
   const nx = dx / len;
   const ny = dy / len;
+  const ox = -ny;
+  const oy = nx;
   const end = kind === "melee" ? 0.36 : 0.74;
   const start = kind === "melee" ? 0.08 : 0.02;
   state.strokes.push({
@@ -1293,6 +1404,59 @@ function strokeTrail(x1, y1, x2, y2, color, alpha = 0.18, kind = "char") {
     age: 0,
     life: kind === "melee" ? 0.16 : 0.22
   });
+  if (kind === "stab" || kind === "dash") {
+    for (let i = 0; i < 2; i++) {
+      const side = i === 0 ? -1 : 1;
+      const spread = layout.cell * (kind === "dash" ? 0.2 : 0.13) * side;
+      state.strokes.push({
+        x1: x1 + dx * 0.04 + ox * spread,
+        y1: y1 + dy * 0.04 + oy * spread,
+        x2: x1 + dx * 0.68 + ox * spread * 0.35,
+        y2: y1 + dy * 0.68 + oy * spread * 0.35,
+        color: "#17120f",
+        width: layout.cell * (kind === "dash" ? 0.055 : 0.046),
+        alpha: alpha * 0.78,
+        glint: false,
+        tip: false,
+        nx,
+        ny,
+        age: 0,
+        life: kind === "dash" ? 0.2 : 0.18
+      });
+    }
+  } else if (kind === "arrow") {
+    state.strokes.push({
+      x1: x1 + dx * 0.16 - ox * layout.cell * 0.16,
+      y1: y1 + dy * 0.16 - oy * layout.cell * 0.16,
+      x2: x1 + dx * 0.62 + ox * layout.cell * 0.12,
+      y2: y1 + dy * 0.62 + oy * layout.cell * 0.12,
+      color: "rgba(24,18,14,0.9)",
+      width: layout.cell * 0.04,
+      alpha: alpha * 0.82,
+      glint: true,
+      tip: false,
+      nx,
+      ny,
+      age: 0,
+      life: 0.2
+    });
+  } else if (kind === "melee") {
+    state.strokes.push({
+      x1: x1 + dx * 0.12 - ox * layout.cell * 0.14,
+      y1: y1 + dy * 0.12 - oy * layout.cell * 0.14,
+      x2: x1 + dx * 0.34 + ox * layout.cell * 0.18,
+      y2: y1 + dy * 0.34 + oy * layout.cell * 0.18,
+      color: "rgba(255,246,214,0.95)",
+      width: layout.cell * 0.05,
+      alpha: alpha * 1.15,
+      glint: false,
+      tip: false,
+      nx,
+      ny,
+      age: 0,
+      life: 0.12
+    });
+  }
 }
 
 function drawStrokeTip(s, k) {

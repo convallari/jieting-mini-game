@@ -174,6 +174,32 @@ const GLYPH_MOTION = {
   "斗": { feature: [0, 3], attackX: 0.025, attackY: -0.012, stretchX: 0.04, stretchY: 0.05 }
 };
 
+const BOW_ATTACK_FRAMES = [
+  [
+    s(58, 15, q(34, 19, 30, 43), 9),
+    s(30, 43, q(48, 49, 58, 64), 8),
+    s(58, 64, q(43, 79, 27, 76), 10)
+  ],
+  [
+    s(65, 17, q(31, 17, 27, 45), 10),
+    s(28, 45, q(57, 43, 61, 61), 8),
+    s(61, 61, q(44, 86, 23, 74), 10),
+    s(41, 34, q(50, 47, 42, 61), 5)
+  ],
+  [
+    s(43, 13, q(69, 22, 70, 45), 8),
+    s(70, 45, q(42, 48, 35, 64), 8),
+    s(35, 64, q(56, 69, 64, 83), 8),
+    s(38, 46, q(51, 42, 66, 44), 5)
+  ],
+  [
+    s(39, 18, q(62, 17, 73, 31), 8),
+    s(72, 31, q(49, 39, 43, 53), 9),
+    s(43, 53, q(65, 53, 71, 68), 8),
+    s(70, 68, q(55, 82, 36, 80), 10)
+  ]
+];
+
 export function hasVectorHanzi(text) {
   return [...text].every((char) => Boolean(GLYPH_STROKES[char]));
 }
@@ -198,6 +224,11 @@ export function drawVectorHanzi(ctx, text, size, color, options = {}) {
 }
 
 function drawSingleGlyph(ctx, char, strokes, size, color, options, glyphIndex) {
+  if (char === "弓" && options.action === "attack") {
+    drawBowSpriteFrame(ctx, size, color, options, glyphIndex);
+    return;
+  }
+
   if (MASK_GLYPHS.has(char) && GLYPH_MASKS[char]) {
     drawMaskGlyph(ctx, char, GLYPH_MASKS[char], size, color, options, glyphIndex);
     return;
@@ -251,6 +282,38 @@ function drawSingleGlyph(ctx, char, strokes, size, color, options, glyphIndex) {
       seed: seed + i
     };
     drawStroke(ctx, strokes[i], scale, color, strokeWarp);
+  }
+}
+
+function drawBowSpriteFrame(ctx, size, color, options, glyphIndex) {
+  const progress = clamp01(options.actionProgress ?? 0);
+  const frameIndex = Math.min(BOW_ATTACK_FRAMES.length - 1, Math.floor(progress * BOW_ATTACK_FRAMES.length));
+  const prevIndex = Math.max(0, frameIndex - 1);
+  const scale = size / 100;
+  const attack = options.attack ?? 0;
+  const seed = glyphIndex * 13.37;
+
+  ctx.save();
+  ctx.globalAlpha *= 0.18 + attack * 0.12;
+  for (let i = 0; i < BOW_ATTACK_FRAMES[prevIndex].length; i++) {
+    drawStroke(ctx, BOW_ATTACK_FRAMES[prevIndex][i], scale, color, {
+      lineBoost: 2,
+      alpha: 0.45,
+      offsetX: -size * 0.05,
+      offsetY: size * 0.015,
+      seed: seed + i
+    });
+  }
+  ctx.restore();
+
+  for (let i = 0; i < BOW_ATTACK_FRAMES[frameIndex].length; i++) {
+    const pulse = Math.sin(progress * Math.PI * 2 + i * 0.8);
+    drawStroke(ctx, BOW_ATTACK_FRAMES[frameIndex][i], scale, color, {
+      lineBoost: 1.4 + attack * 1.2,
+      offsetX: pulse * size * 0.006,
+      offsetY: Math.cos(progress * Math.PI * 2 + i) * size * 0.005,
+      seed: seed + i
+    });
   }
 }
 
@@ -380,6 +443,10 @@ function decodeMask(mask) {
   const decoded = cells.length ? { cells, minX, minY, maxX, maxY, cacheKey: mask.rows.join("") } : { cells, minX: 0, minY: 0, maxX: mask.size - 1, maxY: mask.size - 1, cacheKey: mask.rows.join("") };
   decodedMaskCache.set(mask, decoded);
   return decoded;
+}
+
+function clamp01(value) {
+  return Math.max(0, Math.min(1, value));
 }
 
 function drawStroke(ctx, stroke, scale, color, warp = {}) {
