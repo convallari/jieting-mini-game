@@ -10,6 +10,32 @@ import { PLAYER_MAP_GRID, PLAYER_PATHS, playerCellType } from "./originalMapConf
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
+const AUDIO_ROOT = "/original-audio/";
+const audioEngine = {
+  unlocked: false,
+  muted: false,
+  lastPlayed: new Map(),
+  unlock() {
+    this.unlocked = true;
+  },
+  play(name, volume = 0.42, minGap = 0.035) {
+    if (!this.unlocked || this.muted || !name) return;
+    const now = performance.now();
+    const last = this.lastPlayed.get(name) ?? -Infinity;
+    if (now - last < minGap * 1000) return;
+    this.lastPlayed.set(name, now);
+    const audio = new Audio(`${AUDIO_ROOT}${name}.mp3`);
+    audio.volume = Math.max(0, Math.min(1, volume));
+    audio.play().catch(() => {});
+  },
+  voice(name, volume = 0.5) {
+    if (!this.unlocked || this.muted || !name) return;
+    const audio = new Audio(`${AUDIO_ROOT}${name}.wav`);
+    audio.volume = Math.max(0, Math.min(1, volume));
+    audio.play().catch(() => {});
+  }
+};
+
 const BOARD_COLS = PLAYER_MAP_GRID.length;
 const BOARD_ROWS = PLAYER_MAP_GRID[0].length;
 const CAMP_SIZE = 5;
@@ -34,6 +60,25 @@ const weapons = {
   gong: { glyph: "弓", name: "弓", range: 3.5, cooldown: 0.8, damage: 2, targetPolicy: "closest_end", color: "#eef0ff", kind: "arrow" },
   qiang: { glyph: "枪", name: "枪", range: 2.5, cooldown: 0.8, damage: 2, targetPolicy: "nearest", color: "#e8f0d4", kind: "stab" },
   ji: { glyph: "骑", name: "骑", range: 2, cooldown: 0.8, damage: 2, targetPolicy: "nearest", color: "#f4dfd5", kind: "dash" }
+};
+
+const ATTACK_SOUND_BY_TOKEN = {
+  dao: "knife_attack",
+  gong: "bow_attack",
+  qiang: "general_pike_attack",
+  ji: "cavalry_attack",
+  "赵云": "general_pike_attack",
+  "张飞": "knife_attack",
+  "马超": "maChao_attack_lightning",
+  "关羽": "knife_attack",
+  "黄忠": "bow_attack",
+  "关平": "knife_attack",
+  "关兴": "knife_attack",
+  "张苞": "general_pike_attack",
+  "张翼": "knife_attack",
+  "黄盖": "knife_attack",
+  "刘备": "knife_attack",
+  "黄祖": "knife_attack"
 };
 
 const SOLDIER_LEVEL_MULTIPLIERS = [1, 1.5, 2.1, 2.73, 3.4125];
@@ -284,6 +329,9 @@ new ResizeObserver(resize).observe(canvas);
 resize();
 
 function startGame() {
+  audioEngine.unlock();
+  audioEngine.play("match_drum", 0.34, 0.2);
+  audioEngine.voice("zhaoYun_voice_entrance", 0.32);
   state = createState();
   state.mode = "play";
   if (DEBUG_ATTACK) setupDebugAttack();
@@ -528,6 +576,7 @@ function updateWaveFlow(dt) {
     if (state.enemies.length > 0) return;
     if (state.wave >= MAX_WAVE) {
       state.mode = "end";
+      audioEngine.play("battle_end_gold_fly", 0.38, 0.25);
       state.banner = { title: "胜利", sub: "成功守住全部二十波敌军", won: true };
       return;
     }
@@ -545,6 +594,7 @@ function startWave(wave) {
   state.wavePhase = "spawning";
   state.spawnLeft = ENEMY_COUNT_BY_LEVEL[Math.min(ENEMY_COUNT_BY_LEVEL.length - 1, wave - 1)];
   state.waveTimer = 0;
+  audioEngine.play(wave === 1 ? "match_drum" : "enemy_hit", wave === 1 ? 0.28 : 0.16, 0.2);
   maybeSpawnBoss();
   pulseAt(layout.w / 2, layout.safeTop + 36, "#f3c037", 36);
   toast(`第${wave}波敌军来袭`, "#d34331");
@@ -1224,6 +1274,7 @@ function setUnitAction(unit, action, life, dx = 0, dy = 0) {
 }
 
 function fireAt(unit, cell, enemy) {
+  audioEngine.play(ATTACK_SOUND_BY_TOKEN[unit.token] ?? "knife_attack", unit.type === "general" ? 0.22 : 0.14, 0.08);
   const from = cellCenter(cell.r, cell.c);
   from.x += (cell.offsetX ?? 0) * layout.cell;
   const to = enemyPosition(enemy);
@@ -1293,6 +1344,7 @@ function fireAt(unit, cell, enemy) {
 function damageDefense(enemy) {
   const gate = enemy.pathSide === "right" ? "right" : "left";
   state.douHp[gate] -= 1;
+  audioEngine.play("enemy_knife_attack", 0.3, 0.12);
   shake(0.13, 3.4);
   const endpoint = pathForEnemy(enemy).at(-1);
   floatText(
@@ -1303,6 +1355,7 @@ function damageDefense(enemy) {
     18
   );
   if (state.douHp[gate] > 0) return;
+  audioEngine.play("gameover_double_gold", 0.38, 0.25);
   state.mode = "end";
   state.banner = {
     title: "失败",
@@ -1329,6 +1382,7 @@ function hitEnemy(projectile) {
     enemy.generalContributors.add(sourceUnit.id);
   }
   enemy.hp -= projectile.damage;
+  audioEngine.play(enemy.hp <= 0 ? "enemy_dead" : "enemy_hit", enemy.hp <= 0 ? 0.22 : 0.1, enemy.hp <= 0 ? 0.08 : 0.035);
   enemy.hitFlash = 0.1;
   enemy.hitAge = 0;
   const hitLen = Math.max(1, Math.hypot(projectile.tx - projectile.sx, projectile.ty - projectile.sy));
@@ -2481,6 +2535,7 @@ function isCharPairReady(unit) {
 
 function pointerDown(event) {
   event.preventDefault();
+  audioEngine.unlock();
   const p = eventPoint(event);
   if (state.mode === "menu") {
     if (state.menuPanel) {
@@ -2575,6 +2630,7 @@ function useSelectedProp(r, c) {
     }
   }
   state.propCooldowns[prop] = config.cooldown;
+  audioEngine.play(prop === "trap" ? "trap_trigger" : prop === "landmine" ? "landmine_explode" : "skill_ink_splash", 0.26, 0.1);
   state.selectedProp = null;
   const center = cellCenter(r, c);
   pulseAt(center.x, center.y, prop === "inkstone" ? "#16110f" : "#d19b42", layout.cell);
@@ -2617,8 +2673,10 @@ document.addEventListener("visibilitychange", () => {
   if (document.hidden && state.mode === "play") state.paused = true;
 });
 window.addEventListener("keydown", (event) => {
+  audioEngine.unlock();
   if (event.key === "Escape" && state.mode === "play") {
     state.paused = !state.paused;
+    audioEngine.play(state.paused ? "btn_down" : "popup_notification", 0.14, 0.1);
     event.preventDefault();
   } else if (event.key === "Enter" && state.mode === "menu" && !state.menuPanel) {
     startGame();
