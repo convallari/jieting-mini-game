@@ -6,12 +6,12 @@ const TOKEN_TO_REFERENCE_KEY = {
 };
 
 const ORIGINAL_GLYPHS = {
-  dao: { sheet: "dao-attack-sheet.png", frames: 19, frameWidth: 120, frameHeight: 129, scale: 1.02 },
+  dao: { sheet: "dao-attack-sheet.png", frames: 19, frameWidth: 120, frameHeight: 129, scale: 1.18 },
   // The captured bow animation points upward. The original game rotates the
   // complete animation container toward the target before playing it.
   gong: { sheet: "gong-attack-sheet.png", frames: 30, frameWidth: 74, frameHeight: 95, scale: 0.98, aimOffset: Math.PI / 2 },
   qiang: { sheet: "qiang-full-review-sheet.png", frames: 21, frameWidth: 224, frameHeight: 224, scale: 1.04 },
-  qi: { sheet: "qi-attack-sheet.png", frames: 19, frameWidth: 263, frameHeight: 294, scale: 1.42 }
+  qi: { sheet: "qi-attack-sheet.png", frames: 19, frameWidth: 263, frameHeight: 294, scale: 1.66 }
 };
 
 const ATTACK_TIMING = {

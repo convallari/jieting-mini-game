@@ -1895,7 +1895,7 @@ function drawMapSideLabels() {
     const [r, c] = path.at(-1);
     const x = layout.boardX + (c + 0.5) * layout.cell;
     const y = layout.boardY + (r + 0.5) * layout.cell;
-    if (!isADouAnimationReady()) {
+    if (gate === "left" && !isADouAnimationReady()) {
       ctx.save();
       ctx.globalAlpha = 0.82;
       drawCalligraphy("斗", x, y + layout.cell * 0.12, layout.cell * 0.72, "#18110e");
@@ -1979,27 +1979,22 @@ function drawGeneralCard(unit, cx, cy, width, time) {
   const height = layout.cell * 0.9;
   const asset = getHanziAsset(unit.token);
   ctx.save();
-  ctx.fillStyle = asset.paper;
-  ctx.strokeStyle = asset.border;
-  ctx.lineWidth = 3;
-  roundRect(cx - width / 2, cy - height / 2, width, height, 5, true, true);
-  line(cx, cy - height / 2, cx, cy + height / 2, "rgba(130,88,31,0.2)", 1);
   const originalReady = hasOriginalGeneralAnimation(unit.token) && isOriginalGeneralReady(unit.id);
   if (!originalReady) {
     const chars = [...unit.token];
     const pose = sampleGenericGeneralPose(unit, time);
-    drawGenericGeneralPart(chars[0] ?? "", cx - width * 0.25, cy + height * 0.17, height * 0.62, asset.ink ?? "#17120f", pose);
-    drawGenericGeneralPart(chars[1] ?? "", cx + width * 0.25, cy + height * 0.17, height * 0.62, asset.ink ?? "#17120f", pose);
+    drawGenericGeneralPart(chars[0] ?? "", cx - width * 0.25, cy + height * 0.22, height * 0.72, asset.ink ?? "#17120f", pose);
+    drawGenericGeneralPart(chars[1] ?? "", cx + width * 0.25, cy + height * 0.22, height * 0.72, asset.ink ?? "#17120f", pose);
   }
-  drawText(String(unit.level), cx + width / 2 - 10, cy - height / 2 + 15, Math.max(11, height * 0.22), "#10100f", "900", "center");
+  drawText(String(unit.level), cx + width * 0.43, cy - height * 0.38, Math.max(11, height * 0.22), "#10100f", "900", "center");
   const thresholds = ELITE_GENERALS.has(unit.token) ? ELITE_GENERAL_EXP : REGULAR_GENERAL_EXP;
   const currentFloor = thresholds[Math.max(0, unit.level - 1)] ?? 0;
   const next = thresholds[unit.level];
   const progress = next == null ? 1 : Math.max(0, Math.min(1, ((unit.experience ?? 0) - currentFloor) / (next - currentFloor)));
   ctx.fillStyle = "rgba(53,43,35,0.25)";
-  roundRect(cx - width * 0.38, cy + height * 0.36, width * 0.76, 4, 2, true, false);
+  roundRect(cx - width * 0.32, cy + height * 0.43, width * 0.64, 3, 2, true, false);
   ctx.fillStyle = "#d8a936";
-  roundRect(cx - width * 0.38, cy + height * 0.36, width * 0.76 * progress, 4, 2, true, false);
+  roundRect(cx - width * 0.32, cy + height * 0.43, width * 0.64 * progress, 3, 2, true, false);
   drawUnitStatusLabels(unit, cx, cy, height);
   ctx.restore();
 }
@@ -2373,11 +2368,14 @@ function drawUnitCard(unit, cx, cy, size, time, dragging) {
   ctx.shadowOffsetY = dragging ? 8 : 2;
 
   ctx.globalAlpha = pose.alpha;
-  ctx.fillStyle = asset.paper ?? "#faf5e9";
-  roundRect(x, y, s, s, 4, true, false);
-  ctx.strokeStyle = asset.border ?? (unit.type === "general" ? "#d7ad35" : "#756b61");
-  ctx.lineWidth = unit.type === "general" ? 3 : 2;
-  roundRect(x, y, s, s, 4, false, true);
+  const boardUnit = isOnBoard(unit) && !dragging;
+  if (!boardUnit) {
+    ctx.fillStyle = asset.paper ?? "#faf5e9";
+    roundRect(x, y, s, s, 4, true, false);
+    ctx.strokeStyle = asset.border ?? (unit.type === "general" ? "#d7ad35" : "#756b61");
+    ctx.lineWidth = unit.type === "general" ? 3 : 2;
+    roundRect(x, y, s, s, 4, false, true);
+  }
   if (pose.glow > 0.05) {
     ctx.save();
     ctx.globalAlpha = pose.glow * 0.55;
@@ -2391,7 +2389,7 @@ function drawUnitCard(unit, cx, cy, size, time, dragging) {
     drawAttachment(asset, cx, cy, s, time, pose, "tool");
   } else {
     const glyphCx = cx + pose.x + pose.glyphX;
-    const glyphCy = cy + pose.y + s * asset.baseline + pose.glyphY;
+    const glyphCy = cy + pose.y + s * (asset.baseline + (unit.type === "general" ? 0.09 : 0.04)) + pose.glyphY;
     const glyphPose = {
       scaleX: pose.scaleX * pose.glyphScaleX,
       scaleY: pose.scaleY * pose.glyphScaleY,
@@ -2556,6 +2554,22 @@ function isCharPairReady(unit) {
   return false;
 }
 
+function splitGeneralForDrag(unit, mainKey, movingKey, p) {
+  const [firstGlyph, secondGlyph] = [...unit.token];
+  const secondKey = `${keyToCell(mainKey).r},${keyToCell(mainKey).c + 1}`;
+  const movingGlyph = movingKey === mainKey ? firstGlyph : secondGlyph;
+  const partnerGlyph = movingKey === mainKey ? secondGlyph : firstGlyph;
+  state.board.delete(mainKey);
+  state.board.delete(secondKey);
+  const partnerKey = movingKey === mainKey ? secondKey : mainKey;
+  const partner = makeUnit(partnerGlyph ?? unit.token, unit.level);
+  partner.placedAt = performance.now();
+  state.board.set(partnerKey, partner);
+  const moving = makeUnit(movingGlyph ?? unit.token, unit.level);
+  moving.placedAt = performance.now();
+  startDrag(moving, { kind: "board", key: movingKey }, p);
+}
+
 function pointerDown(event) {
   event.preventDefault();
   audioEngine.unlock();
@@ -2615,15 +2629,17 @@ function pointerDown(event) {
       if (unit.type === "general-reserved") {
         const owner = state.board.get(unit.ownerKey);
         if (owner) {
-          startDrag(owner, { kind: "board", key: unit.ownerKey, reserveKey: key }, p);
-          state.board.delete(unit.ownerKey);
-          state.board.delete(key);
+          splitGeneralForDrag(owner, unit.ownerKey, key, p);
         }
       } else {
         const reserveKey = unit.type === "general" && unit.span === 2 ? `${cell.r},${cell.c + 1}` : null;
-        startDrag(unit, { kind: "board", key, reserveKey }, p);
-        state.board.delete(key);
-        if (reserveKey) state.board.delete(reserveKey);
+        if (unit.type === "general" && unit.span === 2) {
+          splitGeneralForDrag(unit, key, key, p);
+        } else {
+          startDrag(unit, { kind: "board", key, reserveKey }, p);
+          state.board.delete(key);
+          if (reserveKey) state.board.delete(reserveKey);
+        }
       }
     }
   }
@@ -3444,24 +3460,15 @@ function syncOriginalADouLayer() {
     return;
   }
   const lowerEnd = PLAYER_PATHS.left.at(-1);
-  const upperEnd = PLAYER_PATHS.right.at(-1);
   syncADouAnimations([
     {
       key: "player",
       mode: "play",
       x: layout.boardX + (lowerEnd[1] + 0.5) * layout.cell,
-      y: layout.boardY + (lowerEnd[0] + 0.62) * layout.cell,
+      y: layout.boardY + (lowerEnd[0] + 0.5) * layout.cell,
       size: layout.cell * 1.05,
       hp: state.douHp.left,
       mirror: true
-    },
-    {
-      key: "player-upper",
-      mode: "play",
-      x: layout.boardX + (upperEnd[1] + 0.5) * layout.cell,
-      y: layout.boardY + (upperEnd[0] + 0.62) * layout.cell,
-      size: layout.cell * 1.05,
-      hp: state.douHp.right
     }
   ]);
 }
