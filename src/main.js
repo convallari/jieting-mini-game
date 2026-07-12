@@ -2373,15 +2373,15 @@ function drawUnitCard(unit, cx, cy, size, time, dragging) {
   ctx.shadowOffsetY = dragging ? 8 : 2;
 
   ctx.globalAlpha = pose.alpha;
-  const boardUnit = isOnBoard(unit) && !dragging;
-  if (!boardUnit) {
+  const showCard = !dragging && !isOnBoard(unit);
+  if (showCard) {
     ctx.fillStyle = asset.paper ?? "#faf5e9";
     roundRect(x, y, s, s, 4, true, false);
     ctx.strokeStyle = asset.border ?? (unit.type === "general" ? "#d7ad35" : "#756b61");
     ctx.lineWidth = unit.type === "general" ? 3 : 2;
     roundRect(x, y, s, s, 4, false, true);
   }
-  if (pose.glow > 0.05) {
+  if (!dragging && pose.glow > 0.05) {
     ctx.save();
     ctx.globalAlpha = pose.glow * 0.55;
     ctx.strokeStyle = asset.role === "general" ? "#f3c44e" : "#fff1a8";
