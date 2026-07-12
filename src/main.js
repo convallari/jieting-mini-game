@@ -3469,8 +3469,8 @@ function syncOriginalADouLayer() {
     {
       key: "player",
       mode: "play",
-      x: layout.boardX + (lowerEnd[1] + 0.5) * layout.cell,
-      y: layout.boardY + (lowerEnd[0] + 0.5) * layout.cell,
+      x: layout.boardX + (lowerEnd[1] + 0.35) * layout.cell,
+      y: layout.boardY + (lowerEnd[0] + 0.22) * layout.cell,
       size: layout.cell * 1.05,
       hp: state.douHp.left,
       mirror: false
