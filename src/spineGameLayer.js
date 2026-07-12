@@ -129,7 +129,9 @@ export function syncGeneralAnimations(generals, cellSize) {
       instance.stateKey = "";
     }
     const attacking = item.action === "attack";
-    const stateKey = attacking ? `attack:${item.attackSerial ?? 0}` : "idle";
+    // The original state machine holds the final attack pose while a target
+    // remains in range. It only returns to zhan1/zhan2 after disengaging.
+    const stateKey = attacking ? `attack:${item.attackSerial ?? 0}` : item.engaged ? instance.stateKey : "idle";
     if (ready && stateKey && instance.stateKey !== stateKey) {
       instance.stateKey = stateKey;
       const rate = attacking ? config.attackDuration / Math.max(0.1, item.actionLife) : 1;
