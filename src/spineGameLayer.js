@@ -44,6 +44,16 @@ export function isOriginalGeneralReady(id) {
   return Boolean(instance?.leftReady && instance?.rightReady);
 }
 
+export function removeGeneralAnimation(id) {
+  const instance = instances.get(id);
+  if (!instance) return;
+  instance.left.visible = false;
+  instance.right.visible = false;
+  instance.left.destroy(true);
+  instance.right.destroy(true);
+  instances.delete(id);
+}
+
 export function isOriginalEnemyReady(id) {
   return Boolean(enemyInstances.get(id)?.ready);
 }
@@ -130,6 +140,10 @@ export function syncGeneralAnimations(generals, cellSize) {
     }
   }
   for (const [id, instance] of instances) {
+    if (!present.has(id)) {
+      instance.left.visible = false;
+      instance.right.visible = false;
+    }
     if (!present.has(id) && performance.now() - instance.lastSeen > 1600) {
       instance.left.destroy(true);
       instance.right.destroy(true);

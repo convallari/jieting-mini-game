@@ -4,7 +4,7 @@ import { drawWeaponGlyphSprite, getWeaponAnimationTiming, hasWeaponGlyphSprite, 
 import { drawOriginalHitEffect, getOriginalHitEffectTiming, hitEffectForToken, preloadOriginalHitEffects } from "./originalHitEffects.js";
 import { drawOriginalFarmer, preloadOriginalUnitSprites } from "./originalUnitSprites.js";
 import { ACTIVE_PROP_CONFIG, drawOriginalPropSprite, preloadOriginalPropSprites } from "./originalPropSprites.js";
-import { hasOriginalGeneralAnimation, initSpineGameLayer, isADouAnimationReady, isOriginalEnemyReady, isOriginalGeneralReady, resizeSpineGameLayer, syncADouAnimations, syncEnemyAnimations, syncGeneralAnimations } from "./spineGameLayer.js";
+import { hasOriginalGeneralAnimation, initSpineGameLayer, isADouAnimationReady, isOriginalEnemyReady, isOriginalGeneralReady, removeGeneralAnimation, resizeSpineGameLayer, syncADouAnimations, syncEnemyAnimations, syncGeneralAnimations } from "./spineGameLayer.js";
 import { PLAYER_MAP_GRID, PLAYER_PATHS, playerCellType } from "./originalMapConfig.js";
 
 const canvas = document.getElementById("game");
@@ -2564,6 +2564,7 @@ function splitGeneralForDrag(unit, mainKey, movingKey, p) {
   const secondKey = `${keyToCell(mainKey).r},${keyToCell(mainKey).c + 1}`;
   const movingGlyph = movingKey === mainKey ? firstGlyph : secondGlyph;
   const partnerGlyph = movingKey === mainKey ? secondGlyph : firstGlyph;
+  removeGeneralAnimation(unit.id);
   state.board.delete(mainKey);
   state.board.delete(secondKey);
   const partnerKey = movingKey === mainKey ? secondKey : mainKey;
