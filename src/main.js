@@ -369,8 +369,8 @@ function startGame() {
 }
 
 function setupDebugAttack() {
-  state.buns = 120;
-  state.displayedBuns = 120;
+  state.buns = 20;
+  state.displayedBuns = 20;
   state.wave = 3;
   state.wavePhase = "combat";
   state.spawnLeft = DEBUG_GENERAL_IDLE ? 999 : 0;
@@ -570,7 +570,7 @@ function triggerLandmine(mine) {
     enemy.deathAge = 0;
     enemy.deathLife = enemy.spineType === "thief" ? 2.05 : 0.7;
     enemyDeathFx(pos.x, pos.y, enemy);
-    dropBun(pos.x, pos.y, enemy.spineType === "thief" ? 1 : 10, enemy.pathSide);
+    dropBun(pos.x, pos.y, bunRewardForEnemy(enemy), enemy.pathSide);
   }
 }
 
@@ -1365,7 +1365,7 @@ function fireAt(unit, cell, enemy) {
 }
 
 function damageDefense(enemy) {
-  const gate = enemy.pathSide === "right" ? "right" : "left";
+  const gate = "left";
   state.douHp[gate] -= 1;
   audioEngine.play("enemy_knife_attack", 0.3, 0.12);
   shake(0.13, 3.4);
@@ -1430,7 +1430,7 @@ function hitEnemy(projectile) {
     enemy.deathLife = enemy.spineType === "thief" ? 2.05 : 0.7;
     enemyDeathFx(pos.x, pos.y, enemy);
     awardGeneralExperience(enemy, sourceUnit);
-    dropBun(pos.x, pos.y, enemy.spineType === "thief" ? 1 : 10, enemy.pathSide);
+    dropBun(pos.x, pos.y, bunRewardForEnemy(enemy), enemy.pathSide);
   }
 }
 
@@ -1513,6 +1513,10 @@ function dropBun(x, y, amount = 1, pathSide = "left") {
   const tx = 76;
   state.floats.push({ type: "bun", sx: x, sy: y, tx, ty: layout.safeTop + 23, x, y, age: 0, life: 0.52 });
   pulseAt(tx, layout.safeTop + 23, "#f1dfc2", 24);
+}
+
+function bunRewardForEnemy(enemy) {
+  return Number.isInteger(enemy?.bossIndex) ? 10 : 1;
 }
 
 function findTarget(r, c, range, offsetX = 0, policy = "nearest", defendedPath = "left") {
@@ -1901,7 +1905,8 @@ function drawMapSideLabels() {
       drawCalligraphy("斗", x, y + layout.cell * 0.12, layout.cell * 0.72, "#18110e");
       ctx.restore();
     }
-    const heartsY = y + (r < BOARD_ROWS / 2 ? layout.cell * 0.42 : -layout.cell * 0.48);
+    if (gate !== "left") continue;
+    const heartsY = y - layout.cell * 0.48;
     for (let i = 0; i < 3; i++) {
       drawHeart(x - 13 + i * 13, heartsY, i < state.douHp[gate] ? "#d83435" : "#6b5d57");
     }
@@ -3468,7 +3473,7 @@ function syncOriginalADouLayer() {
       y: layout.boardY + (lowerEnd[0] + 0.5) * layout.cell,
       size: layout.cell * 1.05,
       hp: state.douHp.left,
-      mirror: true
+      mirror: false
     }
   ]);
 }

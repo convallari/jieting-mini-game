@@ -12,7 +12,9 @@ const required = [
   ["农民生产周期", "const FARMER_CYCLE_SECONDS = [20, 10, 5, 3, 2]"],
   ["精英将领经验", "const ELITE_GENERAL_EXP = [0, 10, 35, 75, 130]"],
   ["普通将领经验", "const REGULAR_GENERAL_EXP = [0, 8, 23]"],
-  ["雨天攻速因子", "const RAIN_ATTACK_SPEED_FACTOR = 0.8"]
+  ["雨天攻速因子", "const RAIN_ATTACK_SPEED_FACTOR = 0.8"],
+  ["普通敌人和首领馒头奖励", "return Number.isInteger(enemy?.bossIndex) ? 10 : 1"],
+  ["双路线共用单斗生命", "const gate = \"left\""]
 ];
 
 const missing = required.filter(([, text]) => !source.includes(text));

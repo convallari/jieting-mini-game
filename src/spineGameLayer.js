@@ -119,7 +119,7 @@ export function syncGeneralAnimations(generals, cellSize) {
       instance.stateKey = "";
     }
     const attacking = item.action === "attack";
-    const stateKey = attacking ? `attack:${item.attackSerial ?? 0}` : item.engaged ? instance.stateKey : "idle";
+    const stateKey = attacking ? `attack:${item.attackSerial ?? 0}` : "idle";
     if (ready && stateKey && instance.stateKey !== stateKey) {
       instance.stateKey = stateKey;
       const rate = attacking ? config.attackDuration / Math.max(0.1, item.actionLife) : 1;

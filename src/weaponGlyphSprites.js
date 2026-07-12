@@ -6,12 +6,12 @@ const TOKEN_TO_REFERENCE_KEY = {
 };
 
 const ORIGINAL_GLYPHS = {
-  dao: { sheet: "dao-attack-sheet.png", frames: 19, frameWidth: 120, frameHeight: 129, scale: 1.18 },
+  dao: { sheet: "dao-attack-sheet.png", frames: 19, frameWidth: 120, frameHeight: 129, bounds: [54, 56, 92, 97] },
   // The captured bow animation points upward. The original game rotates the
   // complete animation container toward the target before playing it.
-  gong: { sheet: "gong-attack-sheet.png", frames: 30, frameWidth: 74, frameHeight: 95, scale: 0.98, aimOffset: Math.PI / 2 },
-  qiang: { sheet: "qiang-full-review-sheet.png", frames: 21, frameWidth: 224, frameHeight: 224, scale: 1.04 },
-  qi: { sheet: "qi-attack-sheet.png", frames: 19, frameWidth: 263, frameHeight: 294, scale: 1.66 }
+  gong: { sheet: "gong-attack-sheet.png", frames: 30, frameWidth: 74, frameHeight: 95, bounds: [21, 1, 48, 53], aimOffset: Math.PI / 2 },
+  qiang: { sheet: "qiang-full-review-sheet.png", frames: 21, frameWidth: 224, frameHeight: 224, bounds: [34, 20, 184, 198] },
+  qi: { sheet: "qi-attack-sheet.png", frames: 19, frameWidth: 263, frameHeight: 294, bounds: [106, 116, 183, 177] }
 };
 
 const ATTACK_TIMING = {
@@ -45,10 +45,14 @@ export function drawWeaponGlyphSprite(ctx, token, cx, cy, cardSize, options = {}
 
   const frame = selectFrame(item.frames, options.action, options.actionProgress);
   const sx = frame * item.frameWidth;
-  const drawHeight = cardSize * item.scale * (options.dragging ? 1.08 : 1);
-  const drawWidth = drawHeight * item.frameWidth / item.frameHeight;
-  const x = cx - drawWidth / 2 + (options.offsetX ?? 0);
-  const y = cy - drawHeight / 2 + (options.offsetY ?? 0);
+  const [bx0, by0, bx1, by1] = item.bounds;
+  const visibleWidth = bx1 - bx0;
+  const visibleHeight = by1 - by0;
+  const visibleScale = cardSize * 0.84 / Math.max(visibleWidth, visibleHeight) * (options.dragging ? 1.08 : 1);
+  const drawWidth = item.frameWidth * visibleScale;
+  const drawHeight = item.frameHeight * visibleScale;
+  const x = cx - (bx0 + visibleWidth / 2) * visibleScale + (options.offsetX ?? 0);
+  const y = cy - (by0 + visibleHeight / 2) * visibleScale + (options.offsetY ?? 0);
 
   ctx.save();
   ctx.imageSmoothingEnabled = true;
