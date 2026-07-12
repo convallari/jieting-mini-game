@@ -1,0 +1,22 @@
+{
+  "knife": {
+    "frames": 1,
+    "frameWidth": 96,
+    "frameHeight": 96
+  },
+  "pike": {
+    "frames": 1,
+    "frameWidth": 96,
+    "frameHeight": 96
+  },
+  "bow": {
+    "frames": 3,
+    "frameWidth": 96,
+    "frameHeight": 96
+  },
+  "cavalry": {
+    "frames": 2,
+    "frameWidth": 96,
+    "frameHeight": 96
+  }
+}

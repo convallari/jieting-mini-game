@@ -1,0 +1,22 @@
+{
+  "dao": {
+    "frames": 19,
+    "frameWidth": 120,
+    "frameHeight": 129
+  },
+  "gong": {
+    "frames": 30,
+    "frameWidth": 74,
+    "frameHeight": 95
+  },
+  "qiang": {
+    "frames": 21,
+    "frameWidth": 80,
+    "frameHeight": 80
+  },
+  "qi": {
+    "frames": 19,
+    "frameWidth": 263,
+    "frameHeight": 294
+  }
+}

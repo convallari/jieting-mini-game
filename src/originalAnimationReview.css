@@ -1,0 +1,31 @@
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; background: #e7ddc9; color: #291f1a; font-family: system-ui, sans-serif; }
+body { display: flex; justify-content: center; }
+main { width: min(100%, 900px); padding: 20px 14px 40px; }
+header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+h1, h2, p { margin: 0; }
+h1 { font-size: clamp(24px, 5vw, 36px); }
+h2 { font-size: 18px; margin-bottom: 10px; }
+.eyebrow { color: #9b3e2f; font-size: 13px; font-weight: 900; letter-spacing: .08em; }
+a { color: #7b3428; font-weight: 800; text-decoration: none; }
+nav { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 12px; }
+button, select { border: 2px solid #6e5c4f; border-radius: 9px; background: #fff7e8; color: #291f1a; min-height: 44px; font: inherit; font-weight: 900; }
+button.active, #play { background: #a94737; border-color: #753126; color: white; }
+.stage { display: grid; grid-template-columns: minmax(280px, 1fr) minmax(250px, .85fr); gap: 14px; }
+.card-preview, aside, .controls, .contact-section { background: rgba(255,248,233,.78); border: 2px solid #766658; border-radius: 12px; padding: 12px; }
+canvas { display: block; width: 100%; aspect-ratio: 1; background: #d9cfbb; border-radius: 8px; }
+aside { display: flex; flex-direction: column; gap: 12px; }
+.frame-line { display: flex; align-items: baseline; gap: 10px; }
+.frame-line strong { color: #a23f30; font-size: 30px; }
+.frame-line span { font-weight: 900; }
+#phaseNote, .phase-list p { line-height: 1.5; }
+.phase-list { display: grid; gap: 7px; }
+.phase-list article { padding: 8px; border-left: 4px solid #b7a792; background: rgba(255,255,255,.42); }
+.phase-list article.active { border-color: #c74e35; background: #fff1d4; }
+.phase-list p { margin-top: 3px; font-size: 12px; }
+.controls { display: grid; grid-template-columns: 86px 1fr 150px; gap: 12px; align-items: center; margin: 12px 0; }
+.controls label { display: grid; grid-template-columns: auto 1fr; gap: 8px; align-items: center; font-weight: 800; }
+input { width: 100%; accent-color: #a94737; }
+.contact-section img { display: block; width: 100%; height: auto; border-radius: 8px; }
+@media (max-width: 680px) { .stage { grid-template-columns: 1fr; } .controls { grid-template-columns: 80px 1fr; } .controls label:last-child { grid-column: 1 / -1; } }
+ .header-links { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 14px; }

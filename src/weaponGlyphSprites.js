@@ -1,5 +1,3 @@
-import { REFERENCE_GLYPHS } from "./referenceGlyphManifest.js";
-
 const TOKEN_TO_REFERENCE_KEY = {
   dao: "dao",
   qiang: "qiang",
@@ -7,18 +5,20 @@ const TOKEN_TO_REFERENCE_KEY = {
   ji: "qi"
 };
 
-const STATIC_FRAMES = {
-  dao: 0,
-  qiang: 0,
-  gong: 0,
-  qi: 0
+const ORIGINAL_GLYPHS = {
+  dao: { sheet: "dao-attack-sheet.png", frames: 19, frameWidth: 120, frameHeight: 129, scale: 1.02 },
+  // The captured bow animation points upward. The original game rotates the
+  // complete animation container toward the target before playing it.
+  gong: { sheet: "gong-attack-sheet.png", frames: 30, frameWidth: 74, frameHeight: 95, scale: 0.98, aimOffset: Math.PI / 2 },
+  qiang: { sheet: "qiang-full-review-sheet.png", frames: 21, frameWidth: 224, frameHeight: 224, scale: 1.04 },
+  qi: { sheet: "qi-attack-sheet.png", frames: 19, frameWidth: 263, frameHeight: 294, scale: 1.42 }
 };
 
-const RHYTHM = {
-  dao: { fps: 30, start: 0, frames: 24 },
-  qiang: { fps: 30, start: 0, frames: 24 },
-  gong: { fps: 30, start: 0, frames: 24 },
-  qi: { fps: 30, start: 24, frames: 24 }
+const ATTACK_TIMING = {
+  dao: { duration: 0.6, impact: 0.5 },
+  qiang: { duration: 0.667, releaseRatio: 360 / 667, activeRatio: 120 / 667 },
+  gong: { duration: 1, releaseRatio: 0.65, activeRatio: 0.35 },
+  ji: { duration: 0.6, releaseRatio: 0.25, activeRatio: 0.5 }
 };
 
 const cache = new Map();
@@ -32,38 +32,63 @@ export function hasWeaponGlyphSprite(token) {
   return Boolean(TOKEN_TO_REFERENCE_KEY[token]);
 }
 
+export function getWeaponAnimationTiming(token) {
+  return ATTACK_TIMING[token] ?? null;
+}
+
 export function drawWeaponGlyphSprite(ctx, token, cx, cy, cardSize, options = {}) {
   const key = TOKEN_TO_REFERENCE_KEY[token];
   if (!key) return false;
-  const item = REFERENCE_GLYPHS.glyphs[key];
+  const item = ORIGINAL_GLYPHS[key];
   const sprite = loadSprite(key);
   if (!item || !sprite.loaded) return false;
 
-  const frame = selectFrame(key, item.frames, options.action, options.actionAge);
+  const frame = selectFrame(item.frames, options.action, options.actionProgress);
   const sx = frame * item.frameWidth;
-  const drawSize = cardSize * (options.dragging ? 1.1 : 1.06);
-  const x = cx - drawSize / 2 + (options.offsetX ?? 0);
-  const y = cy - drawSize / 2 + (options.offsetY ?? 0);
+  const drawHeight = cardSize * item.scale * (options.dragging ? 1.08 : 1);
+  const drawWidth = drawHeight * item.frameWidth / item.frameHeight;
+  const x = cx - drawWidth / 2 + (options.offsetX ?? 0);
+  const y = cy - drawHeight / 2 + (options.offsetY ?? 0);
 
   ctx.save();
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
   if (options.asleep) ctx.globalAlpha *= 0.62;
-  ctx.drawImage(sprite.image, sx, 0, item.frameWidth, item.frameHeight, x, y, drawSize, drawSize);
+  if (Number.isFinite(item.aimOffset)) {
+    let rotation = 0;
+    if (options.action === "attack" && Number.isFinite(options.actionAimAngle)) {
+      const start = options.actionStartAngle ?? 0;
+      const target = options.actionAimAngle;
+      const turnProgress = Math.min(1, (options.actionProgress ?? 0) / 0.65);
+      const eased = turnProgress * turnProgress * (3 - 2 * turnProgress);
+      const delta = Math.atan2(Math.sin(target - start), Math.cos(target - start));
+      rotation = start + delta * eased;
+    } else if (options.engaged) {
+      rotation = options.aimAngle ?? 0;
+    } else if (Number.isFinite(options.aimAngle) && (options.aimReturnAge ?? 0) < 0.65) {
+      const returnProgress = Math.min(1, (options.aimReturnAge ?? 0) / 0.65);
+      const eased = returnProgress * returnProgress * (3 - 2 * returnProgress);
+      rotation = options.aimAngle * (1 - eased);
+    }
+    if (Math.abs(rotation) > 0.0001) {
+      ctx.translate(cx, cy);
+      ctx.rotate(rotation);
+      ctx.translate(-cx, -cy);
+    }
+  }
+  ctx.drawImage(sprite.image, sx, 0, item.frameWidth, item.frameHeight, x, y, drawWidth, drawHeight);
   ctx.restore();
   return true;
 }
 
 function loadSprite(key) {
   if (cache.has(key)) return cache.get(key);
-  const item = REFERENCE_GLYPHS.glyphs[key];
+  const item = ORIGINAL_GLYPHS[key];
   const image = new Image();
-  const gameSheet = item.gameSheet ?? item.sheet.replace("-sheet.png", "-game-sheet.png");
   const candidates = [
-    `${BASE_URL}reference-glyphs/${gameSheet}`,
-    `${BASE_URL}public/reference-glyphs/${gameSheet}`,
-    `/reference-glyphs/${gameSheet}`,
-    `/public/reference-glyphs/${gameSheet}`
+    `${BASE_URL}original-glyphs/${item.sheet}`,
+    `/original-glyphs/${item.sheet}`,
+    `/public/original-glyphs/${item.sheet}`
   ];
   const sprite = { image, loaded: false, failed: false, index: 0 };
   image.onload = () => {
@@ -82,9 +107,8 @@ function loadSprite(key) {
   return sprite;
 }
 
-function selectFrame(key, frames, action, actionAge = 0) {
-  if (action !== "attack") return STATIC_FRAMES[key] ?? 0;
-  const rhythm = RHYTHM[key] ?? { fps: REFERENCE_GLYPHS.fps ?? 30, start: 0, frames: frames };
-  const localFrame = Math.min(rhythm.frames - 1, Math.floor(Math.max(0, actionAge) * rhythm.fps));
-  return Math.min(frames - 1, rhythm.start + localFrame);
+function selectFrame(frames, action, actionProgress = 0) {
+  if (action !== "attack") return 0;
+  const progress = Math.max(0, Math.min(0.999999, actionProgress));
+  return Math.min(frames - 1, Math.floor(progress * frames));
 }

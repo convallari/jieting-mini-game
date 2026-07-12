@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>原版角色动画审阅台</title>
+    <link rel="stylesheet" href="/src/spineAnimationReview.css" />
+  </head>
+  <body>
+    <main class="review-shell">
+      <header>
+        <div>
+          <p class="eyebrow">ORIGINAL SPINE MOTION</p>
+          <h1>原版角色动画审阅台</h1>
+          <p class="hint">直接播放原游戏骨骼、贴图与时间轴。角色与动作可随时切换。</p>
+        </div>
+        <a href="/original-animation-review.html">查看四字攻击动画</a>
+      </header>
+      <section class="toolbar">
+        <label>角色<select id="character"></select></label>
+        <label>动作<select id="animation"></select></label>
+        <label>资源组<select id="skin"><option value="1">一级字形</option><option value="2">二级字形</option><option value="3">三级字形</option></select></label>
+        <button id="replay" type="button">重新播放</button>
+        <label class="range">缩放<input id="scale" type="range" min="50" max="300" value="165" /></label>
+      </section>
+      <section id="stage-wrap" aria-label="动画舞台"></section>
+      <p id="status">正在载入原版动画资源…</p>
+    </main>
+    <script src="/vendor/laya/laya.core.js"></script>
+    <script src="/vendor/laya/laya.webgl_2D.js"></script>
+    <script src="/vendor/laya/laya.ui.js"></script>
+    <script src="/vendor/laya/spine-core-3.7.js"></script>
+    <script src="/vendor/laya/laya.spine.js"></script>
+    <script type="module" src="/src/spineAnimationReview.js"></script>
+  </body>
+</html>

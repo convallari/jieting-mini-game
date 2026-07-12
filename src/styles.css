@@ -16,6 +16,7 @@ body {
 }
 
 .app-shell {
+  position: relative;
   width: 100vw;
   height: 100dvh;
   display: grid;
@@ -32,4 +33,11 @@ body {
   max-height: 980px;
   background: #e9dec6;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5), 0 18px 44px rgba(0, 0, 0, 0.42);
+}
+
+#spine-game-layer {
+  position: absolute !important;
+  z-index: 4;
+  pointer-events: none;
+  background: transparent !important;
 }

@@ -6,7 +6,9 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: "index.html",
-        animationLab: "animation-lab.html"
+        animationLab: "animation-lab.html",
+        originalAnimationReview: "original-animation-review.html",
+        spineAnimationReview: "spine-animation-review.html"
       }
     }
   }

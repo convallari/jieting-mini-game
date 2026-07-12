@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>原版汉字动画审阅台</title>
+    <link rel="stylesheet" href="/src/originalAnimationReview.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <div>
+          <p class="eyebrow">确认后再接入游戏</p>
+          <h1>原版汉字动画逻辑</h1>
+        </div>
+        <div class="header-links">
+          <a href="/spine-animation-review.html">角色与敌人动画</a>
+          <a href="./">返回游戏</a>
+        </div>
+      </header>
+
+      <nav id="glyphTabs" aria-label="选择汉字"></nav>
+
+      <section class="stage">
+        <div class="card-preview">
+          <canvas id="preview" width="420" height="420"></canvas>
+        </div>
+        <aside>
+          <div class="frame-line">
+            <strong id="frameLabel">f00</strong>
+            <span id="phaseLabel"></span>
+          </div>
+          <p id="phaseNote"></p>
+          <div id="phaseList" class="phase-list"></div>
+        </aside>
+      </section>
+
+      <section class="controls">
+        <button id="play">暂停</button>
+        <label><span>逐帧</span><input id="frame" type="range" min="0" value="0" /></label>
+        <label><span>速度</span><select id="fps"><option value="12">12 fps</option><option value="18" selected>18 fps</option><option value="24">24 fps</option><option value="30">30 fps</option></select></label>
+      </section>
+
+      <section class="contact-section">
+        <h2>完整逐帧顺序</h2>
+        <img id="contact" alt="完整逐帧动画总览" />
+      </section>
+    </main>
+    <script type="module" src="/src/originalAnimationReview.js"></script>
+  </body>
+</html>

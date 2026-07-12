@@ -8,12 +8,33 @@ const requiredFiles = [
   "src/glyphMasks.js",
   "src/vectorHanzi.js",
   "src/weaponGlyphSprites.js",
+  "src/originalUnitSprites.js",
+  "src/originalPropSprites.js",
+  "src/originalMapConfig.js",
   "src/styles.css",
   "vite.config.js",
   "tools/build-glyph-masks.py",
   "tools/build-game-glyph-sprites.py",
   "tools/make-animation-references.mjs",
-  "docs/game-design.md"
+  "tools/extract-original-maps.mjs",
+  "docs/game-design.md",
+  "public/original-units/farmer.png",
+  "public/original-units/hoe.png",
+  "public/original-units/gold-mine.png",
+  "public/original-units/crops-0.png",
+  "public/original-units/crops-1.png",
+  "public/original-units/crops-2.png",
+  "public/original-units/crops-3.png",
+  "public/original-props/trap_1.png",
+  "public/original-props/trap_2.png",
+  "public/original-props/landmine_1.png",
+  "public/original-props/inkstone_1.png",
+  "public/original-props/ink.png",
+  "public/original-props/mound.png",
+  "public/original-glyphs/dao-attack-sheet.png",
+  "public/original-glyphs/gong-attack-sheet.png",
+  "public/original-glyphs/qiang-full-review-sheet.png",
+  "public/original-glyphs/qi-attack-sheet.png"
 ];
 
 for (const file of requiredFiles) {
@@ -34,6 +55,12 @@ if (vectorSyntax.status !== 0) process.exit(vectorSyntax.status ?? 1);
 
 const weaponSpriteSyntax = spawnSync("node", ["--check", "src/weaponGlyphSprites.js"], { stdio: "inherit" });
 if (weaponSpriteSyntax.status !== 0) process.exit(weaponSpriteSyntax.status ?? 1);
+
+const unitSpriteSyntax = spawnSync("node", ["--check", "src/originalUnitSprites.js"], { stdio: "inherit" });
+if (unitSpriteSyntax.status !== 0) process.exit(unitSpriteSyntax.status ?? 1);
+
+const propSpriteSyntax = spawnSync("node", ["--check", "src/originalPropSprites.js"], { stdio: "inherit" });
+if (propSpriteSyntax.status !== 0) process.exit(propSpriteSyntax.status ?? 1);
 
 const animationReferenceSyntax = spawnSync("node", ["--check", "tools/make-animation-references.mjs"], { stdio: "inherit" });
 if (animationReferenceSyntax.status !== 0) process.exit(animationReferenceSyntax.status ?? 1);

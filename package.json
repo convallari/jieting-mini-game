@@ -2,12 +2,13 @@
   "name": "jieting-mini-game",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "description": "A mobile-first Three Kingdoms tower-defense merge game prototype.",
   "scripts": {
     "start": "vite --host 127.0.0.1",
     "dev": "vite --host 127.0.0.1",
     "build": "vite build",
-    "check": "node tools/check-assets.mjs"
+    "check": "node tools/check-assets.mjs && node tools/check-spine-assets.mjs && node tools/check-spine-runtime.mjs && node tools/check-battle-values.mjs"
   },
   "devDependencies": {
     "ffmpeg-static": "^5.3.0",
