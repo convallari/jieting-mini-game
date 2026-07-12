@@ -14,25 +14,33 @@ const AUDIO_ROOT = "/original-audio/";
 const audioEngine = {
   unlocked: false,
   muted: false,
-  lastPlayed: new Map(),
+  pending: [],
   unlock() {
     this.unlocked = true;
+    const pending = this.pending.splice(0);
+    for (const event of pending) this._play(event.name, event.ext, event.volume);
   },
-  play(name, volume = 0.42, minGap = 0.035) {
-    if (!this.unlocked || this.muted || !name) return;
-    const now = performance.now();
-    const last = this.lastPlayed.get(name) ?? -Infinity;
-    if (now - last < minGap * 1000) return;
-    this.lastPlayed.set(name, now);
-    const audio = new Audio(`${AUDIO_ROOT}${name}.mp3`);
+  _play(name, ext, volume) {
+    if (this.muted || !name) return;
+    const audio = new Audio(`${AUDIO_ROOT}${name}.${ext}`);
     audio.volume = Math.max(0, Math.min(1, volume));
     audio.play().catch(() => {});
+  },
+  play(name, volume = 0.42) {
+    if (!name || this.muted) return;
+    if (!this.unlocked) {
+      if (this.pending.length < 48) this.pending.push({ name, ext: "mp3", volume });
+      return;
+    }
+    this._play(name, "mp3", volume);
   },
   voice(name, volume = 0.5) {
-    if (!this.unlocked || this.muted || !name) return;
-    const audio = new Audio(`${AUDIO_ROOT}${name}.wav`);
-    audio.volume = Math.max(0, Math.min(1, volume));
-    audio.play().catch(() => {});
+    if (!name || this.muted) return;
+    if (!this.unlocked) {
+      if (this.pending.length < 48) this.pending.push({ name, ext: "wav", volume });
+      return;
+    }
+    this._play(name, "wav", volume);
   }
 };
 
@@ -79,6 +87,20 @@ const ATTACK_SOUND_BY_TOKEN = {
   "黄盖": "knife_attack",
   "刘备": "knife_attack",
   "黄祖": "knife_attack"
+};
+const BOSS_SOUND_BY_SKILL = {
+  chaos: "chain_lock",
+  revive: "boss_sweep_skill",
+  inspire: "boss_sweep_skill",
+  demolish: "bulldozer_land",
+  rain: "zhenFu_skill_rain",
+  charm: "diaoChan_skill_charm",
+  cavalry: "summon_cavalry_skill",
+  halberd: "luBu_skill",
+  devour: "dongZhuo_skill_phase1_suck",
+  frenzy: "maChao_attack_lightning",
+  blind: "boss_sweep_skill",
+  seal: "caoCao_skill_seal"
 };
 
 const SOLDIER_LEVEL_MULTIPLIERS = [1, 1.5, 2.1, 2.73, 3.4125];
@@ -763,6 +785,7 @@ function updateUnits(dt) {
 function castBossSkill(enemy) {
   const boss = BOSS_ROSTER[enemy.bossIndex];
   if (!boss) return;
+  audioEngine.play(BOSS_SOUND_BY_SKILL[boss.skill] ?? "boss_entrance", 0.28);
   let castDuration = boss.castDuration;
   let effectAt = boss.effectAt;
   if (boss.skill === "frenzy") {
