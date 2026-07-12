@@ -3439,7 +3439,11 @@ function syncOriginalGeneralLayer() {
       if (unit.type !== "general" || !hasOriginalGeneralAnimation(unit.token)) continue;
       const { r, c } = keyToCell(key);
       const center = cellCenter(r, c);
-      generals.push({ ...unit, x: center.x + (unit.span === 2 ? layout.cell * 0.5 : 0), y: center.y });
+      generals.push({
+        ...unit,
+        x: center.x + (unit.span === 2 ? layout.cell * 0.5 : 0),
+        y: center.y + layout.cell * 0.16
+      });
   }
   syncGeneralAnimations(generals, layout.cell);
 }
