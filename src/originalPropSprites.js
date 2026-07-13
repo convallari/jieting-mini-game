@@ -2,14 +2,14 @@ const BASE_URL = import.meta.env.BASE_URL || "/";
 const cache = new Map();
 
 export const ACTIVE_PROP_CONFIG = {
-  trap: { label: "陷阱", icon: "trap_1.png", cooldown: 50 },
-  landmine: { label: "地雷", icon: "landmine_1.png", cooldown: 55 },
-  inkstone: { label: "砚台", icon: "inkstone_1.png", cooldown: 90 }
+  trap: { label: "拒马", icon: "trap_1.png", cooldown: 50 },
+  landmine: { label: "伏火", icon: "landmine_1.png", cooldown: 55 },
+  inkstone: { label: "疑兵墨阵", icon: "inkstone_1.png", cooldown: 90 }
 };
 
 export function preloadOriginalPropSprites() {
   for (const config of Object.values(ACTIVE_PROP_CONFIG)) load(config.icon);
-  for (const file of ["trap_2.png", "mound.png", "ink.png"]) load(file);
+  for (const file of ["trap_2.png", "mound.png", "ink.png", "shovel_1.png", "shovel_2.png", "shovelShadow.png"]) load(file);
 }
 
 export function drawOriginalPropSprite(ctx, file, x, y, width, height = width, options = {}) {

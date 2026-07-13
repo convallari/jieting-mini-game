@@ -6,8 +6,15 @@ const characters = {
   thief: { label: "小兵", scale: 120, defaultSkin: true, animations: ["animation", "animation2", "animation3", "die"] },
   boss0: { label: "首领·一", scale: 78, defaultSkin: true, animations: ["attackbao", "attackjiao", "attackliang", "gobao", "gojiao", "goliang"] },
   boss1: { label: "首领·二", scale: 78, defaultSkin: true, animations: ["attackdiao", "attackxiang", "attackzhen", "godiao", "goxiang", "gozhen"] },
-  boss2: { label: "首领·三", scale: 78, defaultSkin: true, animations: ["attackcao", "attackdian", "attackdun", "gocao", "godian", "godian2", "goxia"] }
+  boss2: { label: "首领·三", scale: 78, defaultSkin: true, animations: ["attackcao", "attackdian", "attackdun", "gocao", "godian", "godian2", "goxia"] },
+  huaXiong: { label: "华雄", scale: 90, defaultSkin: true, animations: ["gohx", "attackhx"] },
+  lvBu: { label: "吕布", scale: 90, defaultSkin: true, animations: ["golvbu", "attacklvbu"] },
+  dongZhuo: { label: "董卓", scale: 90, defaultSkin: true, animations: ["godz", "attackdz", "attack2dz"] },
+  dancer: { label: "舞姬", scale: 110, defaultSkin: true, animations: ["animation"] }
 };
+
+const query = new URLSearchParams(location.search);
+if (query.get("embed") === "1") document.body.classList.add("embed");
 
 const characterSelect = document.querySelector("#character");
 const animationSelect = document.querySelector("#animation");
@@ -71,7 +78,12 @@ function loadCharacter() {
 }
 
 async function init() {
+  const requestedCharacter = query.get("character");
+  if (requestedCharacter && characters[requestedCharacter]) characterSelect.value = requestedCharacter;
   fillAnimations();
+  const requestedAnimation = query.get("animation");
+  if (requestedAnimation && characters[characterSelect.value].animations.includes(requestedAnimation)) animationSelect.value = requestedAnimation;
+  scaleInput.value = characters[characterSelect.value].scale;
   updateSkinControl();
   await Laya.init(wrap.clientWidth, wrap.clientHeight, Laya.WebGL);
   Laya.stage.bgColor = "#eadbbd";

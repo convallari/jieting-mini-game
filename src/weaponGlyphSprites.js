@@ -6,7 +6,7 @@ const TOKEN_TO_REFERENCE_KEY = {
 };
 
 const ORIGINAL_GLYPHS = {
-  dao: { sheet: "dao-attack-sheet.png", frames: 19, frameWidth: 120, frameHeight: 129, bounds: [54, 56, 92, 97], visualScale: 0.76 },
+  dao: { sheet: "dao-attack-sheet.png", frames: 19, frameWidth: 120, frameHeight: 129, bounds: [54, 56, 92, 97], visualScale: 0.62 },
   // The captured bow animation points upward. The original game rotates the
   // complete animation container toward the target before playing it.
   gong: { sheet: "gong-attack-sheet.png", frames: 30, frameWidth: 74, frameHeight: 95, bounds: [21, 1, 48, 53], visualScale: 0.76, aimOffset: Math.PI / 2 },

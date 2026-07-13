@@ -3,7 +3,11 @@ import { spawnSync } from "node:child_process";
 
 const requiredFiles = [
   "index.html",
+  "glyph-designer.html",
   "src/main.js",
+  "src/glyphDesigner.js",
+  "src/glyphDesigner.css",
+  "src/actorAssetSchema.js",
   "src/hanziAssets.js",
   "src/glyphMasks.js",
   "src/vectorHanzi.js",
@@ -11,13 +15,17 @@ const requiredFiles = [
   "src/originalUnitSprites.js",
   "src/originalPropSprites.js",
   "src/originalMapConfig.js",
+  "src/scenarioJieting.js",
+  "src/animationPresets.js",
   "src/styles.css",
   "vite.config.js",
   "tools/build-glyph-masks.py",
   "tools/build-game-glyph-sprites.py",
   "tools/make-animation-references.mjs",
   "tools/extract-original-maps.mjs",
+  "tools/check-jieting-config.mjs",
   "docs/game-design.md",
+  "docs/animation-asset-standard.md",
   "public/original-units/farmer.png",
   "public/original-units/hoe.png",
   "public/original-units/gold-mine.png",
@@ -61,6 +69,12 @@ if (unitSpriteSyntax.status !== 0) process.exit(unitSpriteSyntax.status ?? 1);
 
 const propSpriteSyntax = spawnSync("node", ["--check", "src/originalPropSprites.js"], { stdio: "inherit" });
 if (propSpriteSyntax.status !== 0) process.exit(propSpriteSyntax.status ?? 1);
+
+const scenarioSyntax = spawnSync("node", ["--check", "src/scenarioJieting.js"], { stdio: "inherit" });
+if (scenarioSyntax.status !== 0) process.exit(scenarioSyntax.status ?? 1);
+
+const animationPresetSyntax = spawnSync("node", ["--check", "src/animationPresets.js"], { stdio: "inherit" });
+if (animationPresetSyntax.status !== 0) process.exit(animationPresetSyntax.status ?? 1);
 
 const animationReferenceSyntax = spawnSync("node", ["--check", "tools/make-animation-references.mjs"], { stdio: "inherit" });
 if (animationReferenceSyntax.status !== 0) process.exit(animationReferenceSyntax.status ?? 1);

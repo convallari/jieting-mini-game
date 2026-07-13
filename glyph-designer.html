@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>街亭字形设计台</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/src/glyphDesigner.css" />
+  </head>
+  <body>
+    <main class="designer-shell">
+      <aside class="glyph-panel">
+        <div class="brand">
+          <strong>街亭字形动画台</strong>
+          <span>Layered 512</span>
+        </div>
+        <div id="glyphList" class="glyph-list" aria-label="字形列表"></div>
+        <div class="layer-panel">
+          <div class="panel-title">动画图层</div>
+          <div id="layerList" class="layer-list"></div>
+        </div>
+      </aside>
+
+      <section class="workbench">
+        <header class="toolbar">
+          <button id="brushTool" class="tool active" type="button" title="画笔">✒</button>
+          <button id="eraserTool" class="tool" type="button" title="橡皮">⌫</button>
+          <button id="undoButton" class="tool" type="button" title="撤销">↶</button>
+          <button id="clearButton" class="tool danger" type="button" title="清空">×</button>
+          <label class="field">
+            <span>粗细</span>
+            <input id="brushSize" type="range" min="4" max="72" value="24" />
+          </label>
+          <label class="field">
+            <span>墨色</span>
+            <input id="inkColor" type="color" value="#17120f" />
+          </label>
+          <label class="field">
+            <span>参考</span>
+            <input id="referenceInput" type="file" accept="image/*" />
+          </label>
+          <button id="toggleReference" class="tool" type="button" title="参考图">◉</button>
+        </header>
+
+        <div id="canvasZone" class="canvas-zone">
+          <iframe id="sourceSpinePreview" title="Spine 动画源预览" hidden></iframe>
+          <iframe id="sourceSpinePreviewB" title="Spine 动画第二部件预览" hidden></iframe>
+          <canvas id="referenceCanvas" width="512" height="512" aria-hidden="true"></canvas>
+          <div class="safe-frame"></div>
+        </div>
+        <section class="animation-panel" aria-label="动画制作面板">
+          <header class="animation-toolbar">
+            <button id="animationPlay" type="button" title="播放/暂停">▶</button>
+            <label>动作
+              <select id="clipSelect">
+                <option value="idle">idle 待机</option>
+                <option value="attack">attack 攻击</option>
+                <option value="hit">hit 受击</option>
+                <option value="death">death 阵亡</option>
+                <option value="skill">skill 技能</option>
+              </select>
+            </label>
+            <label>帧率 <input id="timelineFps" type="number" min="6" max="30" value="12" /></label>
+            <label>总帧 <input id="timelineDuration" type="number" min="4" max="120" value="24" /></label>
+            <span id="frameReadout">f00 / 24</span>
+            <button id="addKeyframe" type="button">添加关键帧</button>
+            <button id="deleteKeyframe" type="button">删除关键帧</button>
+          </header>
+          <div class="timeline-editor">
+            <div class="transform-controls">
+              <label>X <input id="transformX" type="number" value="0" /></label>
+              <label>Y <input id="transformY" type="number" value="0" /></label>
+              <label>缩放 <input id="transformScale" type="number" min="0.1" max="3" step="0.05" value="1" /></label>
+              <label>旋转 <input id="transformRotation" type="number" min="-360" max="360" value="0" /></label>
+              <label>透明 <input id="transformOpacity" type="number" min="0" max="1" step="0.05" value="1" /></label>
+              <label>补间
+                <select id="timelineEase"><option value="easeInOut">缓入缓出</option><option value="linear">线性</option><option value="step">逐帧</option></select>
+              </label>
+            </div>
+            <div class="timeline-tracks">
+              <input id="timelineScrubber" type="range" min="0" max="23" value="0" />
+              <div id="trackList" class="track-list"></div>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <aside class="export-panel">
+        <div class="current-card">
+          <div id="currentGlyph" class="current-glyph">马</div>
+          <div id="currentName" class="current-name">ma actor pack</div>
+        </div>
+        <div class="preview-row">
+          <canvas id="previewLarge" width="128" height="128"></canvas>
+          <canvas id="previewSmall" width="64" height="64"></canvas>
+        </div>
+        <div id="formationPreview" class="formation-preview" aria-label="阵型占格预览"></div>
+        <div id="stateMatrix" class="state-matrix"></div>
+        <label class="export-field">
+          <span>动画用途</span>
+          <select id="animationMode">
+            <option value="card">字牌通用</option>
+            <option value="general">将领大牌</option>
+            <option value="enemy">敌方字形</option>
+            <option value="terrain">地图标记</option>
+            <option value="weapon">兵种/工具</option>
+          </select>
+        </label>
+        <div class="actions">
+          <button id="saveGlyph" type="button">保存字</button>
+          <button id="exportPng" type="button">导出合成 PNG</button>
+          <button id="saveProjectPack" type="button">写入项目</button>
+          <button id="exportPack" type="button">导出角色动画包</button>
+        </div>
+        <textarea id="manifestPreview" readonly spellcheck="false"></textarea>
+      </aside>
+    </main>
+    <section class="asset-library" aria-label="项目素材库">
+      <header class="library-header">
+        <div>
+          <strong>项目素材库</strong>
+          <span id="assetCount"></span>
+        </div>
+        <div id="assetFilters" class="asset-filters"></div>
+        <input id="assetSearch" type="search" placeholder="搜索字形、角色、特效、道具" />
+      </header>
+      <div class="library-body">
+        <div id="assetGrid" class="asset-grid"></div>
+        <aside class="compare-panel">
+          <div class="compare-title">
+            <strong>动画对比</strong>
+            <button id="comparePlay" type="button">暂停</button>
+          </div>
+          <div class="compare-canvases">
+            <figure><canvas id="compareA" width="180" height="150"></canvas><figcaption id="compareALabel">选择素材 A</figcaption></figure>
+            <figure><canvas id="compareB" width="180" height="150"></canvas><figcaption id="compareBLabel">选择素材 B</figcaption></figure>
+          </div>
+        </aside>
+      </div>
+    </section>
+    <script type="module" src="/src/glyphDesigner.js"></script>
+  </body>
+</html>

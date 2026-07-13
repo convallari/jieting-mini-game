@@ -5,6 +5,10 @@ const POSE_KEYS = [
 ];
 
 const baseMotions = {
+  neutral: [
+    { t: 0, x: 0, y: 0, scaleX: 1, scaleY: 1, rotate: 0, alpha: 1 },
+    { t: 1, x: 0, y: 0, scaleX: 1, scaleY: 1, rotate: 0, alpha: 1 }
+  ],
   idle: [
     { t: 0, y: 0, scaleX: 1, scaleY: 1, rotate: 0, glyphScaleX: 1, glyphScaleY: 1 },
     { t: 0.5, y: -1.2, scaleX: 1.012, scaleY: 0.99, rotate: 0.018, glyphScaleX: 1.018, glyphScaleY: 0.992 },
@@ -99,13 +103,30 @@ const glyphOverrides = {
   "飞": { role: "char", fontScale: 0.62, baseline: 0.18, tilt: 0.03, paper: "#f9f5d8", ink: "#17120f" },
   "马": { role: "char", fontScale: 0.6, baseline: 0.18, tilt: 0.015, paper: "#f9f5d8", ink: "#8a641c" },
   "超": { role: "char", fontScale: 0.58, baseline: 0.18, tilt: -0.015, paper: "#f9f5d8", ink: "#17120f" },
+  "谡": { role: "char", fontScale: 0.54, baseline: 0.18, tilt: -0.018, paper: "#f5edcf", ink: "#17120f" },
+  "王": { role: "char", fontScale: 0.68, baseline: 0.17, tilt: 0.01, paper: "#edf4df", ink: "#173127" },
+  "平": { role: "char", fontScale: 0.65, baseline: 0.17, tilt: -0.008, paper: "#edf4df", ink: "#173127" },
+  "诸": { role: "char", fontScale: 0.52, baseline: 0.18, tilt: -0.012, paper: "#f8f2d8", ink: "#1b1a18" },
+  "葛": { role: "char", fontScale: 0.55, baseline: 0.18, tilt: 0.012, paper: "#f8f2d8", ink: "#1b1a18" },
+  "亮": { role: "char", fontScale: 0.58, baseline: 0.18, tilt: -0.01, paper: "#f8f2d8", ink: "#1b1a18" },
   "赵云": { role: "general", fontScale: 0.42, baseline: 0.16, tilt: -0.015, paper: "#fff0b8", border: "#d7ad35", ink: "#11100f", attachment: "general-ring" },
   "张飞": { role: "general", fontScale: 0.42, baseline: 0.16, tilt: 0.025, paper: "#f3e7ff", border: "#9c6bd8", ink: "#6b42a1", attachment: "general-ring" },
   "马超": { role: "general", fontScale: 0.42, baseline: 0.16, tilt: -0.02, paper: "#fff0b8", border: "#d7ad35", ink: "#8a641c", attachment: "general-ring" },
+  "马谡": { role: "general", fontScale: 0.42, baseline: 0.16, tilt: -0.012, paper: "#f6e8bd", border: "#bd8f35", ink: "#5d311c", attachment: "general-ring" },
+  "王平": { role: "general", fontScale: 0.42, baseline: 0.16, tilt: 0.01, paper: "#e6f0da", border: "#5b8b6f", ink: "#173127", attachment: "general-ring" },
+  "诸葛亮": { role: "general", fontScale: 0.35, baseline: 0.16, tilt: -0.008, paper: "#fff4c8", border: "#d7ad35", ink: "#17120f", attachment: "general-ring" },
   "兵": { role: "enemy", fontScale: 0.8, baseline: 0.16, tilt: -0.02, ink: "#17120f" },
   "卒": { role: "enemy", fontScale: 0.78, baseline: 0.16, tilt: 0.025, ink: "#201713" },
   "贼": { role: "enemy", fontScale: 0.63, baseline: 0.15, tilt: -0.035, ink: "#24150f" },
   "寇": { role: "enemy", fontScale: 0.68, baseline: 0.15, tilt: 0.02, ink: "#24150f" },
+  "张郃": { role: "enemy", fontScale: 0.45, baseline: 0.15, tilt: -0.02, ink: "#391914" },
+  "司马懿": { role: "enemy", fontScale: 0.34, baseline: 0.15, tilt: 0.012, ink: "#15213c" },
+  "魏军先锋": { role: "enemy", fontScale: 0.32, baseline: 0.15, tilt: -0.01, ink: "#253348" },
+  "魏": { role: "enemy", fontScale: 0.68, baseline: 0.15, tilt: -0.018, ink: "#2b211d" },
+  "蜀": { role: "goal", fontScale: 0.72, baseline: 0.15, tilt: 0.01, ink: "#70291f" },
+  "营": { role: "goal", fontScale: 0.76, baseline: 0.15, tilt: 0, ink: "#18110e" },
+  "水": { role: "goal", fontScale: 0.76, baseline: 0.15, tilt: 0.018, ink: "#1f5b72" },
+  "山": { role: "goal", fontScale: 0.76, baseline: 0.15, tilt: -0.01, ink: "#486b3e" },
   "斗": { role: "goal", fontScale: 0.9, baseline: 0.15, tilt: 0, ink: "#18110e" },
   "铲": { role: "tool", fontScale: 0.55, baseline: 0.14, tilt: -0.04, paper: "#e8f0ef", ink: "#26323a", attachment: "shovel" }
 };
@@ -133,14 +154,14 @@ export const HANZI_ASSETS = Object.fromEntries(
   Object.entries(glyphOverrides).map(([glyph, asset]) => [glyph, withMotions(asset)])
 );
 
-export const ENEMY_GLYPHS = ["兵", "贼"];
+export const ENEMY_GLYPHS = ["魏", "卒"];
 
 export function getHanziAsset(glyph) {
   return HANZI_ASSETS[glyph] ?? withMotions({ role: "char" });
 }
 
 export function sampleMotion(asset, motionName, progress) {
-  const frames = asset.motions?.[motionName] ?? baseMotions.idle;
+  const frames = asset.motions?.[motionName] ?? baseMotions.neutral;
   const t = clamp01(progress);
   let a = frames[0];
   let b = frames[frames.length - 1];

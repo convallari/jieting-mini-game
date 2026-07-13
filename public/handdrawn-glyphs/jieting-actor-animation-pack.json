@@ -1,0 +1,4447 @@
+{
+  "version": 4,
+  "format": "jieting-actor-animation-pack",
+  "canvas": {
+    "width": 512,
+    "height": 512,
+    "safePadding": 48
+  },
+  "layerOrder": [
+    "ink",
+    "accent",
+    "shadow",
+    "fx"
+  ],
+  "animationContract": {
+    "ink": "body: scale, squash, hit flash, attack offset",
+    "accent": "ornament: follows ink with 1-2 frame lag",
+    "shadow": "smear: low alpha drag and impact echo",
+    "fx": "effect: additive pulse and glow",
+    "clips": "shared actor clips: idle, attack, hit, death, skill",
+    "keyframes": "layer transform keys with linear, easeInOut or step interpolation"
+  },
+  "actors": {
+    "glyph.ma": {
+      "glyph": "马",
+      "token": "glyph.ma",
+      "actorType": "generalGlyph",
+      "stateProfile": "generalGlyph",
+      "members": [
+        "glyph.ma"
+      ],
+      "span": 1,
+      "neutralSource": "layer.ink",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "authored"
+        },
+        "drag": {
+          "status": "missing"
+        },
+        "drop": {
+          "status": "missing"
+        },
+        "link": {
+          "status": "missing"
+        },
+        "unlink": {
+          "status": "missing"
+        },
+        "form": {
+          "status": "notApplicable"
+        },
+        "attack": {
+          "status": "notApplicable"
+        },
+        "hit": {
+          "status": "notApplicable"
+        },
+        "death": {
+          "status": "notApplicable"
+        },
+        "skill": {
+          "status": "notApplicable"
+        },
+        "break": {
+          "status": "notApplicable"
+        },
+        "merge": {
+          "status": "notApplicable"
+        },
+        "sleep": {
+          "status": "notApplicable"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "notApplicable"
+        },
+        "armed": {
+          "status": "notApplicable"
+        },
+        "trigger": {
+          "status": "notApplicable"
+        },
+        "expire": {
+          "status": "notApplicable"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "glyph.ma_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {
+        "idle": {
+          "name": "idle",
+          "fps": 12,
+          "duration": 24,
+          "loop": true,
+          "events": [],
+          "tracks": {}
+        }
+      },
+      "layers": {
+        "ink": {
+          "label": "主墨",
+          "role": "body",
+          "animation": "breath, squash, attack-offset",
+          "file": "glyph.ma_ink.png",
+          "width": 512,
+          "height": 512
+        }
+      }
+    },
+    "glyph.su": {
+      "glyph": "谡",
+      "token": "glyph.su",
+      "actorType": "generalGlyph",
+      "stateProfile": "generalGlyph",
+      "members": [
+        "glyph.su"
+      ],
+      "span": 1,
+      "neutralSource": "layer.ink",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "authored"
+        },
+        "drag": {
+          "status": "missing"
+        },
+        "drop": {
+          "status": "missing"
+        },
+        "link": {
+          "status": "missing"
+        },
+        "unlink": {
+          "status": "missing"
+        },
+        "form": {
+          "status": "notApplicable"
+        },
+        "attack": {
+          "status": "notApplicable"
+        },
+        "hit": {
+          "status": "notApplicable"
+        },
+        "death": {
+          "status": "notApplicable"
+        },
+        "skill": {
+          "status": "notApplicable"
+        },
+        "break": {
+          "status": "notApplicable"
+        },
+        "merge": {
+          "status": "notApplicable"
+        },
+        "sleep": {
+          "status": "notApplicable"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "notApplicable"
+        },
+        "armed": {
+          "status": "notApplicable"
+        },
+        "trigger": {
+          "status": "notApplicable"
+        },
+        "expire": {
+          "status": "notApplicable"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "glyph.su_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {
+        "idle": {
+          "name": "idle",
+          "fps": 12,
+          "duration": 24,
+          "loop": true,
+          "events": [],
+          "tracks": {}
+        }
+      },
+      "layers": {
+        "ink": {
+          "label": "主墨",
+          "role": "body",
+          "animation": "breath, squash, attack-offset",
+          "file": "glyph.su_ink.png",
+          "width": 512,
+          "height": 512
+        }
+      }
+    },
+    "glyph.wang": {
+      "glyph": "王",
+      "token": "glyph.wang",
+      "actorType": "generalGlyph",
+      "stateProfile": "generalGlyph",
+      "members": [
+        "glyph.wang"
+      ],
+      "span": 1,
+      "neutralSource": "layer.ink",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "authored"
+        },
+        "drag": {
+          "status": "missing"
+        },
+        "drop": {
+          "status": "missing"
+        },
+        "link": {
+          "status": "missing"
+        },
+        "unlink": {
+          "status": "missing"
+        },
+        "form": {
+          "status": "notApplicable"
+        },
+        "attack": {
+          "status": "notApplicable"
+        },
+        "hit": {
+          "status": "notApplicable"
+        },
+        "death": {
+          "status": "notApplicable"
+        },
+        "skill": {
+          "status": "notApplicable"
+        },
+        "break": {
+          "status": "notApplicable"
+        },
+        "merge": {
+          "status": "notApplicable"
+        },
+        "sleep": {
+          "status": "notApplicable"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "notApplicable"
+        },
+        "armed": {
+          "status": "notApplicable"
+        },
+        "trigger": {
+          "status": "notApplicable"
+        },
+        "expire": {
+          "status": "notApplicable"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "glyph.wang_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {
+        "idle": {
+          "name": "idle",
+          "fps": 12,
+          "duration": 24,
+          "loop": true,
+          "events": [],
+          "tracks": {}
+        }
+      },
+      "layers": {
+        "ink": {
+          "label": "主墨",
+          "role": "body",
+          "animation": "breath, squash, attack-offset",
+          "file": "glyph.wang_ink.png",
+          "width": 512,
+          "height": 512
+        }
+      }
+    },
+    "glyph.ping": {
+      "glyph": "平",
+      "token": "glyph.ping",
+      "actorType": "generalGlyph",
+      "stateProfile": "generalGlyph",
+      "members": [
+        "glyph.ping"
+      ],
+      "span": 1,
+      "neutralSource": "layer.ink",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "authored"
+        },
+        "drag": {
+          "status": "missing"
+        },
+        "drop": {
+          "status": "missing"
+        },
+        "link": {
+          "status": "missing"
+        },
+        "unlink": {
+          "status": "missing"
+        },
+        "form": {
+          "status": "notApplicable"
+        },
+        "attack": {
+          "status": "notApplicable"
+        },
+        "hit": {
+          "status": "notApplicable"
+        },
+        "death": {
+          "status": "notApplicable"
+        },
+        "skill": {
+          "status": "notApplicable"
+        },
+        "break": {
+          "status": "notApplicable"
+        },
+        "merge": {
+          "status": "notApplicable"
+        },
+        "sleep": {
+          "status": "notApplicable"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "notApplicable"
+        },
+        "armed": {
+          "status": "notApplicable"
+        },
+        "trigger": {
+          "status": "notApplicable"
+        },
+        "expire": {
+          "status": "notApplicable"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "glyph.ping_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {
+        "idle": {
+          "name": "idle",
+          "fps": 12,
+          "duration": 24,
+          "loop": true,
+          "events": [],
+          "tracks": {}
+        }
+      },
+      "layers": {
+        "ink": {
+          "label": "主墨",
+          "role": "body",
+          "animation": "breath, squash, attack-offset",
+          "file": "glyph.ping_ink.png",
+          "width": 512,
+          "height": 512
+        }
+      }
+    },
+    "glyph.zhu": {
+      "glyph": "诸",
+      "token": "glyph.zhu",
+      "actorType": "generalGlyph",
+      "stateProfile": "generalGlyph",
+      "members": [
+        "glyph.zhu"
+      ],
+      "span": 1,
+      "neutralSource": "layer.ink",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "authored"
+        },
+        "drag": {
+          "status": "missing"
+        },
+        "drop": {
+          "status": "missing"
+        },
+        "link": {
+          "status": "missing"
+        },
+        "unlink": {
+          "status": "missing"
+        },
+        "form": {
+          "status": "notApplicable"
+        },
+        "attack": {
+          "status": "notApplicable"
+        },
+        "hit": {
+          "status": "notApplicable"
+        },
+        "death": {
+          "status": "notApplicable"
+        },
+        "skill": {
+          "status": "notApplicable"
+        },
+        "break": {
+          "status": "notApplicable"
+        },
+        "merge": {
+          "status": "notApplicable"
+        },
+        "sleep": {
+          "status": "notApplicable"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "notApplicable"
+        },
+        "armed": {
+          "status": "notApplicable"
+        },
+        "trigger": {
+          "status": "notApplicable"
+        },
+        "expire": {
+          "status": "notApplicable"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "glyph.zhu_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {
+        "idle": {
+          "name": "idle",
+          "fps": 12,
+          "duration": 24,
+          "loop": true,
+          "events": [],
+          "tracks": {}
+        }
+      },
+      "layers": {
+        "ink": {
+          "label": "主墨",
+          "role": "body",
+          "animation": "breath, squash, attack-offset",
+          "file": "glyph.zhu_ink.png",
+          "width": 512,
+          "height": 512
+        }
+      }
+    },
+    "glyph.ge": {
+      "glyph": "葛",
+      "token": "glyph.ge",
+      "actorType": "generalGlyph",
+      "stateProfile": "generalGlyph",
+      "members": [
+        "glyph.ge"
+      ],
+      "span": 1,
+      "neutralSource": "layer.ink",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "authored"
+        },
+        "drag": {
+          "status": "missing"
+        },
+        "drop": {
+          "status": "missing"
+        },
+        "link": {
+          "status": "missing"
+        },
+        "unlink": {
+          "status": "missing"
+        },
+        "form": {
+          "status": "notApplicable"
+        },
+        "attack": {
+          "status": "notApplicable"
+        },
+        "hit": {
+          "status": "notApplicable"
+        },
+        "death": {
+          "status": "notApplicable"
+        },
+        "skill": {
+          "status": "notApplicable"
+        },
+        "break": {
+          "status": "notApplicable"
+        },
+        "merge": {
+          "status": "notApplicable"
+        },
+        "sleep": {
+          "status": "notApplicable"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "notApplicable"
+        },
+        "armed": {
+          "status": "notApplicable"
+        },
+        "trigger": {
+          "status": "notApplicable"
+        },
+        "expire": {
+          "status": "notApplicable"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "glyph.ge_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {
+        "idle": {
+          "name": "idle",
+          "fps": 12,
+          "duration": 24,
+          "loop": true,
+          "events": [],
+          "tracks": {}
+        }
+      },
+      "layers": {
+        "ink": {
+          "label": "主墨",
+          "role": "body",
+          "animation": "breath, squash, attack-offset",
+          "file": "glyph.ge_ink.png",
+          "width": 512,
+          "height": 512
+        }
+      }
+    },
+    "glyph.liang": {
+      "glyph": "亮",
+      "token": "glyph.liang",
+      "actorType": "generalGlyph",
+      "stateProfile": "generalGlyph",
+      "members": [
+        "glyph.liang"
+      ],
+      "span": 1,
+      "neutralSource": "layer.ink",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "authored"
+        },
+        "drag": {
+          "status": "missing"
+        },
+        "drop": {
+          "status": "missing"
+        },
+        "link": {
+          "status": "missing"
+        },
+        "unlink": {
+          "status": "missing"
+        },
+        "form": {
+          "status": "notApplicable"
+        },
+        "attack": {
+          "status": "notApplicable"
+        },
+        "hit": {
+          "status": "notApplicable"
+        },
+        "death": {
+          "status": "notApplicable"
+        },
+        "skill": {
+          "status": "notApplicable"
+        },
+        "break": {
+          "status": "notApplicable"
+        },
+        "merge": {
+          "status": "notApplicable"
+        },
+        "sleep": {
+          "status": "notApplicable"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "notApplicable"
+        },
+        "armed": {
+          "status": "notApplicable"
+        },
+        "trigger": {
+          "status": "notApplicable"
+        },
+        "expire": {
+          "status": "notApplicable"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "glyph.liang_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {
+        "idle": {
+          "name": "idle",
+          "fps": 12,
+          "duration": 24,
+          "loop": true,
+          "events": [],
+          "tracks": {}
+        }
+      },
+      "layers": {
+        "ink": {
+          "label": "主墨",
+          "role": "body",
+          "animation": "breath, squash, attack-offset",
+          "file": "glyph.liang_ink.png",
+          "width": 512,
+          "height": 512
+        }
+      }
+    },
+    "glyph.zhao": {
+      "glyph": "赵",
+      "token": "glyph.zhao",
+      "actorType": "generalGlyph",
+      "stateProfile": "generalGlyph",
+      "members": [
+        "glyph.zhao"
+      ],
+      "span": 1,
+      "neutralSource": "layer.ink",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "authored"
+        },
+        "drag": {
+          "status": "missing"
+        },
+        "drop": {
+          "status": "missing"
+        },
+        "link": {
+          "status": "missing"
+        },
+        "unlink": {
+          "status": "missing"
+        },
+        "form": {
+          "status": "notApplicable"
+        },
+        "attack": {
+          "status": "notApplicable"
+        },
+        "hit": {
+          "status": "notApplicable"
+        },
+        "death": {
+          "status": "notApplicable"
+        },
+        "skill": {
+          "status": "notApplicable"
+        },
+        "break": {
+          "status": "notApplicable"
+        },
+        "merge": {
+          "status": "notApplicable"
+        },
+        "sleep": {
+          "status": "notApplicable"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "notApplicable"
+        },
+        "armed": {
+          "status": "notApplicable"
+        },
+        "trigger": {
+          "status": "notApplicable"
+        },
+        "expire": {
+          "status": "notApplicable"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "glyph.zhao_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {
+        "idle": {
+          "name": "idle",
+          "fps": 12,
+          "duration": 24,
+          "loop": true,
+          "events": [],
+          "tracks": {}
+        }
+      },
+      "layers": {}
+    },
+    "glyph.yun": {
+      "glyph": "云",
+      "token": "glyph.yun",
+      "actorType": "generalGlyph",
+      "stateProfile": "generalGlyph",
+      "members": [
+        "glyph.yun"
+      ],
+      "span": 1,
+      "neutralSource": "layer.ink",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "missing"
+        },
+        "drag": {
+          "status": "missing"
+        },
+        "drop": {
+          "status": "missing"
+        },
+        "link": {
+          "status": "missing"
+        },
+        "unlink": {
+          "status": "missing"
+        },
+        "form": {
+          "status": "notApplicable"
+        },
+        "attack": {
+          "status": "notApplicable"
+        },
+        "hit": {
+          "status": "notApplicable"
+        },
+        "death": {
+          "status": "notApplicable"
+        },
+        "skill": {
+          "status": "notApplicable"
+        },
+        "break": {
+          "status": "notApplicable"
+        },
+        "merge": {
+          "status": "notApplicable"
+        },
+        "sleep": {
+          "status": "notApplicable"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "notApplicable"
+        },
+        "armed": {
+          "status": "notApplicable"
+        },
+        "trigger": {
+          "status": "notApplicable"
+        },
+        "expire": {
+          "status": "notApplicable"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "glyph.yun_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {},
+      "layers": {}
+    },
+    "glyph.zhang": {
+      "glyph": "张",
+      "token": "glyph.zhang",
+      "actorType": "generalGlyph",
+      "stateProfile": "generalGlyph",
+      "members": [
+        "glyph.zhang"
+      ],
+      "span": 1,
+      "neutralSource": "layer.ink",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "authored"
+        },
+        "drag": {
+          "status": "missing"
+        },
+        "drop": {
+          "status": "missing"
+        },
+        "link": {
+          "status": "missing"
+        },
+        "unlink": {
+          "status": "missing"
+        },
+        "form": {
+          "status": "notApplicable"
+        },
+        "attack": {
+          "status": "notApplicable"
+        },
+        "hit": {
+          "status": "notApplicable"
+        },
+        "death": {
+          "status": "notApplicable"
+        },
+        "skill": {
+          "status": "notApplicable"
+        },
+        "break": {
+          "status": "notApplicable"
+        },
+        "merge": {
+          "status": "notApplicable"
+        },
+        "sleep": {
+          "status": "notApplicable"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "notApplicable"
+        },
+        "armed": {
+          "status": "notApplicable"
+        },
+        "trigger": {
+          "status": "notApplicable"
+        },
+        "expire": {
+          "status": "notApplicable"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "glyph.zhang_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {
+        "idle": {
+          "name": "idle",
+          "fps": 12,
+          "duration": 24,
+          "loop": true,
+          "events": [],
+          "tracks": {}
+        }
+      },
+      "layers": {
+        "ink": {
+          "label": "主墨",
+          "role": "body",
+          "animation": "breath, squash, attack-offset",
+          "file": "glyph.zhang_ink.png",
+          "width": 512,
+          "height": 512
+        }
+      }
+    },
+    "glyph.fei": {
+      "glyph": "飞",
+      "token": "glyph.fei",
+      "actorType": "generalGlyph",
+      "stateProfile": "generalGlyph",
+      "members": [
+        "glyph.fei"
+      ],
+      "span": 1,
+      "neutralSource": "layer.ink",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "missing"
+        },
+        "drag": {
+          "status": "missing"
+        },
+        "drop": {
+          "status": "missing"
+        },
+        "link": {
+          "status": "missing"
+        },
+        "unlink": {
+          "status": "missing"
+        },
+        "form": {
+          "status": "notApplicable"
+        },
+        "attack": {
+          "status": "notApplicable"
+        },
+        "hit": {
+          "status": "notApplicable"
+        },
+        "death": {
+          "status": "notApplicable"
+        },
+        "skill": {
+          "status": "notApplicable"
+        },
+        "break": {
+          "status": "notApplicable"
+        },
+        "merge": {
+          "status": "notApplicable"
+        },
+        "sleep": {
+          "status": "notApplicable"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "notApplicable"
+        },
+        "armed": {
+          "status": "notApplicable"
+        },
+        "trigger": {
+          "status": "notApplicable"
+        },
+        "expire": {
+          "status": "notApplicable"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "glyph.fei_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {},
+      "layers": {}
+    },
+    "glyph.chao": {
+      "glyph": "超",
+      "token": "glyph.chao",
+      "actorType": "generalGlyph",
+      "stateProfile": "generalGlyph",
+      "members": [
+        "glyph.chao"
+      ],
+      "span": 1,
+      "neutralSource": "layer.ink",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "missing"
+        },
+        "drag": {
+          "status": "missing"
+        },
+        "drop": {
+          "status": "missing"
+        },
+        "link": {
+          "status": "missing"
+        },
+        "unlink": {
+          "status": "missing"
+        },
+        "form": {
+          "status": "notApplicable"
+        },
+        "attack": {
+          "status": "notApplicable"
+        },
+        "hit": {
+          "status": "notApplicable"
+        },
+        "death": {
+          "status": "notApplicable"
+        },
+        "skill": {
+          "status": "notApplicable"
+        },
+        "break": {
+          "status": "notApplicable"
+        },
+        "merge": {
+          "status": "notApplicable"
+        },
+        "sleep": {
+          "status": "notApplicable"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "notApplicable"
+        },
+        "armed": {
+          "status": "notApplicable"
+        },
+        "trigger": {
+          "status": "notApplicable"
+        },
+        "expire": {
+          "status": "notApplicable"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "glyph.chao_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {},
+      "layers": {}
+    },
+    "glyph.huang": {
+      "glyph": "黄",
+      "token": "glyph.huang",
+      "actorType": "generalGlyph",
+      "stateProfile": "generalGlyph",
+      "members": [
+        "glyph.huang"
+      ],
+      "span": 1,
+      "neutralSource": "layer.ink",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "missing"
+        },
+        "drag": {
+          "status": "missing"
+        },
+        "drop": {
+          "status": "missing"
+        },
+        "link": {
+          "status": "missing"
+        },
+        "unlink": {
+          "status": "missing"
+        },
+        "form": {
+          "status": "notApplicable"
+        },
+        "attack": {
+          "status": "notApplicable"
+        },
+        "hit": {
+          "status": "notApplicable"
+        },
+        "death": {
+          "status": "notApplicable"
+        },
+        "skill": {
+          "status": "notApplicable"
+        },
+        "break": {
+          "status": "notApplicable"
+        },
+        "merge": {
+          "status": "notApplicable"
+        },
+        "sleep": {
+          "status": "notApplicable"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "notApplicable"
+        },
+        "armed": {
+          "status": "notApplicable"
+        },
+        "trigger": {
+          "status": "notApplicable"
+        },
+        "expire": {
+          "status": "notApplicable"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "glyph.huang_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {},
+      "layers": {}
+    },
+    "glyph.zhong": {
+      "glyph": "忠",
+      "token": "glyph.zhong",
+      "actorType": "generalGlyph",
+      "stateProfile": "generalGlyph",
+      "members": [
+        "glyph.zhong"
+      ],
+      "span": 1,
+      "neutralSource": "layer.ink",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "authored"
+        },
+        "drag": {
+          "status": "missing"
+        },
+        "drop": {
+          "status": "missing"
+        },
+        "link": {
+          "status": "missing"
+        },
+        "unlink": {
+          "status": "missing"
+        },
+        "form": {
+          "status": "notApplicable"
+        },
+        "attack": {
+          "status": "notApplicable"
+        },
+        "hit": {
+          "status": "notApplicable"
+        },
+        "death": {
+          "status": "notApplicable"
+        },
+        "skill": {
+          "status": "notApplicable"
+        },
+        "break": {
+          "status": "notApplicable"
+        },
+        "merge": {
+          "status": "notApplicable"
+        },
+        "sleep": {
+          "status": "notApplicable"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "notApplicable"
+        },
+        "armed": {
+          "status": "notApplicable"
+        },
+        "trigger": {
+          "status": "notApplicable"
+        },
+        "expire": {
+          "status": "notApplicable"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "glyph.zhong_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {
+        "idle": {
+          "name": "idle",
+          "fps": 12,
+          "duration": 24,
+          "loop": true,
+          "events": [],
+          "tracks": {}
+        }
+      },
+      "layers": {}
+    },
+    "glyph.he": {
+      "glyph": "郃",
+      "token": "glyph.he",
+      "actorType": "generalGlyph",
+      "stateProfile": "generalGlyph",
+      "members": [
+        "郃"
+      ],
+      "span": 1,
+      "neutralSource": "layer.ink",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "authored"
+        },
+        "drag": {
+          "status": "missing"
+        },
+        "drop": {
+          "status": "missing"
+        },
+        "link": {
+          "status": "missing"
+        },
+        "unlink": {
+          "status": "missing"
+        },
+        "form": {
+          "status": "notApplicable"
+        },
+        "attack": {
+          "status": "notApplicable"
+        },
+        "hit": {
+          "status": "notApplicable"
+        },
+        "death": {
+          "status": "notApplicable"
+        },
+        "skill": {
+          "status": "notApplicable"
+        },
+        "break": {
+          "status": "notApplicable"
+        },
+        "merge": {
+          "status": "notApplicable"
+        },
+        "sleep": {
+          "status": "notApplicable"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "notApplicable"
+        },
+        "armed": {
+          "status": "notApplicable"
+        },
+        "trigger": {
+          "status": "notApplicable"
+        },
+        "expire": {
+          "status": "notApplicable"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "glyph.he_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {
+        "idle": {
+          "name": "idle",
+          "fps": 12,
+          "duration": 24,
+          "loop": true,
+          "events": [],
+          "tracks": {}
+        }
+      },
+      "layers": {
+        "ink": {
+          "label": "主墨",
+          "role": "body",
+          "animation": "breath, squash, attack-offset",
+          "file": "glyph.he_ink.png",
+          "width": 512,
+          "height": 512
+        }
+      }
+    },
+    "glyph.si": {
+      "glyph": "司",
+      "token": "glyph.si",
+      "actorType": "generalGlyph",
+      "stateProfile": "generalGlyph",
+      "members": [
+        "司"
+      ],
+      "span": 1,
+      "neutralSource": "layer.ink",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "authored"
+        },
+        "drag": {
+          "status": "missing"
+        },
+        "drop": {
+          "status": "missing"
+        },
+        "link": {
+          "status": "missing"
+        },
+        "unlink": {
+          "status": "missing"
+        },
+        "form": {
+          "status": "notApplicable"
+        },
+        "attack": {
+          "status": "notApplicable"
+        },
+        "hit": {
+          "status": "notApplicable"
+        },
+        "death": {
+          "status": "notApplicable"
+        },
+        "skill": {
+          "status": "notApplicable"
+        },
+        "break": {
+          "status": "notApplicable"
+        },
+        "merge": {
+          "status": "notApplicable"
+        },
+        "sleep": {
+          "status": "notApplicable"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "notApplicable"
+        },
+        "armed": {
+          "status": "notApplicable"
+        },
+        "trigger": {
+          "status": "notApplicable"
+        },
+        "expire": {
+          "status": "notApplicable"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "glyph.si_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {
+        "idle": {
+          "name": "idle",
+          "fps": 12,
+          "duration": 24,
+          "loop": true,
+          "events": [],
+          "tracks": {}
+        }
+      },
+      "layers": {
+        "ink": {
+          "label": "主墨",
+          "role": "body",
+          "animation": "breath, squash, attack-offset",
+          "file": "glyph.si_ink.png",
+          "width": 512,
+          "height": 512
+        }
+      }
+    },
+    "glyph.yi": {
+      "glyph": "懿",
+      "token": "glyph.yi",
+      "actorType": "generalGlyph",
+      "stateProfile": "generalGlyph",
+      "members": [
+        "懿"
+      ],
+      "span": 1,
+      "neutralSource": "layer.ink",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "authored"
+        },
+        "drag": {
+          "status": "missing"
+        },
+        "drop": {
+          "status": "missing"
+        },
+        "link": {
+          "status": "missing"
+        },
+        "unlink": {
+          "status": "missing"
+        },
+        "form": {
+          "status": "notApplicable"
+        },
+        "attack": {
+          "status": "notApplicable"
+        },
+        "hit": {
+          "status": "notApplicable"
+        },
+        "death": {
+          "status": "notApplicable"
+        },
+        "skill": {
+          "status": "notApplicable"
+        },
+        "break": {
+          "status": "notApplicable"
+        },
+        "merge": {
+          "status": "notApplicable"
+        },
+        "sleep": {
+          "status": "notApplicable"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "notApplicable"
+        },
+        "armed": {
+          "status": "notApplicable"
+        },
+        "trigger": {
+          "status": "notApplicable"
+        },
+        "expire": {
+          "status": "notApplicable"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "glyph.yi_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {
+        "idle": {
+          "name": "idle",
+          "fps": 12,
+          "duration": 24,
+          "loop": true,
+          "events": [],
+          "tracks": {}
+        }
+      },
+      "layers": {
+        "ink": {
+          "label": "主墨",
+          "role": "body",
+          "animation": "breath, squash, attack-offset",
+          "file": "glyph.yi_ink.png",
+          "width": 512,
+          "height": 512
+        }
+      }
+    },
+    "glyph.wei": {
+      "glyph": "魏",
+      "token": "glyph.wei",
+      "actorType": "generalGlyph",
+      "stateProfile": "generalGlyph",
+      "members": [
+        "魏"
+      ],
+      "span": 1,
+      "neutralSource": "layer.ink",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "authored"
+        },
+        "drag": {
+          "status": "missing"
+        },
+        "drop": {
+          "status": "missing"
+        },
+        "link": {
+          "status": "missing"
+        },
+        "unlink": {
+          "status": "missing"
+        },
+        "form": {
+          "status": "notApplicable"
+        },
+        "attack": {
+          "status": "notApplicable"
+        },
+        "hit": {
+          "status": "notApplicable"
+        },
+        "death": {
+          "status": "notApplicable"
+        },
+        "skill": {
+          "status": "notApplicable"
+        },
+        "break": {
+          "status": "notApplicable"
+        },
+        "merge": {
+          "status": "notApplicable"
+        },
+        "sleep": {
+          "status": "notApplicable"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "notApplicable"
+        },
+        "armed": {
+          "status": "notApplicable"
+        },
+        "trigger": {
+          "status": "notApplicable"
+        },
+        "expire": {
+          "status": "notApplicable"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "glyph.wei_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {
+        "idle": {
+          "name": "idle",
+          "fps": 12,
+          "duration": 24,
+          "loop": true,
+          "events": [],
+          "tracks": {}
+        }
+      },
+      "layers": {
+        "ink": {
+          "label": "主墨",
+          "role": "body",
+          "animation": "breath, squash, attack-offset",
+          "file": "glyph.wei_ink.png",
+          "width": 512,
+          "height": 512
+        }
+      }
+    },
+    "glyph.jun": {
+      "glyph": "军",
+      "token": "glyph.jun",
+      "actorType": "generalGlyph",
+      "stateProfile": "generalGlyph",
+      "members": [
+        "军"
+      ],
+      "span": 1,
+      "neutralSource": "layer.ink",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "authored"
+        },
+        "drag": {
+          "status": "missing"
+        },
+        "drop": {
+          "status": "missing"
+        },
+        "link": {
+          "status": "missing"
+        },
+        "unlink": {
+          "status": "missing"
+        },
+        "form": {
+          "status": "notApplicable"
+        },
+        "attack": {
+          "status": "notApplicable"
+        },
+        "hit": {
+          "status": "notApplicable"
+        },
+        "death": {
+          "status": "notApplicable"
+        },
+        "skill": {
+          "status": "notApplicable"
+        },
+        "break": {
+          "status": "notApplicable"
+        },
+        "merge": {
+          "status": "notApplicable"
+        },
+        "sleep": {
+          "status": "notApplicable"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "notApplicable"
+        },
+        "armed": {
+          "status": "notApplicable"
+        },
+        "trigger": {
+          "status": "notApplicable"
+        },
+        "expire": {
+          "status": "notApplicable"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "glyph.jun_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {
+        "idle": {
+          "name": "idle",
+          "fps": 12,
+          "duration": 24,
+          "loop": true,
+          "events": [],
+          "tracks": {}
+        }
+      },
+      "layers": {
+        "ink": {
+          "label": "主墨",
+          "role": "body",
+          "animation": "breath, squash, attack-offset",
+          "file": "glyph.jun_ink.png",
+          "width": 512,
+          "height": 512
+        }
+      }
+    },
+    "glyph.xian": {
+      "glyph": "先",
+      "token": "glyph.xian",
+      "actorType": "generalGlyph",
+      "stateProfile": "generalGlyph",
+      "members": [
+        "先"
+      ],
+      "span": 1,
+      "neutralSource": "layer.ink",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "authored"
+        },
+        "drag": {
+          "status": "missing"
+        },
+        "drop": {
+          "status": "missing"
+        },
+        "link": {
+          "status": "missing"
+        },
+        "unlink": {
+          "status": "missing"
+        },
+        "form": {
+          "status": "notApplicable"
+        },
+        "attack": {
+          "status": "notApplicable"
+        },
+        "hit": {
+          "status": "notApplicable"
+        },
+        "death": {
+          "status": "notApplicable"
+        },
+        "skill": {
+          "status": "notApplicable"
+        },
+        "break": {
+          "status": "notApplicable"
+        },
+        "merge": {
+          "status": "notApplicable"
+        },
+        "sleep": {
+          "status": "notApplicable"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "notApplicable"
+        },
+        "armed": {
+          "status": "notApplicable"
+        },
+        "trigger": {
+          "status": "notApplicable"
+        },
+        "expire": {
+          "status": "notApplicable"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "glyph.xian_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {
+        "idle": {
+          "name": "idle",
+          "fps": 12,
+          "duration": 24,
+          "loop": true,
+          "events": [],
+          "tracks": {}
+        }
+      },
+      "layers": {
+        "ink": {
+          "label": "主墨",
+          "role": "body",
+          "animation": "breath, squash, attack-offset",
+          "file": "glyph.xian_ink.png",
+          "width": 512,
+          "height": 512
+        }
+      }
+    },
+    "glyph.feng": {
+      "glyph": "锋",
+      "token": "glyph.feng",
+      "actorType": "generalGlyph",
+      "stateProfile": "generalGlyph",
+      "members": [
+        "锋"
+      ],
+      "span": 1,
+      "neutralSource": "layer.ink",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "authored"
+        },
+        "drag": {
+          "status": "missing"
+        },
+        "drop": {
+          "status": "missing"
+        },
+        "link": {
+          "status": "missing"
+        },
+        "unlink": {
+          "status": "missing"
+        },
+        "form": {
+          "status": "notApplicable"
+        },
+        "attack": {
+          "status": "notApplicable"
+        },
+        "hit": {
+          "status": "notApplicable"
+        },
+        "death": {
+          "status": "notApplicable"
+        },
+        "skill": {
+          "status": "notApplicable"
+        },
+        "break": {
+          "status": "notApplicable"
+        },
+        "merge": {
+          "status": "notApplicable"
+        },
+        "sleep": {
+          "status": "notApplicable"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "notApplicable"
+        },
+        "armed": {
+          "status": "notApplicable"
+        },
+        "trigger": {
+          "status": "notApplicable"
+        },
+        "expire": {
+          "status": "notApplicable"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "glyph.feng_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {
+        "idle": {
+          "name": "idle",
+          "fps": 12,
+          "duration": 24,
+          "loop": true,
+          "events": [],
+          "tracks": {}
+        }
+      },
+      "layers": {
+        "ink": {
+          "label": "主墨",
+          "role": "body",
+          "animation": "breath, squash, attack-offset",
+          "file": "glyph.feng_ink.png",
+          "width": 512,
+          "height": 512
+        }
+      }
+    },
+    "glyph.shu": {
+      "glyph": "蜀",
+      "token": "glyph.shu",
+      "actorType": "generalGlyph",
+      "stateProfile": "generalGlyph",
+      "members": [
+        "蜀"
+      ],
+      "span": 1,
+      "neutralSource": "layer.ink",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "authored"
+        },
+        "drag": {
+          "status": "missing"
+        },
+        "drop": {
+          "status": "missing"
+        },
+        "link": {
+          "status": "missing"
+        },
+        "unlink": {
+          "status": "missing"
+        },
+        "form": {
+          "status": "notApplicable"
+        },
+        "attack": {
+          "status": "notApplicable"
+        },
+        "hit": {
+          "status": "notApplicable"
+        },
+        "death": {
+          "status": "notApplicable"
+        },
+        "skill": {
+          "status": "notApplicable"
+        },
+        "break": {
+          "status": "notApplicable"
+        },
+        "merge": {
+          "status": "notApplicable"
+        },
+        "sleep": {
+          "status": "notApplicable"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "notApplicable"
+        },
+        "armed": {
+          "status": "notApplicable"
+        },
+        "trigger": {
+          "status": "notApplicable"
+        },
+        "expire": {
+          "status": "notApplicable"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "glyph.shu_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {
+        "idle": {
+          "name": "idle",
+          "fps": 12,
+          "duration": 24,
+          "loop": true,
+          "events": [],
+          "tracks": {}
+        }
+      },
+      "layers": {
+        "ink": {
+          "label": "主墨",
+          "role": "body",
+          "animation": "breath, squash, attack-offset",
+          "file": "glyph.shu_ink.png",
+          "width": 512,
+          "height": 512
+        }
+      }
+    },
+    "glyph.ying": {
+      "glyph": "营",
+      "token": "glyph.ying",
+      "actorType": "generalGlyph",
+      "stateProfile": "generalGlyph",
+      "members": [
+        "营"
+      ],
+      "span": 1,
+      "neutralSource": "layer.ink",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "authored"
+        },
+        "drag": {
+          "status": "missing"
+        },
+        "drop": {
+          "status": "missing"
+        },
+        "link": {
+          "status": "missing"
+        },
+        "unlink": {
+          "status": "missing"
+        },
+        "form": {
+          "status": "notApplicable"
+        },
+        "attack": {
+          "status": "notApplicable"
+        },
+        "hit": {
+          "status": "notApplicable"
+        },
+        "death": {
+          "status": "notApplicable"
+        },
+        "skill": {
+          "status": "notApplicable"
+        },
+        "break": {
+          "status": "notApplicable"
+        },
+        "merge": {
+          "status": "notApplicable"
+        },
+        "sleep": {
+          "status": "notApplicable"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "notApplicable"
+        },
+        "armed": {
+          "status": "notApplicable"
+        },
+        "trigger": {
+          "status": "notApplicable"
+        },
+        "expire": {
+          "status": "notApplicable"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "glyph.ying_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {
+        "idle": {
+          "name": "idle",
+          "fps": 12,
+          "duration": 24,
+          "loop": true,
+          "events": [],
+          "tracks": {}
+        }
+      },
+      "layers": {
+        "ink": {
+          "label": "主墨",
+          "role": "body",
+          "animation": "breath, squash, attack-offset",
+          "file": "glyph.ying_ink.png",
+          "width": 512,
+          "height": 512
+        }
+      }
+    },
+    "glyph.shan": {
+      "glyph": "山",
+      "token": "glyph.shan",
+      "actorType": "generalGlyph",
+      "stateProfile": "generalGlyph",
+      "members": [
+        "山"
+      ],
+      "span": 1,
+      "neutralSource": "layer.ink",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "authored"
+        },
+        "drag": {
+          "status": "missing"
+        },
+        "drop": {
+          "status": "missing"
+        },
+        "link": {
+          "status": "missing"
+        },
+        "unlink": {
+          "status": "missing"
+        },
+        "form": {
+          "status": "notApplicable"
+        },
+        "attack": {
+          "status": "notApplicable"
+        },
+        "hit": {
+          "status": "notApplicable"
+        },
+        "death": {
+          "status": "notApplicable"
+        },
+        "skill": {
+          "status": "notApplicable"
+        },
+        "break": {
+          "status": "notApplicable"
+        },
+        "merge": {
+          "status": "notApplicable"
+        },
+        "sleep": {
+          "status": "notApplicable"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "notApplicable"
+        },
+        "armed": {
+          "status": "notApplicable"
+        },
+        "trigger": {
+          "status": "notApplicable"
+        },
+        "expire": {
+          "status": "notApplicable"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "glyph.shan_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {
+        "idle": {
+          "name": "idle",
+          "fps": 12,
+          "duration": 24,
+          "loop": true,
+          "events": [],
+          "tracks": {}
+        }
+      },
+      "layers": {
+        "ink": {
+          "label": "主墨",
+          "role": "body",
+          "animation": "breath, squash, attack-offset",
+          "file": "glyph.shan_ink.png",
+          "width": 512,
+          "height": 512
+        }
+      }
+    },
+    "glyph.shui": {
+      "glyph": "水",
+      "token": "glyph.shui",
+      "actorType": "generalGlyph",
+      "stateProfile": "generalGlyph",
+      "members": [
+        "水"
+      ],
+      "span": 1,
+      "neutralSource": "layer.ink",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "authored"
+        },
+        "drag": {
+          "status": "missing"
+        },
+        "drop": {
+          "status": "missing"
+        },
+        "link": {
+          "status": "missing"
+        },
+        "unlink": {
+          "status": "missing"
+        },
+        "form": {
+          "status": "notApplicable"
+        },
+        "attack": {
+          "status": "notApplicable"
+        },
+        "hit": {
+          "status": "notApplicable"
+        },
+        "death": {
+          "status": "notApplicable"
+        },
+        "skill": {
+          "status": "notApplicable"
+        },
+        "break": {
+          "status": "notApplicable"
+        },
+        "merge": {
+          "status": "notApplicable"
+        },
+        "sleep": {
+          "status": "notApplicable"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "notApplicable"
+        },
+        "armed": {
+          "status": "notApplicable"
+        },
+        "trigger": {
+          "status": "notApplicable"
+        },
+        "expire": {
+          "status": "notApplicable"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "glyph.shui_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {
+        "idle": {
+          "name": "idle",
+          "fps": 12,
+          "duration": 24,
+          "loop": true,
+          "events": [],
+          "tracks": {}
+        }
+      },
+      "layers": {
+        "ink": {
+          "label": "主墨",
+          "role": "body",
+          "animation": "breath, squash, attack-offset",
+          "file": "glyph.shui_ink.png",
+          "width": 512,
+          "height": 512
+        }
+      }
+    },
+    "general.zhugeliang": {
+      "glyph": "诸葛亮",
+      "token": "general.zhugeliang",
+      "actorType": "generalFormation",
+      "stateProfile": "generalFormation",
+      "members": [
+        "glyph.zhu",
+        "glyph.ge",
+        "glyph.liang"
+      ],
+      "span": 3,
+      "neutralSource": "composeMembers",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "missing"
+        },
+        "drag": {
+          "status": "notApplicable"
+        },
+        "drop": {
+          "status": "notApplicable"
+        },
+        "link": {
+          "status": "notApplicable"
+        },
+        "unlink": {
+          "status": "notApplicable"
+        },
+        "form": {
+          "status": "missing"
+        },
+        "attack": {
+          "status": "missing"
+        },
+        "hit": {
+          "status": "missing"
+        },
+        "death": {
+          "status": "missing"
+        },
+        "skill": {
+          "status": "missing"
+        },
+        "break": {
+          "status": "missing"
+        },
+        "merge": {
+          "status": "notApplicable"
+        },
+        "sleep": {
+          "status": "notApplicable"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "notApplicable"
+        },
+        "armed": {
+          "status": "notApplicable"
+        },
+        "trigger": {
+          "status": "notApplicable"
+        },
+        "expire": {
+          "status": "notApplicable"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "general.zhugeliang_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {},
+      "layers": {}
+    },
+    "general.masu": {
+      "glyph": "马谡",
+      "token": "general.masu",
+      "actorType": "generalFormation",
+      "stateProfile": "generalFormation",
+      "members": [
+        "glyph.ma",
+        "glyph.su"
+      ],
+      "span": 2,
+      "neutralSource": "composeMembers",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "missing"
+        },
+        "drag": {
+          "status": "notApplicable"
+        },
+        "drop": {
+          "status": "notApplicable"
+        },
+        "link": {
+          "status": "notApplicable"
+        },
+        "unlink": {
+          "status": "notApplicable"
+        },
+        "form": {
+          "status": "missing"
+        },
+        "attack": {
+          "status": "missing"
+        },
+        "hit": {
+          "status": "missing"
+        },
+        "death": {
+          "status": "missing"
+        },
+        "skill": {
+          "status": "missing"
+        },
+        "break": {
+          "status": "missing"
+        },
+        "merge": {
+          "status": "notApplicable"
+        },
+        "sleep": {
+          "status": "notApplicable"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "notApplicable"
+        },
+        "armed": {
+          "status": "notApplicable"
+        },
+        "trigger": {
+          "status": "notApplicable"
+        },
+        "expire": {
+          "status": "notApplicable"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "general.masu_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {},
+      "layers": {}
+    },
+    "general.wangping": {
+      "glyph": "王平",
+      "token": "general.wangping",
+      "actorType": "generalFormation",
+      "stateProfile": "generalFormation",
+      "members": [
+        "glyph.wang",
+        "glyph.ping"
+      ],
+      "span": 2,
+      "neutralSource": "composeMembers",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "missing"
+        },
+        "drag": {
+          "status": "notApplicable"
+        },
+        "drop": {
+          "status": "notApplicable"
+        },
+        "link": {
+          "status": "notApplicable"
+        },
+        "unlink": {
+          "status": "notApplicable"
+        },
+        "form": {
+          "status": "missing"
+        },
+        "attack": {
+          "status": "missing"
+        },
+        "hit": {
+          "status": "missing"
+        },
+        "death": {
+          "status": "missing"
+        },
+        "skill": {
+          "status": "missing"
+        },
+        "break": {
+          "status": "missing"
+        },
+        "merge": {
+          "status": "notApplicable"
+        },
+        "sleep": {
+          "status": "notApplicable"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "notApplicable"
+        },
+        "armed": {
+          "status": "notApplicable"
+        },
+        "trigger": {
+          "status": "notApplicable"
+        },
+        "expire": {
+          "status": "notApplicable"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "general.wangping_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {},
+      "layers": {}
+    },
+    "general.zhuge": {
+      "glyph": "诸葛",
+      "token": "general.zhuge",
+      "actorType": "generalFormation",
+      "stateProfile": "generalFormation",
+      "members": [
+        "glyph.zhu",
+        "glyph.ge"
+      ],
+      "span": 2,
+      "neutralSource": "composeMembers",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "missing"
+        },
+        "drag": {
+          "status": "notApplicable"
+        },
+        "drop": {
+          "status": "notApplicable"
+        },
+        "link": {
+          "status": "notApplicable"
+        },
+        "unlink": {
+          "status": "notApplicable"
+        },
+        "form": {
+          "status": "missing"
+        },
+        "attack": {
+          "status": "missing"
+        },
+        "hit": {
+          "status": "missing"
+        },
+        "death": {
+          "status": "missing"
+        },
+        "skill": {
+          "status": "missing"
+        },
+        "break": {
+          "status": "missing"
+        },
+        "merge": {
+          "status": "notApplicable"
+        },
+        "sleep": {
+          "status": "notApplicable"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "notApplicable"
+        },
+        "armed": {
+          "status": "notApplicable"
+        },
+        "trigger": {
+          "status": "notApplicable"
+        },
+        "expire": {
+          "status": "notApplicable"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "general.zhuge_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {},
+      "layers": {}
+    },
+    "general.zhaoyun": {
+      "glyph": "赵云",
+      "token": "general.zhaoyun",
+      "actorType": "generalFormation",
+      "stateProfile": "generalFormation",
+      "members": [
+        "glyph.zhao",
+        "glyph.yun"
+      ],
+      "span": 2,
+      "neutralSource": "composeMembers",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "missing"
+        },
+        "drag": {
+          "status": "notApplicable"
+        },
+        "drop": {
+          "status": "notApplicable"
+        },
+        "link": {
+          "status": "notApplicable"
+        },
+        "unlink": {
+          "status": "notApplicable"
+        },
+        "form": {
+          "status": "missing"
+        },
+        "attack": {
+          "status": "missing"
+        },
+        "hit": {
+          "status": "missing"
+        },
+        "death": {
+          "status": "missing"
+        },
+        "skill": {
+          "status": "missing"
+        },
+        "break": {
+          "status": "missing"
+        },
+        "merge": {
+          "status": "notApplicable"
+        },
+        "sleep": {
+          "status": "notApplicable"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "notApplicable"
+        },
+        "armed": {
+          "status": "notApplicable"
+        },
+        "trigger": {
+          "status": "notApplicable"
+        },
+        "expire": {
+          "status": "notApplicable"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "general.zhaoyun_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {},
+      "layers": {}
+    },
+    "general.zhangfei": {
+      "glyph": "张飞",
+      "token": "general.zhangfei",
+      "actorType": "generalFormation",
+      "stateProfile": "generalFormation",
+      "members": [
+        "glyph.zhang",
+        "glyph.fei"
+      ],
+      "span": 2,
+      "neutralSource": "composeMembers",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "missing"
+        },
+        "drag": {
+          "status": "notApplicable"
+        },
+        "drop": {
+          "status": "notApplicable"
+        },
+        "link": {
+          "status": "notApplicable"
+        },
+        "unlink": {
+          "status": "notApplicable"
+        },
+        "form": {
+          "status": "missing"
+        },
+        "attack": {
+          "status": "missing"
+        },
+        "hit": {
+          "status": "missing"
+        },
+        "death": {
+          "status": "missing"
+        },
+        "skill": {
+          "status": "missing"
+        },
+        "break": {
+          "status": "missing"
+        },
+        "merge": {
+          "status": "notApplicable"
+        },
+        "sleep": {
+          "status": "notApplicable"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "notApplicable"
+        },
+        "armed": {
+          "status": "notApplicable"
+        },
+        "trigger": {
+          "status": "notApplicable"
+        },
+        "expire": {
+          "status": "notApplicable"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "general.zhangfei_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {},
+      "layers": {}
+    },
+    "general.machao": {
+      "glyph": "马超",
+      "token": "general.machao",
+      "actorType": "generalFormation",
+      "stateProfile": "generalFormation",
+      "members": [
+        "glyph.ma",
+        "glyph.chao"
+      ],
+      "span": 2,
+      "neutralSource": "composeMembers",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "missing"
+        },
+        "drag": {
+          "status": "notApplicable"
+        },
+        "drop": {
+          "status": "notApplicable"
+        },
+        "link": {
+          "status": "notApplicable"
+        },
+        "unlink": {
+          "status": "notApplicable"
+        },
+        "form": {
+          "status": "missing"
+        },
+        "attack": {
+          "status": "missing"
+        },
+        "hit": {
+          "status": "missing"
+        },
+        "death": {
+          "status": "missing"
+        },
+        "skill": {
+          "status": "missing"
+        },
+        "break": {
+          "status": "missing"
+        },
+        "merge": {
+          "status": "notApplicable"
+        },
+        "sleep": {
+          "status": "notApplicable"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "notApplicable"
+        },
+        "armed": {
+          "status": "notApplicable"
+        },
+        "trigger": {
+          "status": "notApplicable"
+        },
+        "expire": {
+          "status": "notApplicable"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "general.machao_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {},
+      "layers": {}
+    },
+    "general.huangzhong": {
+      "glyph": "黄忠",
+      "token": "general.huangzhong",
+      "actorType": "generalFormation",
+      "stateProfile": "generalFormation",
+      "members": [
+        "glyph.huang",
+        "glyph.zhong"
+      ],
+      "span": 2,
+      "neutralSource": "composeMembers",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "missing"
+        },
+        "drag": {
+          "status": "notApplicable"
+        },
+        "drop": {
+          "status": "notApplicable"
+        },
+        "link": {
+          "status": "notApplicable"
+        },
+        "unlink": {
+          "status": "notApplicable"
+        },
+        "form": {
+          "status": "missing"
+        },
+        "attack": {
+          "status": "missing"
+        },
+        "hit": {
+          "status": "missing"
+        },
+        "death": {
+          "status": "missing"
+        },
+        "skill": {
+          "status": "missing"
+        },
+        "break": {
+          "status": "missing"
+        },
+        "merge": {
+          "status": "notApplicable"
+        },
+        "sleep": {
+          "status": "notApplicable"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "notApplicable"
+        },
+        "armed": {
+          "status": "notApplicable"
+        },
+        "trigger": {
+          "status": "notApplicable"
+        },
+        "expire": {
+          "status": "notApplicable"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "general.huangzhong_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {},
+      "layers": {}
+    },
+    "unit.dao": {
+      "glyph": "刀",
+      "token": "unit.dao",
+      "actorType": "unit",
+      "stateProfile": "unit",
+      "members": [
+        "刀"
+      ],
+      "span": 1,
+      "neutralSource": "layer.ink",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "missing"
+        },
+        "drag": {
+          "status": "missing"
+        },
+        "drop": {
+          "status": "missing"
+        },
+        "link": {
+          "status": "notApplicable"
+        },
+        "unlink": {
+          "status": "notApplicable"
+        },
+        "form": {
+          "status": "notApplicable"
+        },
+        "attack": {
+          "status": "missing"
+        },
+        "hit": {
+          "status": "missing"
+        },
+        "death": {
+          "status": "missing"
+        },
+        "skill": {
+          "status": "notApplicable"
+        },
+        "break": {
+          "status": "notApplicable"
+        },
+        "merge": {
+          "status": "missing"
+        },
+        "sleep": {
+          "status": "missing"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "notApplicable"
+        },
+        "armed": {
+          "status": "notApplicable"
+        },
+        "trigger": {
+          "status": "notApplicable"
+        },
+        "expire": {
+          "status": "notApplicable"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "unit.dao_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {},
+      "layers": {}
+    },
+    "unit.qiang": {
+      "glyph": "枪",
+      "token": "unit.qiang",
+      "actorType": "unit",
+      "stateProfile": "unit",
+      "members": [
+        "枪"
+      ],
+      "span": 1,
+      "neutralSource": "layer.ink",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "missing"
+        },
+        "drag": {
+          "status": "missing"
+        },
+        "drop": {
+          "status": "missing"
+        },
+        "link": {
+          "status": "notApplicable"
+        },
+        "unlink": {
+          "status": "notApplicable"
+        },
+        "form": {
+          "status": "notApplicable"
+        },
+        "attack": {
+          "status": "missing"
+        },
+        "hit": {
+          "status": "missing"
+        },
+        "death": {
+          "status": "missing"
+        },
+        "skill": {
+          "status": "notApplicable"
+        },
+        "break": {
+          "status": "notApplicable"
+        },
+        "merge": {
+          "status": "missing"
+        },
+        "sleep": {
+          "status": "missing"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "notApplicable"
+        },
+        "armed": {
+          "status": "notApplicable"
+        },
+        "trigger": {
+          "status": "notApplicable"
+        },
+        "expire": {
+          "status": "notApplicable"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "unit.qiang_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {},
+      "layers": {}
+    },
+    "unit.gong": {
+      "glyph": "弓",
+      "token": "unit.gong",
+      "actorType": "unit",
+      "stateProfile": "unit",
+      "members": [
+        "弓"
+      ],
+      "span": 1,
+      "neutralSource": "layer.ink",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "missing"
+        },
+        "drag": {
+          "status": "missing"
+        },
+        "drop": {
+          "status": "missing"
+        },
+        "link": {
+          "status": "notApplicable"
+        },
+        "unlink": {
+          "status": "notApplicable"
+        },
+        "form": {
+          "status": "notApplicable"
+        },
+        "attack": {
+          "status": "missing"
+        },
+        "hit": {
+          "status": "missing"
+        },
+        "death": {
+          "status": "missing"
+        },
+        "skill": {
+          "status": "notApplicable"
+        },
+        "break": {
+          "status": "notApplicable"
+        },
+        "merge": {
+          "status": "missing"
+        },
+        "sleep": {
+          "status": "missing"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "notApplicable"
+        },
+        "armed": {
+          "status": "notApplicable"
+        },
+        "trigger": {
+          "status": "notApplicable"
+        },
+        "expire": {
+          "status": "notApplicable"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "unit.gong_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {},
+      "layers": {}
+    },
+    "unit.qi": {
+      "glyph": "骑",
+      "token": "unit.qi",
+      "actorType": "unit",
+      "stateProfile": "unit",
+      "members": [
+        "骑"
+      ],
+      "span": 1,
+      "neutralSource": "layer.ink",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "missing"
+        },
+        "drag": {
+          "status": "missing"
+        },
+        "drop": {
+          "status": "missing"
+        },
+        "link": {
+          "status": "notApplicable"
+        },
+        "unlink": {
+          "status": "notApplicable"
+        },
+        "form": {
+          "status": "notApplicable"
+        },
+        "attack": {
+          "status": "missing"
+        },
+        "hit": {
+          "status": "missing"
+        },
+        "death": {
+          "status": "missing"
+        },
+        "skill": {
+          "status": "notApplicable"
+        },
+        "break": {
+          "status": "notApplicable"
+        },
+        "merge": {
+          "status": "missing"
+        },
+        "sleep": {
+          "status": "missing"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "notApplicable"
+        },
+        "armed": {
+          "status": "notApplicable"
+        },
+        "trigger": {
+          "status": "notApplicable"
+        },
+        "expire": {
+          "status": "notApplicable"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "unit.qi_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {},
+      "layers": {}
+    },
+    "prop.chan": {
+      "glyph": "铲",
+      "token": "prop.chan",
+      "actorType": "prop",
+      "stateProfile": "prop",
+      "members": [
+        "铲"
+      ],
+      "span": 1,
+      "neutralSource": "layer.ink",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "notApplicable"
+        },
+        "drag": {
+          "status": "notApplicable"
+        },
+        "drop": {
+          "status": "notApplicable"
+        },
+        "link": {
+          "status": "notApplicable"
+        },
+        "unlink": {
+          "status": "notApplicable"
+        },
+        "form": {
+          "status": "notApplicable"
+        },
+        "attack": {
+          "status": "notApplicable"
+        },
+        "hit": {
+          "status": "notApplicable"
+        },
+        "death": {
+          "status": "notApplicable"
+        },
+        "skill": {
+          "status": "notApplicable"
+        },
+        "break": {
+          "status": "notApplicable"
+        },
+        "merge": {
+          "status": "notApplicable"
+        },
+        "sleep": {
+          "status": "notApplicable"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "missing"
+        },
+        "armed": {
+          "status": "missing"
+        },
+        "trigger": {
+          "status": "missing"
+        },
+        "expire": {
+          "status": "missing"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "prop.chan_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {},
+      "layers": {}
+    },
+    "unit.nong": {
+      "glyph": "农",
+      "token": "unit.nong",
+      "actorType": "unit",
+      "stateProfile": "unit",
+      "members": [
+        "农"
+      ],
+      "span": 1,
+      "neutralSource": "layer.ink",
+      "states": {
+        "neutral": {
+          "status": "source"
+        },
+        "idle": {
+          "status": "missing"
+        },
+        "drag": {
+          "status": "missing"
+        },
+        "drop": {
+          "status": "missing"
+        },
+        "link": {
+          "status": "notApplicable"
+        },
+        "unlink": {
+          "status": "notApplicable"
+        },
+        "form": {
+          "status": "notApplicable"
+        },
+        "attack": {
+          "status": "missing"
+        },
+        "hit": {
+          "status": "missing"
+        },
+        "death": {
+          "status": "missing"
+        },
+        "skill": {
+          "status": "notApplicable"
+        },
+        "break": {
+          "status": "notApplicable"
+        },
+        "merge": {
+          "status": "missing"
+        },
+        "sleep": {
+          "status": "missing"
+        },
+        "move": {
+          "status": "notApplicable"
+        },
+        "cast": {
+          "status": "notApplicable"
+        },
+        "activate": {
+          "status": "notApplicable"
+        },
+        "damaged": {
+          "status": "notApplicable"
+        },
+        "destroy": {
+          "status": "notApplicable"
+        },
+        "place": {
+          "status": "notApplicable"
+        },
+        "armed": {
+          "status": "notApplicable"
+        },
+        "trigger": {
+          "status": "notApplicable"
+        },
+        "expire": {
+          "status": "notApplicable"
+        },
+        "play": {
+          "status": "notApplicable"
+        }
+      },
+      "compositeFile": "unit.nong_composite.png",
+      "animationMode": "card",
+      "pivot": {
+        "x": 256,
+        "y": 300
+      },
+      "bounds": {
+        "x": 48,
+        "y": 48,
+        "width": 416,
+        "height": 416
+      },
+      "clips": {},
+      "layers": {}
+    }
+  },
+  "recipes": [
+    {
+      "id": "general.zhugeliang",
+      "displayName": "诸葛亮",
+      "members": [
+        "诸",
+        "葛",
+        "亮"
+      ],
+      "span": 3
+    },
+    {
+      "id": "general.masu",
+      "displayName": "马谡",
+      "members": [
+        "马",
+        "谡"
+      ],
+      "span": 2
+    },
+    {
+      "id": "general.wangping",
+      "displayName": "王平",
+      "members": [
+        "王",
+        "平"
+      ],
+      "span": 2
+    },
+    {
+      "id": "general.zhuge",
+      "displayName": "诸葛",
+      "members": [
+        "诸",
+        "葛"
+      ],
+      "span": 2
+    },
+    {
+      "id": "general.zhaoyun",
+      "displayName": "赵云",
+      "members": [
+        "赵",
+        "云"
+      ],
+      "span": 2
+    },
+    {
+      "id": "general.zhangfei",
+      "displayName": "张飞",
+      "members": [
+        "张",
+        "飞"
+      ],
+      "span": 2
+    },
+    {
+      "id": "general.machao",
+      "displayName": "马超",
+      "members": [
+        "马",
+        "超"
+      ],
+      "span": 2
+    },
+    {
+      "id": "general.huangzhong",
+      "displayName": "黄忠",
+      "members": [
+        "黄",
+        "忠"
+      ],
+      "span": 2
+    }
+  ],
+  "legacyAliases": {
+    "马": "glyph.ma",
+    "谡": "glyph.su",
+    "王": "glyph.wang",
+    "平": "glyph.ping",
+    "诸": "glyph.zhu",
+    "葛": "glyph.ge",
+    "亮": "glyph.liang",
+    "赵": "glyph.zhao",
+    "云": "glyph.yun",
+    "张": "glyph.zhang",
+    "飞": "glyph.fei",
+    "超": "glyph.chao",
+    "黄": "glyph.huang",
+    "忠": "glyph.zhong",
+    "诸葛亮": "general.zhugeliang",
+    "马谡": "general.masu",
+    "王平": "general.wangping",
+    "诸葛": "general.zhuge",
+    "赵云": "general.zhaoyun",
+    "张飞": "general.zhangfei",
+    "马超": "general.machao",
+    "黄忠": "general.huangzhong",
+    "zhaoYun": "general.zhaoyun",
+    "zhangFei": "general.zhangfei",
+    "maChao": "general.machao"
+  },
+  "sourceStructures": {
+    "unit.qiang": {
+      "kind": "bakedComposite",
+      "logicalParts": [
+        "radical.mu",
+        "radical.cang"
+      ],
+      "editableParts": false,
+      "note": "现有PNG序列已合成，但保留木/仓双部件语义；不可把烘焙帧误报为独立图层。"
+    },
+    "general.zhaoyun": {
+      "kind": "spineParts",
+      "editableParts": true,
+      "parts": [
+        {
+          "id": "glyph.zhao",
+          "idle": "zhan1",
+          "attack": "attack1"
+        },
+        {
+          "id": "glyph.yun",
+          "idle": "zhan2",
+          "attack": "attack2"
+        }
+      ],
+      "synchronization": "sharedSemanticStateAndNormalizedProgress"
+    },
+    "general.zhangfei": {
+      "kind": "spineParts",
+      "editableParts": true,
+      "parts": [
+        {
+          "id": "glyph.zhang",
+          "idle": "zhan1",
+          "attack": "attack1"
+        },
+        {
+          "id": "glyph.fei",
+          "idle": "zhan2",
+          "attack": "attack2"
+        }
+      ],
+      "synchronization": "sharedSemanticStateAndNormalizedProgress"
+    },
+    "general.machao": {
+      "kind": "spineParts",
+      "editableParts": true,
+      "parts": [
+        {
+          "id": "glyph.ma",
+          "idle": "zhan1",
+          "attack": "attack1"
+        },
+        {
+          "id": "glyph.chao",
+          "idle": "zhan2",
+          "attack": "attack2"
+        }
+      ],
+      "synchronization": "sharedSemanticStateAndNormalizedProgress"
+    }
+  },
+  "sourceDisplayPolicy": {
+    "mode": "sourceFirst",
+    "allowImplicitSplit": false,
+    "allowImplicitMerge": false,
+    "derivedCompositeRequiresDeclaration": true,
+    "preserveNativeBonesSlotsLayersAndFrames": true
+  },
+  "sourceOverrides": {
+    "spine-zhaoYun": {
+      "assetId": "spine-zhaoYun",
+      "actorType": "terrain",
+      "clips": {
+        "idle": {
+          "name": "idle",
+          "fps": 12,
+          "duration": 24,
+          "loop": true,
+          "events": [],
+          "tracks": {},
+          "source": {
+            "type": "spine",
+            "asset": "zhaoYun",
+            "animation": "zhan1"
+          }
+        }
+      }
+    }
+  }
+}
