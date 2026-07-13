@@ -270,7 +270,7 @@ function createState() {
     tutorialStep: readTutorialSeen() ? -1 : 0,
     tutorialReplay: false,
     firstRecruitGuaranteed: true,
-    recruitCombatBag: [],
+    lastRecruitBasics: [],
     douHp: { left: 3, right: 3 },
     paused: false,
     cultivated: new Set([...initialCultivated, ...JIETING_TERRAIN.mountain, ...JIETING_TERRAIN.openingDeployment]),
@@ -3980,6 +3980,7 @@ function createRecruitChoices() {
     : supportRoll < 0.56
       ? { category: "辅", original: "铲" }
       : { category: "兵", original: drawRecruitCombatToken(new Set([firstBasic, secondBasic])) };
+  state.lastRecruitBasics = [firstBasic, secondBasic, third.category === "兵" ? third.original : null].filter(Boolean);
   return [
     { category: "兵", original: firstBasic },
     { category: "兵", original: secondBasic },
@@ -3988,20 +3989,19 @@ function createRecruitChoices() {
 }
 
 function drawRecruitCombatToken(excluded = new Set()) {
-  const refill = () => {
-    state.recruitCombatBag = ["刀", "枪", "弓", "骑", "刀", "枪", "弓", "骑"];
-    for (let i = state.recruitCombatBag.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [state.recruitCombatBag[i], state.recruitCombatBag[j]] = [state.recruitCombatBag[j], state.recruitCombatBag[i]];
-    }
-  };
-  if (!state.recruitCombatBag.length) refill();
-  let index = state.recruitCombatBag.findIndex((token) => !excluded.has(token));
-  if (index < 0) {
-    refill();
-    index = state.recruitCombatBag.findIndex((token) => !excluded.has(token));
+  const candidates = ["刀", "枪", "弓", "骑"]
+    .filter((token) => !excluded.has(token))
+    .map((token) => ({
+      token,
+      weight: (JIETING_DECK_WEIGHTS[token] ?? 1) * (state.lastRecruitBasics.includes(token) ? 0.45 : 1)
+    }));
+  const total = candidates.reduce((sum, item) => sum + item.weight, 0);
+  let roll = Math.random() * total;
+  for (const candidate of candidates) {
+    roll -= candidate.weight;
+    if (roll <= 0) return candidate.token;
   }
-  return state.recruitCombatBag.splice(Math.max(0, index), 1)[0];
+  return candidates.at(-1)?.token ?? "刀";
 }
 
 function selectRecruitChoice(index) {
