@@ -353,26 +353,33 @@ function computeLayout(w, h) {
   const boardY = Math.round(topH + Math.max(4, (availableH - boardH) * 0.2));
   const campY = boardY + boardH + 12;
   const slot = Math.min(55, Math.floor((w - 92) / CAMP_SIZE));
+  const actionGap = 8;
+  const propGap = 5;
+  const propWidth = Math.max(42, Math.min(48, Math.floor((w - 28 - 140 - actionGap - propGap * 2) / 3)));
+  const recruitWidth = Math.min(152, w - 28 - actionGap - propWidth * 3 - propGap * 2);
+  const actionWidth = recruitWidth + actionGap + propWidth * 3 + propGap * 2;
+  const actionX = Math.round((w - actionWidth) / 2);
+  const actionY = campY + slot + 14;
   layout = {
     w, h, safeTop, topH, bottomH, cell, cellW, cellH, boardX, boardY, boardW, boardH,
     campY, slot,
     campX: Math.round((w - slot * CAMP_SIZE - 10 * (CAMP_SIZE - 1)) / 2 + 20),
-    recruit: { x: Math.round(w / 2 - 76), y: campY + slot + 14, w: 152, h: 68 },
+    recruit: { x: actionX, y: actionY, w: recruitWidth, h: 68 },
     start: { x: Math.round(w / 2 - 108), y: Math.round(h * 0.68), w: 216, h: 64 },
     pause: { x: 14, y: safeTop + 4, r: 17 },
     codex: { x: 15, y: campY + 10, w: 42, h: 42 }
   };
   layout.orderButtons = {
-    risky: { x: w - 88, y: safeTop + 5, w: 37, h: 30 },
-    steady: { x: w - 49, y: safeTop + 5, w: 37, h: 30 }
+    risky: { x: w - 104, y: safeTop + 3, w: 44, h: 36 },
+    steady: { x: w - 56, y: safeTop + 3, w: 44, h: 36 }
   };
   layout.supplyBar = { x: Math.round(w / 2 - 72), y: safeTop + 68, w: 144, h: 9 };
   layout.propSlots = Object.keys(ACTIVE_PROP_CONFIG).map((key, index) => ({
     key,
-    x: Math.min(w - 38, boardX + boardW - 30),
-    y: Math.round(boardY + boardH / 2 - 50 + index * 38),
-    w: 34,
-    h: 34
+    x: actionX + recruitWidth + actionGap + index * (propWidth + propGap),
+    y: actionY + 4,
+    w: propWidth,
+    h: 60
   }));
 }
 
@@ -2416,7 +2423,7 @@ function drawCampaignHud() {
     roundRect(rect.x, rect.y, rect.w, rect.h, 5, false, true);
     drawCentered(cooldown > 0 && !selected ? String(Math.ceil(cooldown)) : order.shortLabel, rect.x + rect.w / 2, rect.y + rect.h / 2 + 1, 16, selected ? "#fff8e9" : "#44372f", "900");
   }
-  drawCentered(state.orderActiveLeft > 0 ? `${COMMAND_ORDERS[state.commandOrder].shortLabel}令 ${Math.ceil(state.orderActiveLeft)}秒` : "军令待发", layout.w - 49, layout.safeTop + 45, 11, "#4a3830", "800");
+  drawCentered(state.orderActiveLeft > 0 ? `${COMMAND_ORDERS[state.commandOrder].shortLabel}令 ${Math.ceil(state.orderActiveLeft)}秒` : "军令可用", layout.w - 58, layout.safeTop + 50, 12, "#4a3830", "900");
 
   const bar = layout.supplyBar;
   const ratio = Math.max(0, Math.min(1, state.supplyIntegrity / SUPPLY_CONFIG.max));
@@ -2716,17 +2723,19 @@ function drawPropToolbar() {
   for (const slot of layout.propSlots ?? []) {
     const config = ACTIVE_PROP_CONFIG[slot.key];
     const selected = state.selectedProp === slot.key;
+    const iconSize = slot.w;
     ctx.save();
     ctx.fillStyle = selected ? "#f0c84d" : "rgba(52,39,31,0.88)";
     ctx.strokeStyle = selected ? "#fff2a8" : "#241813";
     ctx.lineWidth = selected ? 3 : 2;
     roundRect(slot.x, slot.y, slot.w, slot.h, 5, true, true);
-    drawOriginalPropSprite(ctx, config.icon, slot.x + slot.w / 2, slot.y + slot.h / 2, slot.w * 0.88, slot.h * 0.88);
+    drawOriginalPropSprite(ctx, config.icon, slot.x + slot.w / 2, slot.y + iconSize / 2, iconSize * 0.86, iconSize * 0.86);
+    drawCentered(config.label, slot.x + slot.w / 2, slot.y + slot.h - 7, Math.max(9, slot.w * 0.21), selected ? "#3a281d" : "#fff1d7", "900");
     const cooldown = state.propCooldowns[slot.key];
     if (cooldown > 0) {
       ctx.fillStyle = "rgba(15,12,10,0.68)";
-      roundRect(slot.x, slot.y, slot.w, slot.h, 5, true, false);
-      drawCentered(String(Math.ceil(cooldown)), slot.x + slot.w / 2, slot.y + slot.h / 2, 13, "#fff", "900");
+      roundRect(slot.x, slot.y, slot.w, iconSize, 5, true, false);
+      drawCentered(String(Math.ceil(cooldown)), slot.x + slot.w / 2, slot.y + iconSize / 2, 14, "#fff", "900");
     }
     ctx.restore();
   }
