@@ -270,6 +270,7 @@ function createState() {
     tutorialStep: readTutorialSeen() ? -1 : 0,
     tutorialReplay: false,
     firstRecruitGuaranteed: true,
+    recruitCombatBag: [],
     douHp: { left: 3, right: 3 },
     paused: false,
     cultivated: new Set([...initialCultivated, ...JIETING_TERRAIN.mountain, ...JIETING_TERRAIN.openingDeployment]),
@@ -3971,16 +3972,36 @@ function recruit() {
 }
 
 function createRecruitChoices() {
-  const basic = ["刀", "枪", "弓", "骑"];
-  const support = ["铲", "铲", "铲", "铲", "铲", "铲", "铲", "铲", "铲", ...(ENABLE_FARMER_ABILITY ? ["农"] : [])];
-  const pick = (tokens) => tokens[Math.floor(Math.random() * tokens.length)];
-  const firstBasic = pick(basic);
-  const secondBasic = pick(basic.filter((token) => token !== firstBasic));
+  const firstBasic = drawRecruitCombatToken();
+  const secondBasic = drawRecruitCombatToken(new Set([firstBasic]));
+  const supportRoll = Math.random();
+  const third = ENABLE_FARMER_ABILITY && supportRoll < 0.06
+    ? { category: "辅", original: "农" }
+    : supportRoll < 0.56
+      ? { category: "辅", original: "铲" }
+      : { category: "兵", original: drawRecruitCombatToken(new Set([firstBasic, secondBasic])) };
   return [
     { category: "兵", original: firstBasic },
     { category: "兵", original: secondBasic },
-    { category: "辅", original: pick(support) }
+    third
   ].map((choice) => ({ ...choice, label: `${choice.category} · ${choice.original}`, unit: makeUnit(internalToken(choice.original), 1) }));
+}
+
+function drawRecruitCombatToken(excluded = new Set()) {
+  const refill = () => {
+    state.recruitCombatBag = ["刀", "枪", "弓", "骑", "刀", "枪", "弓", "骑"];
+    for (let i = state.recruitCombatBag.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [state.recruitCombatBag[i], state.recruitCombatBag[j]] = [state.recruitCombatBag[j], state.recruitCombatBag[i]];
+    }
+  };
+  if (!state.recruitCombatBag.length) refill();
+  let index = state.recruitCombatBag.findIndex((token) => !excluded.has(token));
+  if (index < 0) {
+    refill();
+    index = state.recruitCombatBag.findIndex((token) => !excluded.has(token));
+  }
+  return state.recruitCombatBag.splice(Math.max(0, index), 1)[0];
 }
 
 function selectRecruitChoice(index) {
