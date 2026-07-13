@@ -1879,6 +1879,7 @@ function rebuildFormations() {
   }
   state.formations = next;
   canvas.dataset.formations = next.map((formation) => `${formation.actorId}:${formation.memberKeys.join("+")}`).join("|");
+  canvas.dataset.formationTint = next.length ? "#d7aa3a" : "";
 }
 
 function getAttackLife(unit, kind) {
@@ -3158,12 +3159,13 @@ function drawGlyphLayer(text, x, y, size, color, pose = {}) {
   ctx.transform(1, 0, pose.skewX ?? 0, 1, 0, 0);
   ctx.rotate(pose.rotate ?? 0);
   ctx.scale(pose.scaleX ?? 1, pose.scaleY ?? 1);
-  let drawn = drawHanddrawnGlyph(ctx, text, size);
+  const renderColor = pose.tint === "formationGold" ? formationGoldGradient(size) : color;
+  let drawn = drawHanddrawnGlyph(ctx, text, size, { tint: pose.tint ?? null });
   if (!drawn && isJietingHanddrawnText(text)) {
-    drawReadableGlyphFallback(text, size, color);
+    drawReadableGlyphFallback(text, size, renderColor);
     drawn = true;
   } else if (!drawn) {
-    drawn = drawVectorHanzi(ctx, text, size, color, {
+    drawn = drawVectorHanzi(ctx, text, size, renderColor, {
       jitter: pose.jitter ?? 0,
       stroke: pose.stroke,
       breathe: Math.abs((pose.glyphScaleX ?? 1) - (pose.glyphScaleY ?? 1)) + Math.abs(pose.rotate ?? 0),
@@ -3174,8 +3176,16 @@ function drawGlyphLayer(text, x, y, size, color, pose = {}) {
       actionProgress: pose.actionProgress
     });
   }
-  if (!drawn) drawInkSigil(size, color);
+  if (!drawn) drawInkSigil(size, renderColor);
   ctx.restore();
+}
+
+function formationGoldGradient(size) {
+  const gold = ctx.createLinearGradient(0, -size * 0.52, 0, size * 0.52);
+  gold.addColorStop(0, "#d7aa3a");
+  gold.addColorStop(0.48, "#9f711f");
+  gold.addColorStop(1, "#684111");
+  return gold;
 }
 
 function drawReadableGlyphFallback(text, size, color) {
@@ -3325,7 +3335,8 @@ function drawUnitCard(unit, cx, cy, size, time, dragging) {
       skewX: pose.skewX + pose.glyphSkewX,
       rotate: asset.tilt + pose.rotate + pose.glyphRotate,
       jitter: asleep ? 0.18 : asset.jitter,
-      stroke: unit.type === "general" ? "rgba(128,79,19,0.26)" : "rgba(255,255,255,0.18)",
+      stroke: formation ? "rgba(105,63,13,0.5)" : unit.type === "general" ? "rgba(128,79,19,0.26)" : "rgba(255,255,255,0.18)",
+      tint: formation ? "formationGold" : null,
       action: animationUnit.action,
       actionProgress
     };
@@ -3357,7 +3368,7 @@ function drawUnitCard(unit, cx, cy, size, time, dragging) {
     }));
     if (!usedSpriteGlyph) {
       drawAttachment(asset, glyphCx, cy + pose.y, s, time, pose, "under");
-      drawGlyphLayer(glyph, glyphCx, glyphCy, s * asset.fontScale, asleep ? "#857a70" : asset.ink, glyphPose);
+      drawGlyphLayer(glyph, glyphCx, glyphCy, s * asset.fontScale, formation ? "#9f711f" : asleep ? "#857a70" : asset.ink, glyphPose);
       if (animationUnit.action === "attack") drawCardAttackOverlay(glyph, cx, cy, s, actionProgress, formation ? animationPresetForUnit(formation, weapons, GENERAL_COMBAT_CONFIG).cardKind : weapons[unit.token]?.kind ?? asset.role);
       drawAttachment(asset, glyphCx, cy + pose.y, s, time, pose, "over");
     }

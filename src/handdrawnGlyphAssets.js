@@ -3,6 +3,7 @@ const PACK_URL = `${BASE_URL}handdrawn-glyphs/jieting-actor-animation-pack.json`
 const IMAGE_ROOT = `${BASE_URL}handdrawn-glyphs/`;
 
 const actorsByGlyph = new Map();
+const tintedLayerCache = new Map();
 const JIETING_RUNTIME_GLYPHS = new Set([
   "马", "谡", "王", "平",
   "张", "郃", "司", "懿", "魏", "军", "锋", "蜀", "营", "山", "水",
@@ -18,13 +19,14 @@ let loadPromise;
 
 export function preloadHanddrawnGlyphs() {
   if (loadPromise) return loadPromise;
-  loadPromise = fetch(PACK_URL)
+  loadPromise = fetch(PACK_URL, { cache: "no-store" })
     .then((response) => {
       if (!response.ok) throw new Error(`Hand-drawn glyph pack HTTP ${response.status}`);
       return response.json();
     })
     .then(async (pack) => {
       if (pack?.format !== "jieting-actor-animation-pack") throw new Error("Invalid hand-drawn glyph pack");
+      const assetRevision = encodeURIComponent(pack.assetRevision ?? "current");
       const glyphActors = Object.values(pack.actors ?? {}).filter((actor) =>
         actor.actorType === "generalGlyph"
         && [...(actor.glyph ?? "")].length === 1
@@ -37,7 +39,7 @@ export function preloadHanddrawnGlyphs() {
           if (!layer?.file) continue;
           const image = new Image();
           image.decoding = "async";
-          image.src = `${IMAGE_ROOT}${encodeURIComponent(layer.file)}`;
+          image.src = `${IMAGE_ROOT}${encodeURIComponent(layer.file)}?v=${assetRevision}`;
           await image.decode();
           layers.push({ id: layerId, image });
         }
@@ -66,7 +68,7 @@ export function isJietingHanddrawnText(text) {
   return chars.length > 0 && chars.every((char) => JIETING_RUNTIME_GLYPHS.has(char));
 }
 
-export function drawHanddrawnGlyph(ctx, text, size) {
+export function drawHanddrawnGlyph(ctx, text, size, { tint = null } = {}) {
   const chars = [...String(text ?? "")];
   if (!chars.length || !chars.every((char) => actorsByGlyph.has(char))) return false;
 
@@ -83,12 +85,36 @@ export function drawHanddrawnGlyph(ctx, text, size) {
     const x = startX + index * spacing - pivotX * glyphSize;
     const y = -pivotY * glyphSize - glyphSize * 0.1;
     for (const layer of actor.layers) {
+      const image = tint ? tintedLayer(actor, layer, tint) : layer.image;
       ctx.drawImage(
-        layer.image,
+        image,
         bounds.x, bounds.y, bounds.width, bounds.height,
         x, y, glyphSize, glyphSize
       );
     }
   });
   return true;
+}
+
+function tintedLayer(actor, layer, color) {
+  const key = `${actor.token}:${layer.id}:${color}`;
+  if (tintedLayerCache.has(key)) return tintedLayerCache.get(key);
+  const canvas = document.createElement("canvas");
+  canvas.width = layer.image.naturalWidth || layer.image.width;
+  canvas.height = layer.image.naturalHeight || layer.image.height;
+  const context = canvas.getContext("2d");
+  context.drawImage(layer.image, 0, 0);
+  context.globalCompositeOperation = "source-in";
+  if (color === "formationGold") {
+    const gold = context.createLinearGradient(0, 0, 0, canvas.height);
+    gold.addColorStop(0, "#d7aa3a");
+    gold.addColorStop(0.48, "#9f711f");
+    gold.addColorStop(1, "#684111");
+    context.fillStyle = gold;
+  } else {
+    context.fillStyle = color;
+  }
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  tintedLayerCache.set(key, canvas);
+  return canvas;
 }

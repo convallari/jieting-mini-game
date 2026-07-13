@@ -23,8 +23,12 @@
 
       <section class="workbench">
         <header class="toolbar">
-          <button id="brushTool" class="tool active" type="button" title="画笔">✒</button>
+          <button id="selectTool" class="tool select-tool active" type="button" title="选择、移动、缩放与旋转"><span>↖</span><small>选择</small></button>
+          <button id="marqueeTool" class="tool select-tool" type="button" title="拖出矩形框选多个对象"><span>▧</span><small>框选</small></button>
+          <button id="brushTool" class="tool" type="button" title="自由曲线">✒</button>
+          <button id="lineTool" class="tool" type="button" title="直线">╱</button>
           <button id="eraserTool" class="tool" type="button" title="橡皮">⌫</button>
+          <button id="deleteObject" class="tool danger" type="button" title="删除所选对象">⊗</button>
           <button id="undoButton" class="tool" type="button" title="撤销">↶</button>
           <button id="clearButton" class="tool danger" type="button" title="清空">×</button>
           <label class="field">
@@ -44,13 +48,33 @@
 
         <div class="creative-tray" aria-label="彩墨与拼装素材">
           <div id="colorSwatches" class="color-swatches" aria-label="彩墨笔"></div>
+          <details id="colorPalette" class="color-palette">
+            <summary title="展开完整调色板">调色板</summary>
+            <div class="palette-popover">
+              <header><strong>完整调色板</strong><span>选择笔色或修改所选对象</span></header>
+              <div id="paletteGroups" class="palette-groups"></div>
+              <div class="palette-custom">
+                <label>自定义 <input id="paletteCustomColor" type="color" value="#a83227" /></label>
+                <label>HEX <input id="paletteHex" type="text" value="#a83227" maxlength="7" spellcheck="false" /></label>
+                <button id="applyPaletteHex" type="button">应用</button>
+              </div>
+              <div><span class="palette-caption">最近使用</span><div id="recentColors" class="recent-colors"></div></div>
+            </div>
+          </details>
           <div id="stampPalette" class="stamp-palette" aria-label="可拼装元素与特效"></div>
+          <div id="premiumAssetPalette" class="premium-asset-palette" aria-label="原作精细特效素材"></div>
           <label class="tray-control" title="拼装元素尺寸">尺寸
             <input id="stampSize" type="range" min="32" max="220" value="96" />
           </label>
           <label class="tray-control" title="拼装元素旋转">旋转
             <input id="stampRotation" type="range" min="-180" max="180" value="0" />
           </label>
+          <div id="objectInspector" class="object-inspector" aria-label="所选对象属性">
+            <span id="selectedObjectLabel">未选对象</span>
+            <label>缩放 <input id="objectScale" type="number" min="0.1" max="8" step="0.05" value="1" disabled /></label>
+            <label>旋转 <input id="objectRotation" type="number" min="-360" max="360" step="1" value="0" disabled /></label>
+            <label>透明 <input id="objectOpacity" type="number" min="0" max="1" step="0.05" value="1" disabled /></label>
+          </div>
         </div>
 
         <div id="canvasZone" class="canvas-zone">

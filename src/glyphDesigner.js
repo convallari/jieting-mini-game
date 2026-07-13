@@ -28,6 +28,16 @@ const COLOR_SWATCHES = [
   ["水青", "#3c8192"], ["军金", "#d7aa3a"], ["烟灰", "#756b61"], ["亮白", "#fff4d8"]
 ];
 
+const COLOR_PALETTE_GROUPS = [
+  ["墨与纸", ["#0d0b0a", "#17120f", "#2d2621", "#554b43", "#756b61", "#b9aa96", "#e8dcc5", "#fff4d8"]],
+  ["蜀军红", ["#541b18", "#7b2420", "#a83227", "#c94736", "#e66b4f", "#f09978", "#f6b9a0"]],
+  ["魏军蓝", ["#182b40", "#294b70", "#35658a", "#477fa0", "#6fa0b5", "#a6c4cc"]],
+  ["山林青", ["#20351f", "#365331", "#486b3e", "#668a54", "#88a66c", "#b0c38c"]],
+  ["水与玉", ["#194653", "#276775", "#3c8192", "#58a2aa", "#81bec0", "#b6d9d2"]],
+  ["军金火焰", ["#6f4219", "#9b6825", "#d7aa3a", "#f0cf57", "#fff08a", "#8f2519", "#d64327", "#f27a32"]],
+  ["奇术紫", ["#3c274b", "#65406f", "#86598d", "#ae7cac", "#d0a6ca"]]
+];
+
 const STAMP_DEFINITIONS = [
   { id: "flag", icon: "⚑", label: "军旗", layer: "accent", color: "#a83227" },
   { id: "shield", icon: "盾", label: "盾纹", layer: "accent", color: "#486b3e" },
@@ -39,6 +49,19 @@ const STAMP_DEFINITIONS = [
   { id: "smoke", icon: "☁", label: "烟尘", layer: "shadow", color: "#756b61" },
   { id: "water", icon: "≋", label: "水纹", layer: "fx", color: "#3c8192" },
   { id: "spark", icon: "✦", label: "火星", layer: "fx", color: "#d7aa3a" }
+];
+
+const PREMIUM_ASSETS = [
+  { id: "knifeHit", label: "刀击", src: `${BASE_URL}original-effects/knife-hit-sheet.png`, layer: "fx", frame: [0, 0, 96, 96] },
+  { id: "pikeHit", label: "枪击", src: `${BASE_URL}original-effects/pike-hit-sheet.png`, layer: "fx", frame: [0, 0, 96, 96] },
+  { id: "bowHit", label: "箭爆", src: `${BASE_URL}original-effects/bow-hit-sheet.png`, layer: "fx", frame: [96, 0, 96, 96] },
+  { id: "cavalryHit", label: "骑尘", src: `${BASE_URL}original-effects/cavalry-hit-sheet.png`, layer: "fx", frame: [96, 0, 96, 96] },
+  { id: "fire", label: "火焰", src: `${BASE_URL}original-props/fire2.png`, layer: "fx" },
+  { id: "meteor", label: "流星", src: `${BASE_URL}original-props/meteor_1.png`, layer: "fx" },
+  { id: "ink", label: "墨爆", src: `${BASE_URL}original-props/ink.png`, layer: "fx" },
+  { id: "star", label: "星芒", src: `${BASE_URL}original-props/star.png`, layer: "fx" },
+  { id: "guide", label: "引导光", src: `${BASE_URL}original-props/leadLight1.png`, layer: "fx" },
+  { id: "footprint", label: "脚印", src: `${BASE_URL}original-props/footprint.png`, layer: "shadow" }
 ];
 
 const ANIMATION_REQUIREMENTS = {
@@ -59,16 +82,31 @@ const glyphList = document.getElementById("glyphList");
 const layerList = document.getElementById("layerList");
 const currentGlyph = document.getElementById("currentGlyph");
 const currentName = document.getElementById("currentName");
+const selectTool = document.getElementById("selectTool");
+const marqueeTool = document.getElementById("marqueeTool");
 const brushTool = document.getElementById("brushTool");
+const lineTool = document.getElementById("lineTool");
 const eraserTool = document.getElementById("eraserTool");
+const deleteObject = document.getElementById("deleteObject");
 const undoButton = document.getElementById("undoButton");
 const clearButton = document.getElementById("clearButton");
 const brushSize = document.getElementById("brushSize");
 const inkColor = document.getElementById("inkColor");
 const colorSwatches = document.getElementById("colorSwatches");
+const colorPalette = document.getElementById("colorPalette");
+const paletteGroups = document.getElementById("paletteGroups");
+const paletteCustomColor = document.getElementById("paletteCustomColor");
+const paletteHex = document.getElementById("paletteHex");
+const applyPaletteHex = document.getElementById("applyPaletteHex");
+const recentColors = document.getElementById("recentColors");
 const stampPalette = document.getElementById("stampPalette");
+const premiumAssetPalette = document.getElementById("premiumAssetPalette");
 const stampSize = document.getElementById("stampSize");
 const stampRotation = document.getElementById("stampRotation");
+const selectedObjectLabel = document.getElementById("selectedObjectLabel");
+const objectScale = document.getElementById("objectScale");
+const objectRotation = document.getElementById("objectRotation");
+const objectOpacity = document.getElementById("objectOpacity");
 const referenceInput = document.getElementById("referenceInput");
 const toggleReference = document.getElementById("toggleReference");
 const saveGlyph = document.getElementById("saveGlyph");
@@ -146,12 +184,24 @@ const assetImages = new Map();
 
 let selected = GLYPHS[0];
 let activeLayerId = "ink";
-let tool = "brush";
+let tool = "select";
 let selectedStamp = STAMP_DEFINITIONS[0].id;
+let selectedPremiumAsset = PREMIUM_ASSETS[0].id;
 let drawing = false;
 let last = null;
 let undoStack = [];
 const layerCanvases = new Map();
+const objectImages = new Map();
+let formationBaseCanvas;
+let formationBaseCtx;
+let objectCanvas;
+let objectCtx;
+let editableObjects = [];
+let selectedObjectId = null;
+let selectedObjectIds = new Set();
+let objectInteraction = null;
+let draftObject = null;
+let marqueeSelection = null;
 
 function init() {
   migrateLegacyLocalStorage();
@@ -175,12 +225,11 @@ function initCreativeTray() {
     button.title = `${label} ${color}`;
     button.setAttribute("aria-label", label);
     button.addEventListener("click", () => {
-      inkColor.value = color;
-      setTool("brush");
-      updateCreativeSelection();
+      applyPaintColor(color);
     });
     colorSwatches.appendChild(button);
   }
+  initFullColorPalette();
 
   for (const stamp of STAMP_DEFINITIONS) {
     const button = document.createElement("button");
@@ -199,7 +248,97 @@ function initCreativeTray() {
     });
     stampPalette.appendChild(button);
   }
+  for (const asset of PREMIUM_ASSETS) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "premium-asset-button";
+    button.dataset.asset = asset.id;
+    button.innerHTML = `<img src="${asset.src}" alt="" />`;
+    button.title = `${asset.label} · 点击后在画布放置，可选择变形`;
+    button.setAttribute("aria-label", asset.label);
+    button.addEventListener("click", () => {
+      selectedPremiumAsset = asset.id;
+      selectLayer(asset.layer);
+      setTool("asset");
+      updateCreativeSelection();
+    });
+    premiumAssetPalette.appendChild(button);
+    preloadObjectImage(asset);
+  }
   updateCreativeSelection();
+}
+
+function initFullColorPalette() {
+  paletteGroups.innerHTML = "";
+  for (const [label, colors] of COLOR_PALETTE_GROUPS) {
+    const group = document.createElement("div");
+    group.className = "palette-group";
+    group.innerHTML = `<span>${label}</span><div class="palette-colors"></div>`;
+    for (const color of colors) group.querySelector(".palette-colors").appendChild(createPaletteColorButton(color));
+    paletteGroups.appendChild(group);
+  }
+  paletteCustomColor.addEventListener("input", () => {
+    paletteHex.value = paletteCustomColor.value.toUpperCase();
+    applyPaintColor(paletteCustomColor.value);
+  });
+  applyPaletteHex.addEventListener("click", applyHexColor);
+  paletteHex.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") applyHexColor();
+  });
+  renderRecentColors();
+}
+
+function createPaletteColorButton(color) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "palette-color";
+  button.style.setProperty("--palette-color", color);
+  button.dataset.color = color;
+  button.title = color.toUpperCase();
+  button.setAttribute("aria-label", color.toUpperCase());
+  button.addEventListener("click", () => applyPaintColor(color));
+  return button;
+}
+
+function applyHexColor() {
+  const value = paletteHex.value.trim();
+  if (!/^#[0-9a-f]{6}$/i.test(value)) {
+    paletteHex.setCustomValidity("请输入六位 HEX 颜色，例如 #A83227");
+    paletteHex.reportValidity();
+    return;
+  }
+  paletteHex.setCustomValidity("");
+  applyPaintColor(value);
+}
+
+function applyPaintColor(color) {
+  const normalized = color.toLowerCase();
+  inkColor.value = normalized;
+  paletteCustomColor.value = normalized;
+  paletteHex.value = normalized.toUpperCase();
+  const recolorable = editableObjects.filter((item) => selectedObjectIds.has(item.id) && (item.kind === "path" || item.kind === "stamp"));
+  if (recolorable.length) {
+    pushUndo();
+    for (const object of recolorable) object.color = normalized;
+    renderEditableObjects();
+    updatePreview();
+  } else if (tool === "select") {
+    setTool("brush");
+  }
+  rememberRecentColor(normalized);
+  updateCreativeSelection();
+}
+
+function rememberRecentColor(color) {
+  const key = `${STORAGE_PREFIX}recentColors`;
+  const recent = safeJson(localStorage.getItem(key)) ?? [];
+  localStorage.setItem(key, JSON.stringify([color, ...recent.filter((item) => item !== color)].slice(0, 10)));
+  renderRecentColors();
+}
+
+function renderRecentColors() {
+  const colors = safeJson(localStorage.getItem(`${STORAGE_PREFIX}recentColors`)) ?? [];
+  recentColors.replaceChildren(...colors.map(createPaletteColorButton));
 }
 
 function updateCreativeSelection() {
@@ -208,6 +347,12 @@ function updateCreativeSelection() {
   }
   for (const button of stampPalette.children) {
     button.classList.toggle("active", button.dataset.stamp === selectedStamp && tool === "stamp");
+  }
+  for (const button of premiumAssetPalette.children) {
+    button.classList.toggle("active", button.dataset.asset === selectedPremiumAsset && tool === "asset");
+  }
+  for (const button of [...paletteGroups.querySelectorAll(".palette-color"), ...recentColors.querySelectorAll(".palette-color")]) {
+    button.classList.toggle("active", button.dataset.color.toLowerCase() === inkColor.value.toLowerCase());
   }
 }
 
@@ -249,17 +394,25 @@ function renderAssetLibrary() {
     const typeMatch = libraryState.filter === "all" || asset.type === libraryState.filter;
     return typeMatch && (!libraryState.search || `${asset.name} ${asset.tags}`.toLowerCase().includes(libraryState.search));
   });
-  assetCount.textContent = `${assets.length} 项 · E 编辑，R 参考，A/B 对比`;
+  assetCount.textContent = `${assets.length} 项 · 可拖入画布 · E 编辑，R 参考，A/B 对比`;
   assetGrid.innerHTML = "";
   for (const asset of assets) {
     const card = document.createElement("article");
     card.className = "asset-card";
+    card.draggable = true;
+    card.dataset.assetId = asset.id;
+    card.title = "拖到上方画布即可加入为可编辑元素";
+    card.addEventListener("dragstart", (event) => {
+      event.dataTransfer.effectAllowed = "copy";
+      event.dataTransfer.setData("application/x-jieting-asset", asset.id);
+      event.dataTransfer.setData("text/plain", asset.id);
+    });
     const source = asset.dataUrl ?? asset.path;
     card.innerHTML = `
       <img class="asset-thumb" src="${source}" alt="${asset.name}" />
       <div class="asset-info">
         <div class="asset-name">${asset.name}</div>
-        <div class="asset-meta">${ASSET_GROUPS[asset.type]} · ${asset.frames > 1 ? `${asset.frames} 帧` : "静态"} · ${asset.sourceStructure?.kind ?? "bitmap"}</div>
+        <div class="asset-meta">${ASSET_GROUPS[asset.type]} · ${asset.frames > 1 ? `${asset.frames} 帧` : "静态"} · 拖入画布</div>
         <div class="asset-actions">
           <button type="button" title="载入统一动画编辑器">E</button>
           <button type="button" title="设为画布参考">R</button>
@@ -421,11 +574,19 @@ function loadAssetImage(asset) {
 
 function compositeSavedGlyph(key) {
   if (key === selected[1]) return compositeCanvas().toDataURL("image/png");
-  return localStorage.getItem(storageKey(key, "ink"))
-    ?? LAYERS.map((layer) => localStorage.getItem(storageKey(key, layer.id))).find(Boolean);
+  return localStorage.getItem(renderedStorageKey(key, "ink"))
+    ?? localStorage.getItem(storageKey(key, "ink"))
+    ?? LAYERS.map((layer) => localStorage.getItem(renderedStorageKey(key, layer.id)) ?? localStorage.getItem(storageKey(key, layer.id))).find(Boolean);
 }
 
 function createLayerCanvases() {
+  formationBaseCanvas = document.createElement("canvas");
+  formationBaseCanvas.width = 512;
+  formationBaseCanvas.height = 512;
+  formationBaseCanvas.className = "formation-base-canvas";
+  formationBaseCanvas.setAttribute("aria-hidden", "true");
+  canvasZone.appendChild(formationBaseCanvas);
+  formationBaseCtx = formationBaseCanvas.getContext("2d");
   for (const layer of LAYERS) {
     const canvas = document.createElement("canvas");
     canvas.width = 512;
@@ -436,11 +597,51 @@ function createLayerCanvases() {
     canvasZone.appendChild(canvas);
     layerCanvases.set(layer.id, canvas);
   }
+  objectCanvas = document.createElement("canvas");
+  objectCanvas.width = 512;
+  objectCanvas.height = 512;
+  objectCanvas.id = "objectCanvas";
+  objectCanvas.setAttribute("aria-label", "可编辑对象画布");
+  canvasZone.appendChild(objectCanvas);
+  objectCtx = objectCanvas.getContext("2d");
+}
+
+function selectedSpan() {
+  return selected?.[2] === "generalFormation" ? Math.max(1, selected[3]?.length ?? 1) : 1;
+}
+
+function resizeWorkspaceCanvas(span = selectedSpan()) {
+  const width = 512 * span;
+  canvasZone.style.setProperty("--canvas-span", String(span));
+  canvasZone.dataset.span = String(span);
+  for (const canvas of [formationBaseCanvas, ...layerCanvases.values(), objectCanvas, referenceCanvas]) {
+    if (!canvas) continue;
+    canvas.width = width;
+    canvas.height = 512;
+  }
+  objectCtx = objectCanvas.getContext("2d");
+  formationBaseCtx = formationBaseCanvas.getContext("2d");
+  canvasZone.querySelector(".canvas-cell-labels")?.remove();
+  if (span > 1) {
+    const labels = document.createElement("div");
+    labels.className = "canvas-cell-labels";
+    labels.style.gridTemplateColumns = `repeat(${span}, 1fr)`;
+    for (const member of selected[3] ?? []) {
+      const label = document.createElement("span");
+      label.textContent = `${member} · 1格`;
+      labels.appendChild(label);
+    }
+    canvasZone.appendChild(labels);
+  }
 }
 
 function bindEvents() {
+  selectTool.addEventListener("click", () => setTool("select"));
+  marqueeTool.addEventListener("click", () => setTool("marquee"));
   brushTool.addEventListener("click", () => setTool("brush"));
+  lineTool.addEventListener("click", () => setTool("line"));
   eraserTool.addEventListener("click", () => setTool("eraser"));
+  deleteObject.addEventListener("click", removeSelectedObject);
   undoButton.addEventListener("click", undo);
   clearButton.addEventListener("click", clearActiveLayer);
   saveGlyph.addEventListener("click", saveCurrent);
@@ -449,7 +650,10 @@ function bindEvents() {
   saveProjectPack.addEventListener("click", writeActorPackToProject);
   toggleReference.addEventListener("click", () => referenceCanvas.classList.toggle("hidden"));
   referenceInput.addEventListener("change", loadReference);
-  inkColor.addEventListener("input", updateCreativeSelection);
+  inkColor.addEventListener("input", () => applyPaintColor(inkColor.value));
+  document.addEventListener("pointerdown", (event) => {
+    if (colorPalette.open && !colorPalette.contains(event.target)) colorPalette.open = false;
+  });
   animationMode.addEventListener("change", updateManifestPreview);
   animationPlay.addEventListener("click", toggleTimelinePlayback);
   clipSelect.addEventListener("change", loadSelectedClip);
@@ -461,13 +665,26 @@ function bindEvents() {
   for (const input of [transformX, transformY, transformScale, transformRotation, transformOpacity, timelineEase]) {
     input.addEventListener("input", previewTransformControls);
   }
-
-  for (const canvas of layerCanvases.values()) {
-    canvas.addEventListener("pointerdown", startStroke);
-    canvas.addEventListener("pointermove", moveStroke);
-    canvas.addEventListener("pointerup", endStroke);
-    canvas.addEventListener("pointercancel", endStroke);
+  for (const input of [objectScale, objectRotation, objectOpacity]) {
+    input.addEventListener("input", updateSelectedObjectFromInspector);
   }
+  objectCanvas.addEventListener("pointerdown", startStroke);
+  objectCanvas.addEventListener("pointermove", moveStroke);
+  objectCanvas.addEventListener("pointerup", endStroke);
+  objectCanvas.addEventListener("pointercancel", endStroke);
+  objectCanvas.addEventListener("dragover", (event) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "copy";
+    objectCanvas.classList.add("drop-target");
+  });
+  objectCanvas.addEventListener("dragleave", () => objectCanvas.classList.remove("drop-target"));
+  objectCanvas.addEventListener("drop", dropLibraryAsset);
+  window.addEventListener("keydown", (event) => {
+    if ((event.key === "Delete" || event.key === "Backspace") && selectedObjectIds.size && !event.target.matches("input, textarea")) {
+      event.preventDefault();
+      removeSelectedObject();
+    }
+  });
 }
 
 function renderGlyphList() {
@@ -484,13 +701,18 @@ function renderGlyphList() {
     }
     const button = document.createElement("button");
     button.type = "button";
-    button.className = `glyph-button${actorType === "generalFormation" ? " formation" : ""}${hasSavedGlyph(key) ? " saved" : ""}`;
+    button.className = `glyph-button${actorType === "generalFormation" ? " formation" : ""}${hasSavedGlyph(key) ? " saved" : ""}${selected[1] === key ? " active" : ""}`;
     button.dataset.key = key;
     button.textContent = glyph;
     button.title = `${glyph} / ${key}`;
     button.addEventListener("click", () => {
-      saveCurrent();
+      saveCurrent({ refresh: false });
       selectGlyph(key);
+      requestAnimationFrame(() => {
+        renderGlyphList();
+        renderAssetLibrary();
+        renderStateMatrix();
+      });
     });
     glyphList.appendChild(button);
   }
@@ -532,6 +754,7 @@ function renderLayerList() {
 function selectGlyph(key) {
   leaveSourceAssetMode();
   selected = GLYPHS.find((item) => item[1] === key) ?? GLYPHS[0];
+  resizeWorkspaceCanvas(selectedSpan());
   currentGlyph.textContent = selected[0];
   currentName.textContent = `${selected[1]} actor pack`;
   animationMode.value = selected[2] === "generalFormation" ? "general" : selected[2] === "prop" ? "weapon" : "card";
@@ -542,10 +765,48 @@ function selectGlyph(key) {
   }
   clearAllLayerCanvases();
   loadSavedLayers(selected[1]);
+  loadSavedObjects(selected[1]);
   loadAnimationData(selected[1]);
+  renderFormationBase();
   undoStack = [];
   updatePreview();
   updateManifestPreview();
+}
+
+async function renderFormationBase() {
+  formationBaseCtx.clearRect(0, 0, formationBaseCanvas.width, formationBaseCanvas.height);
+  formationBaseCanvas.dataset.membersLoaded = "0";
+  formationBaseCanvas.dataset.tint = "#d7aa3a";
+  if (selected[2] !== "generalFormation") return;
+  const actorKey = selected[1];
+  const members = selected[3] ?? [];
+  const sources = members.map((member) => compositeSavedGlyph(GLYPH_ACTORS[member]?.id ?? member));
+  await Promise.all(sources.map((source) => source ? loadImageSource(source) : Promise.resolve(null))).then((images) => {
+    if (selected[1] !== actorKey) return;
+    images.forEach((image, index) => {
+      if (!image) return;
+      const cell = document.createElement("canvas");
+      cell.width = 512;
+      cell.height = 512;
+      const context = cell.getContext("2d");
+      context.drawImage(image, 0, 0, 512, 512);
+      context.globalCompositeOperation = "source-in";
+      context.fillStyle = "#d7aa3a";
+      context.fillRect(0, 0, 512, 512);
+      formationBaseCtx.drawImage(cell, index * 512, 0);
+    });
+    formationBaseCanvas.dataset.membersLoaded = String(images.filter(Boolean).length);
+    updatePreview();
+  });
+}
+
+function loadImageSource(source) {
+  return new Promise((resolve) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => resolve(null);
+    image.src = source;
+  });
 }
 
 function configureStateOptions() {
@@ -650,8 +911,8 @@ function selectLayer(layerId) {
   }
   for (const [id, canvas] of layerCanvases) {
     canvas.classList.toggle("active", id === layerId);
-    canvas.style.pointerEvents = id === layerId ? "auto" : "none";
   }
+  renderEditableObjects();
   updateManifestPreview();
   syncTransformControls();
   renderTimelineTracks();
@@ -777,6 +1038,7 @@ function applyTimelineFrame() {
     const value = interpolatedTransform(activeClip().tracks[layer.id] ?? [], timelineState.frame);
     applyCanvasTransform(layerCanvases.get(layer.id), value);
   }
+  renderEditableObjects();
   if (sourceAsset) {
     const sourceValue = interpolatedTransform(activeClip().tracks.ink ?? [], timelineState.frame);
     const preservesNativeParts = sourceAsset.sourceStructure?.kind === "spineParts";
@@ -833,45 +1095,116 @@ function toggleLayer(layerId) {
   const canvas = layerCanvases.get(layerId);
   if (!canvas) return;
   canvas.classList.toggle("hidden");
+  renderEditableObjects();
   updatePreview();
   updateManifestPreview();
 }
 
 function setTool(nextTool) {
   tool = nextTool;
+  selectTool.classList.toggle("active", tool === "select");
+  marqueeTool.classList.toggle("active", tool === "marquee");
   brushTool.classList.toggle("active", tool === "brush");
+  lineTool.classList.toggle("active", tool === "line");
   eraserTool.classList.toggle("active", tool === "eraser");
+  objectCanvas.style.cursor = tool === "select" ? "default" : "crosshair";
   updateCreativeSelection();
 }
 
 function startStroke(event) {
   event.preventDefault();
+  const point = pointFromEvent(event);
+  if (tool === "marquee") {
+    marqueeSelection = { start: point, current: point };
+    drawing = true;
+    objectCanvas.setPointerCapture?.(event.pointerId);
+    renderEditableObjects();
+    return;
+  }
+  if (tool === "select") {
+    beginObjectInteraction(point);
+    objectCanvas.setPointerCapture?.(event.pointerId);
+    return;
+  }
   pushUndo();
   if (tool === "stamp") {
-    drawStamp(pointFromEvent(event));
+    addStampObject(point);
+    setTool("select");
     updatePreview();
     return;
   }
+  if (tool === "asset") {
+    addPremiumAssetObject(point);
+    setTool("select");
+    updatePreview();
+    return;
+  }
+  if (tool === "line" || tool === "brush") {
+    drawing = true;
+    draftObject = createPathObject(point, tool === "line" ? "直线" : "自由曲线");
+    editableObjects.push(draftObject);
+    selectOnlyObject(draftObject.id);
+    renderEditableObjects();
+    objectCanvas.setPointerCapture?.(event.pointerId);
+    return;
+  }
   drawing = true;
-  last = pointFromEvent(event);
+  last = point;
   drawDot(last);
-  activeCanvas().setPointerCapture?.(event.pointerId);
+  objectCanvas.setPointerCapture?.(event.pointerId);
 }
 
 function moveStroke(event) {
+  if (tool === "marquee" && marqueeSelection) {
+    event.preventDefault();
+    marqueeSelection.current = pointFromEvent(event);
+    renderEditableObjects();
+    return;
+  }
+  if (tool === "select" && objectInteraction) {
+    event.preventDefault();
+    updateObjectInteraction(pointFromEvent(event));
+    return;
+  }
   if (!drawing) return;
   event.preventDefault();
   const point = pointFromEvent(event);
+  if (draftObject) {
+    const relative = { x: point.x - draftObject.x, y: point.y - draftObject.y };
+    if (tool === "line") draftObject.points[1] = relative;
+    else if (distance(draftObject.points.at(-1), relative) > 2) draftObject.points.push(relative);
+    renderEditableObjects();
+    updatePreview();
+    return;
+  }
   drawLine(last, point);
   last = point;
   updatePreview();
 }
 
 function endStroke(event) {
+  if (tool === "marquee" && marqueeSelection) {
+    finishMarqueeSelection();
+    drawing = false;
+    objectCanvas.releasePointerCapture?.(event.pointerId);
+    renderEditableObjects();
+    updateObjectInspector();
+    setTool("select");
+    return;
+  }
+  if (objectInteraction) {
+    objectInteraction = null;
+    objectCanvas.releasePointerCapture?.(event.pointerId);
+    updateObjectInspector();
+    updatePreview();
+    return;
+  }
   if (!drawing) return;
   drawing = false;
   last = null;
-  activeCanvas().releasePointerCapture?.(event.pointerId);
+  draftObject = null;
+  objectCanvas.releasePointerCapture?.(event.pointerId);
+  renderEditableObjects();
   updatePreview();
 }
 
@@ -902,30 +1235,372 @@ function drawLine(from, to) {
   context.restore();
 }
 
-function drawStamp(point) {
-  const context = activeCtx();
-  const size = Number(stampSize.value) || 96;
-  const rotation = (Number(stampRotation.value) || 0) * Math.PI / 180;
+function drawStampObject(context, object) {
+  const size = object.size;
+  const rotation = object.rotation * Math.PI / 180;
   context.save();
-  context.translate(point.x, point.y);
+  context.translate(object.x, object.y);
   context.rotate(rotation);
-  context.strokeStyle = inkColor.value;
-  context.fillStyle = inkColor.value;
+  context.scale(object.scale, object.scale);
+  context.globalAlpha = object.opacity;
+  context.strokeStyle = object.color;
+  context.fillStyle = object.color;
   context.lineWidth = Math.max(3, size * 0.065);
   context.lineCap = "round";
   context.lineJoin = "round";
 
-  if (selectedStamp === "flag") drawFlagStamp(context, size);
-  else if (selectedStamp === "shield") drawShieldStamp(context, size);
-  else if (selectedStamp === "slash") drawSlashStamp(context, size);
-  else if (selectedStamp === "spear") drawSpearStamp(context, size);
-  else if (selectedStamp === "arrow") drawArrowStamp(context, size);
-  else if (selectedStamp === "ring") drawRingStamp(context, size);
-  else if (selectedStamp === "inkBurst") drawInkBurstStamp(context, size);
-  else if (selectedStamp === "smoke") drawSmokeStamp(context, size);
-  else if (selectedStamp === "water") drawWaterStamp(context, size);
+  if (object.stamp === "flag") drawFlagStamp(context, size);
+  else if (object.stamp === "shield") drawShieldStamp(context, size);
+  else if (object.stamp === "slash") drawSlashStamp(context, size);
+  else if (object.stamp === "spear") drawSpearStamp(context, size);
+  else if (object.stamp === "arrow") drawArrowStamp(context, size);
+  else if (object.stamp === "ring") drawRingStamp(context, size);
+  else if (object.stamp === "inkBurst") drawInkBurstStamp(context, size);
+  else if (object.stamp === "smoke") drawSmokeStamp(context, size);
+  else if (object.stamp === "water") drawWaterStamp(context, size);
   else drawSparkStamp(context, size);
   context.restore();
+}
+
+function addStampObject(point) {
+  const definition = STAMP_DEFINITIONS.find((item) => item.id === selectedStamp);
+  const object = {
+    id: crypto.randomUUID(), kind: "stamp", label: definition?.label ?? "拼装元素", layer: activeLayerId,
+    stamp: selectedStamp, x: point.x, y: point.y, size: Number(stampSize.value) || 96,
+    scale: 1, rotation: Number(stampRotation.value) || 0, opacity: 1, color: inkColor.value
+  };
+  editableObjects.push(object);
+  selectOnlyObject(object.id);
+  renderEditableObjects();
+  updateObjectInspector();
+}
+
+function addPremiumAssetObject(point) {
+  const asset = PREMIUM_ASSETS.find((item) => item.id === selectedPremiumAsset);
+  if (!asset) return;
+  const object = {
+    id: crypto.randomUUID(), kind: "image", label: asset.label, assetId: asset.id, layer: asset.layer,
+    x: point.x, y: point.y, size: Number(stampSize.value) || 96, scale: 1,
+    rotation: Number(stampRotation.value) || 0, opacity: 1
+  };
+  editableObjects.push(object);
+  selectOnlyObject(object.id);
+  renderEditableObjects();
+  updateObjectInspector();
+}
+
+function createPathObject(point, label) {
+  return {
+    id: crypto.randomUUID(), kind: "path", label, layer: activeLayerId, x: point.x, y: point.y,
+    points: [{ x: 0, y: 0 }, { x: 0, y: 0 }], size: 1, scale: 1, rotation: 0,
+    opacity: 1, color: inkColor.value, width: Number(brushSize.value) || 24
+  };
+}
+
+function selectOnlyObject(id) {
+  selectedObjectId = id ?? null;
+  selectedObjectIds = id ? new Set([id]) : new Set();
+}
+
+function preloadObjectImage(asset) {
+  return preloadObjectSource(asset.id, asset.src);
+}
+
+function preloadObjectSource(id, src) {
+  let variants = objectImages.get(id);
+  if (!variants) {
+    variants = new Map();
+    objectImages.set(id, variants);
+  }
+  if (variants.has(src)) return variants.get(src);
+  const image = new Image();
+  image.onload = () => { image.dataset.loaded = "1"; renderEditableObjects(); updatePreview(); };
+  image.src = src;
+  variants.set(src, image);
+  return image;
+}
+
+function currentSourceForObject(object, fallback) {
+  if (!object.assetId?.startsWith("drawn-")) return fallback;
+  const key = object.assetId.slice("drawn-".length);
+  if (!key || key === selected[1]) return fallback;
+  return compositeSavedGlyph(key) ?? fallback;
+}
+
+function renderEditableObjects(target = objectCtx, includeSelection = true) {
+  if (!target) return;
+  target.clearRect(0, 0, objectCanvas.width, objectCanvas.height);
+  for (const object of editableObjects) {
+    const layerCanvas = layerCanvases.get(object.layer);
+    if (layerCanvas?.classList.contains("hidden")) continue;
+    drawObjectWithLayerTransform(target, object, () => drawEditableObject(target, object));
+  }
+  const selectedObjects = editableObjects.filter((item) => selectedObjectIds.has(item.id));
+  if (includeSelection) {
+    for (const object of selectedObjects) drawObjectWithLayerTransform(target, object, () => drawSelection(target, object));
+    if (marqueeSelection) drawMarquee(target, marqueeSelection);
+  }
+  if (objectCanvas) {
+    objectCanvas.dataset.objectCount = String(editableObjects.length);
+    objectCanvas.dataset.selectedKind = selectedObjects.length > 1 ? "multiple" : selectedObjects[0]?.kind ?? "";
+    objectCanvas.dataset.selectedCount = String(selectedObjects.length);
+    const primary = selectedObjects.find((object) => object.id === selectedObjectId);
+    const topLeft = primary ? objectTopLeftWorld(primary) : null;
+    objectCanvas.dataset.selectedTopLeft = topLeft ? `${topLeft.x.toFixed(2)},${topLeft.y.toFixed(2)}` : "";
+  }
+}
+
+function drawMarquee(context, marquee) {
+  const rect = normalizedRect(marquee.start, marquee.current);
+  context.save();
+  context.fillStyle = "rgba(243, 184, 63, 0.14)";
+  context.strokeStyle = "#f3b83f";
+  context.lineWidth = 2;
+  context.setLineDash([8, 5]);
+  context.fillRect(rect.x, rect.y, rect.width, rect.height);
+  context.strokeRect(rect.x, rect.y, rect.width, rect.height);
+  context.restore();
+}
+
+function normalizedRect(a, b) {
+  return { x: Math.min(a.x, b.x), y: Math.min(a.y, b.y), width: Math.abs(a.x - b.x), height: Math.abs(a.y - b.y) };
+}
+
+function worldBounds(object) {
+  const bounds = objectBounds(object);
+  const angle = object.rotation * Math.PI / 180;
+  const corners = [
+    [bounds.x, bounds.y], [bounds.x + bounds.width, bounds.y],
+    [bounds.x + bounds.width, bounds.y + bounds.height], [bounds.x, bounds.y + bounds.height]
+  ].map(([x, y]) => ({
+    x: object.x + (x * Math.cos(angle) - y * Math.sin(angle)) * object.scale,
+    y: object.y + (x * Math.sin(angle) + y * Math.cos(angle)) * object.scale
+  }));
+  const xs = corners.map((point) => point.x);
+  const ys = corners.map((point) => point.y);
+  return { x: Math.min(...xs), y: Math.min(...ys), width: Math.max(...xs) - Math.min(...xs), height: Math.max(...ys) - Math.min(...ys) };
+}
+
+function rectanglesIntersect(a, b) {
+  return a.x <= b.x + b.width && a.x + a.width >= b.x && a.y <= b.y + b.height && a.y + a.height >= b.y;
+}
+
+function finishMarqueeSelection() {
+  const rect = normalizedRect(marqueeSelection.start, marqueeSelection.current);
+  const ids = editableObjects
+    .filter((object) => !layerCanvases.get(object.layer)?.classList.contains("hidden") && rectanglesIntersect(rect, worldBounds(object)))
+    .map((object) => object.id);
+  selectedObjectIds = new Set(ids);
+  selectedObjectId = ids.at(-1) ?? null;
+  marqueeSelection = null;
+}
+
+function drawObjectWithLayerTransform(context, object, draw) {
+  const value = interpolatedTransform(activeClip().tracks[object.layer] ?? [], timelineState.frame);
+  context.save();
+  const pivotX = activeCanvas().width / 2;
+  context.translate(pivotX + value.x, 300 + value.y);
+  context.rotate(value.rotation * Math.PI / 180);
+  context.scale(value.scale, value.scale);
+  context.translate(-pivotX, -300);
+  context.globalAlpha *= value.opacity;
+  draw();
+  context.restore();
+}
+
+function drawEditableObject(context, object) {
+  if (object.kind === "stamp") return drawStampObject(context, object);
+  context.save();
+  context.translate(object.x, object.y);
+  context.rotate(object.rotation * Math.PI / 180);
+  context.scale(object.scale, object.scale);
+  context.globalAlpha = object.opacity;
+  if (object.kind === "path") {
+    context.strokeStyle = object.color;
+    context.lineWidth = object.width;
+    context.lineCap = "round";
+    context.lineJoin = "round";
+    context.beginPath();
+    object.points.forEach((point, index) => index ? context.lineTo(point.x, point.y) : context.moveTo(point.x, point.y));
+    context.stroke();
+  } else if (object.kind === "image") {
+    const asset = PREMIUM_ASSETS.find((item) => item.id === object.assetId);
+    const source = currentSourceForObject(object, object.src ?? asset?.src);
+    const image = source ? preloadObjectSource(object.assetId, source) : null;
+    if (image?.dataset.loaded === "1") {
+      const frame = object.frame ?? asset?.frame ?? [0, 0, image.naturalWidth, image.naturalHeight];
+      const ratio = frame[2] / frame[3];
+      const width = object.size * Math.min(1.6, Math.max(0.65, ratio));
+      const height = width / ratio;
+      context.drawImage(image, ...frame, -width / 2, -height / 2, width, height);
+    }
+  }
+  context.restore();
+}
+
+function objectBounds(object) {
+  if (object.kind === "path") {
+    const xs = object.points.map((point) => point.x);
+    const ys = object.points.map((point) => point.y);
+    const pad = Math.max(12, object.width / 2);
+    return { x: Math.min(...xs) - pad, y: Math.min(...ys) - pad, width: Math.max(1, Math.max(...xs) - Math.min(...xs)) + pad * 2, height: Math.max(1, Math.max(...ys) - Math.min(...ys)) + pad * 2 };
+  }
+  const size = object.size || 96;
+  return { x: -size / 2, y: -size / 2, width: size, height: size };
+}
+
+function drawSelection(context, object) {
+  const bounds = objectBounds(object);
+  context.save();
+  context.translate(object.x, object.y);
+  context.rotate(object.rotation * Math.PI / 180);
+  context.scale(object.scale, object.scale);
+  context.strokeStyle = "#f3b83f";
+  context.fillStyle = "#fff6dc";
+  context.lineWidth = 2 / object.scale;
+  context.setLineDash([7 / object.scale, 5 / object.scale]);
+  context.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
+  context.setLineDash([]);
+  const handle = 10 / object.scale;
+  context.fillRect(bounds.x + bounds.width - handle / 2, bounds.y + bounds.height - handle / 2, handle, handle);
+  context.beginPath();
+  context.arc(bounds.x + bounds.width / 2, bounds.y - 26 / object.scale, 6 / object.scale, 0, Math.PI * 2);
+  context.fill();
+  context.beginPath();
+  context.moveTo(bounds.x + bounds.width / 2, bounds.y);
+  context.lineTo(bounds.x + bounds.width / 2, bounds.y - 20 / object.scale);
+  context.stroke();
+  context.restore();
+}
+
+function localPointForObject(point, object) {
+  const angle = -object.rotation * Math.PI / 180;
+  const dx = point.x - object.x;
+  const dy = point.y - object.y;
+  return { x: (dx * Math.cos(angle) - dy * Math.sin(angle)) / object.scale, y: (dx * Math.sin(angle) + dy * Math.cos(angle)) / object.scale };
+}
+
+function objectTopLeftWorld(object) {
+  const bounds = objectBounds(object);
+  const angle = object.rotation * Math.PI / 180;
+  const x = bounds.x * object.scale;
+  const y = bounds.y * object.scale;
+  return {
+    x: object.x + x * Math.cos(angle) - y * Math.sin(angle),
+    y: object.y + x * Math.sin(angle) + y * Math.cos(angle)
+  };
+}
+
+function setObjectScaleFromTopLeft(object, nextScale, anchor = objectTopLeftWorld(object)) {
+  const bounds = objectBounds(object);
+  const angle = object.rotation * Math.PI / 180;
+  const x = bounds.x * nextScale;
+  const y = bounds.y * nextScale;
+  object.scale = nextScale;
+  object.x = anchor.x - (x * Math.cos(angle) - y * Math.sin(angle));
+  object.y = anchor.y - (x * Math.sin(angle) + y * Math.cos(angle));
+}
+
+function hitObject(point) {
+  for (const object of [...editableObjects].reverse()) {
+    if (layerCanvases.get(object.layer)?.classList.contains("hidden")) continue;
+    const local = localPointForObject(point, object);
+    const bounds = objectBounds(object);
+    if (local.x >= bounds.x && local.x <= bounds.x + bounds.width && local.y >= bounds.y && local.y <= bounds.y + bounds.height) return object;
+  }
+  return null;
+}
+
+function beginObjectInteraction(point) {
+  let object = editableObjects.find((item) => item.id === selectedObjectId);
+  if (object) {
+    const local = localPointForObject(point, object);
+    const bounds = objectBounds(object);
+    const scaleHandle = { x: bounds.x + bounds.width, y: bounds.y + bounds.height };
+    const rotateHandle = { x: bounds.x + bounds.width / 2, y: bounds.y - 26 / object.scale };
+    if (distance(local, scaleHandle) < 18 / object.scale) return startObjectInteraction("scale", object, point);
+    if (distance(local, rotateHandle) < 18 / object.scale) return startObjectInteraction("rotate", object, point);
+  }
+  object = hitObject(point);
+  if (!object) selectOnlyObject(null);
+  else if (!selectedObjectIds.has(object.id)) selectOnlyObject(object.id);
+  else selectedObjectId = object.id;
+  if (object) startObjectInteraction("move", object, point);
+  renderEditableObjects();
+  updateObjectInspector();
+}
+
+function startObjectInteraction(mode, object, point) {
+  pushUndo();
+  const scaleAnchor = objectTopLeftWorld(object);
+  const group = editableObjects
+    .filter((item) => selectedObjectIds.has(item.id))
+    .map((item) => ({ id: item.id, x: item.x, y: item.y }));
+  objectInteraction = {
+    mode, id: object.id, start: point, x: object.x, y: object.y, scale: object.scale, rotation: object.rotation,
+    group,
+    scaleAnchor,
+    scaleDistance: Math.max(1, distance(point, scaleAnchor)),
+    angle: Math.atan2(point.y - object.y, point.x - object.x)
+  };
+}
+
+function updateObjectInteraction(point) {
+  const object = editableObjects.find((item) => item.id === objectInteraction.id);
+  if (!object) return;
+  if (objectInteraction.mode === "move") {
+    const dx = point.x - objectInteraction.start.x;
+    const dy = point.y - objectInteraction.start.y;
+    for (const initial of objectInteraction.group) {
+      const member = editableObjects.find((item) => item.id === initial.id);
+      if (!member) continue;
+      member.x = initial.x + dx;
+      member.y = initial.y + dy;
+    }
+  } else if (objectInteraction.mode === "scale") {
+    const nextScale = Math.max(0.1, Math.min(8, objectInteraction.scale * distance(point, objectInteraction.scaleAnchor) / objectInteraction.scaleDistance));
+    setObjectScaleFromTopLeft(object, nextScale, objectInteraction.scaleAnchor);
+  } else {
+    const angle = Math.atan2(point.y - object.y, point.x - object.x);
+    object.rotation = objectInteraction.rotation + (angle - objectInteraction.angle) * 180 / Math.PI;
+  }
+  renderEditableObjects();
+  updateObjectInspector();
+}
+
+function updateObjectInspector() {
+  const object = editableObjects.find((item) => item.id === selectedObjectId);
+  selectedObjectLabel.textContent = selectedObjectIds.size > 1 ? `${selectedObjectIds.size} 个对象` : object?.label ?? "未选对象";
+  for (const input of [objectScale, objectRotation, objectOpacity]) input.disabled = !object;
+  if (!object) return;
+  objectScale.value = String(Math.round(object.scale * 100) / 100);
+  objectRotation.value = String(Math.round(object.rotation));
+  objectOpacity.value = String(Math.round(object.opacity * 100) / 100);
+}
+
+function updateSelectedObjectFromInspector() {
+  const object = editableObjects.find((item) => item.id === selectedObjectId);
+  if (!object) return;
+  const anchor = objectTopLeftWorld(object);
+  setObjectScaleFromTopLeft(object, Math.max(0.1, Math.min(8, Number(objectScale.value) || 1)), anchor);
+  object.rotation = Number(objectRotation.value) || 0;
+  object.opacity = Math.max(0, Math.min(1, Number(objectOpacity.value)));
+  renderEditableObjects();
+  updatePreview();
+}
+
+function removeSelectedObject() {
+  if (!selectedObjectIds.size) return;
+  pushUndo();
+  editableObjects = editableObjects.filter((item) => !selectedObjectIds.has(item.id));
+  selectOnlyObject(null);
+  renderEditableObjects();
+  updateObjectInspector();
+  updatePreview();
+}
+
+function distance(a, b) {
+  return Math.hypot((a?.x ?? 0) - (b?.x ?? 0), (a?.y ?? 0) - (b?.y ?? 0));
 }
 
 function drawFlagStamp(context, size) {
@@ -1062,17 +1737,47 @@ function drawSparkStamp(context, size) {
 }
 
 function pointFromEvent(event) {
-  const rect = activeCanvas().getBoundingClientRect();
+  const rect = objectCanvas.getBoundingClientRect();
   return {
-    x: (event.clientX - rect.left) * (activeCanvas().width / rect.width),
-    y: (event.clientY - rect.top) * (activeCanvas().height / rect.height)
+    x: (event.clientX - rect.left) * (objectCanvas.width / rect.width),
+    y: (event.clientY - rect.top) * (objectCanvas.height / rect.height)
   };
+}
+
+function dropLibraryAsset(event) {
+  event.preventDefault();
+  objectCanvas.classList.remove("drop-target");
+  const assetId = event.dataTransfer.getData("application/x-jieting-asset") || event.dataTransfer.getData("text/plain");
+  const asset = allLibraryAssets().find((item) => item.id === assetId);
+  if (!asset) return;
+  const source = asset.dataUrl ?? asset.path;
+  if (!source) return;
+  pushUndo();
+  const object = {
+    id: crypto.randomUUID(), kind: "image", label: asset.name, assetId: asset.id,
+    layer: asset.type === "effect" ? "fx" : asset.type === "drawn" ? "ink" : "accent",
+    src: source,
+    frame: asset.frameWidth && asset.frameHeight ? [0, 0, asset.frameWidth, asset.frameHeight] : null,
+    x: pointFromEvent(event).x, y: pointFromEvent(event).y,
+    size: Number(stampSize.value) || 128, scale: 1, rotation: 0, opacity: 1
+  };
+  editableObjects.push(object);
+  selectOnlyObject(object.id);
+  selectLayer(object.layer);
+  setTool("select");
+  preloadObjectSource(object.assetId, source);
+  renderEditableObjects();
+  updateObjectInspector();
+  updatePreview();
 }
 
 function pushUndo() {
   undoStack.push({
     layerId: activeLayerId,
-    imageData: activeCtx().getImageData(0, 0, 512, 512)
+    imageData: activeCtx().getImageData(0, 0, activeCanvas().width, activeCanvas().height),
+    objects: structuredClone(editableObjects),
+    selectedObjectId,
+    selectedObjectIds: [...selectedObjectIds]
   });
   if (undoStack.length > 32) undoStack.shift();
 }
@@ -1082,26 +1787,42 @@ function undo() {
   if (!previous) return;
   const canvas = layerCanvases.get(previous.layerId);
   canvas.getContext("2d").putImageData(previous.imageData, 0, 0);
+  editableObjects = previous.objects ?? editableObjects;
+  selectedObjectId = previous.selectedObjectId ?? null;
+  selectedObjectIds = new Set(previous.selectedObjectIds ?? (selectedObjectId ? [selectedObjectId] : []));
+  renderEditableObjects();
+  updateObjectInspector();
   updatePreview();
 }
 
 function clearActiveLayer() {
   pushUndo();
-  activeCtx().clearRect(0, 0, 512, 512);
+  activeCtx().clearRect(0, 0, activeCanvas().width, activeCanvas().height);
+  editableObjects = editableObjects.filter((object) => object.layer !== activeLayerId);
+  selectedObjectIds = new Set([...selectedObjectIds].filter((id) => editableObjects.some((object) => object.id === id)));
+  if (!selectedObjectIds.has(selectedObjectId)) selectedObjectId = [...selectedObjectIds].at(-1) ?? null;
   localStorage.removeItem(storageKey(selected[1], activeLayerId));
+  localStorage.removeItem(renderedStorageKey(selected[1], activeLayerId));
+  renderEditableObjects();
+  updateObjectInspector();
   renderGlyphList();
   updatePreview();
   updateManifestPreview();
 }
 
 function clearAllLayerCanvases() {
+  formationBaseCtx.clearRect(0, 0, formationBaseCanvas.width, formationBaseCanvas.height);
   for (const canvas of layerCanvases.values()) {
-    canvas.getContext("2d").clearRect(0, 0, 512, 512);
+    canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
     canvas.classList.remove("hidden");
   }
+  editableObjects = [];
+  selectOnlyObject(null);
+  renderEditableObjects();
+  updateObjectInspector();
 }
 
-function saveCurrent() {
+function saveCurrent({ refresh = true } = {}) {
   if (sourceAsset) {
     localStorage.setItem(`${STORAGE_PREFIX}source.${sourceAsset.id}`, JSON.stringify({
       assetId: sourceAsset.id,
@@ -1113,21 +1834,26 @@ function saveCurrent() {
   }
   for (const layer of LAYERS) {
     const canvas = layerCanvases.get(layer.id);
-    const empty = isCanvasEmpty(canvas);
-    if (empty) localStorage.removeItem(storageKey(selected[1], layer.id));
+    const layerObjects = editableObjects.filter((object) => object.layer === layer.id);
+    const hasDerivedBase = layer.id === "ink" && selected[2] === "generalFormation" && !isCanvasEmpty(formationBaseCanvas);
+    const empty = isCanvasEmpty(canvas) && layerObjects.length === 0 && !hasDerivedBase;
+    if (isCanvasEmpty(canvas)) localStorage.removeItem(storageKey(selected[1], layer.id));
     else localStorage.setItem(storageKey(selected[1], layer.id), canvas.toDataURL("image/png"));
+    if (empty) localStorage.removeItem(renderedStorageKey(selected[1], layer.id));
+    else localStorage.setItem(renderedStorageKey(selected[1], layer.id), compositeLayerCanvas(layer.id).toDataURL("image/png"));
   }
   localStorage.setItem(metaKey(selected[1]), JSON.stringify({
     animationMode: animationMode.value,
-    clips: timelineState.clips
+    clips: timelineState.clips,
+    objects: editableObjects
   }));
-  renderGlyphList();
-  for (const button of glyphList.querySelectorAll(".glyph-button")) {
-    button.classList.toggle("active", button.dataset.key === selected[1]);
-  }
+  if (refresh) renderGlyphList();
+  for (const button of glyphList.querySelectorAll(".glyph-button")) button.classList.toggle("active", button.dataset.key === selected[1]);
   updateManifestPreview();
-  renderAssetLibrary();
-  renderStateMatrix();
+  if (refresh) {
+    renderAssetLibrary();
+    renderStateMatrix();
+  }
 }
 
 function loadSavedLayers(key) {
@@ -1146,6 +1872,14 @@ function loadSavedLayers(key) {
   }
 }
 
+function loadSavedObjects(key) {
+  const meta = safeJson(localStorage.getItem(metaKey(key))) ?? {};
+  editableObjects = Array.isArray(meta.objects) ? meta.objects : [];
+  selectOnlyObject(null);
+  renderEditableObjects();
+  updateObjectInspector();
+}
+
 function updatePreview() {
   drawPreview(previewLarge);
   drawPreview(previewSmall);
@@ -1161,7 +1895,12 @@ function drawPreview(target) {
   previewCtx.strokeRect(1, 1, target.width - 2, target.height - 2);
   const composite = compositeCanvas();
   const pad = target.width * 0.12;
-  previewCtx.drawImage(composite, pad, pad, target.width - pad * 2, target.height - pad * 2);
+  const availableWidth = target.width - pad * 2;
+  const availableHeight = target.height - pad * 2;
+  const scale = Math.min(availableWidth / composite.width, availableHeight / composite.height);
+  const width = composite.width * scale;
+  const height = composite.height * scale;
+  previewCtx.drawImage(composite, (target.width - width) / 2, (target.height - height) / 2, width, height);
 }
 
 function loadReference() {
@@ -1191,16 +1930,17 @@ function buildActorPack() {
     if (override) sourceOverrides[asset.id] = override;
   }
   for (const [glyph, key, catalogType, members] of GLYPHS) {
+    const actorSpan = catalogType === "generalFormation" ? members.length : 1;
     const layers = {};
     for (const layer of LAYERS) {
-      const dataUrl = localStorage.getItem(storageKey(key, layer.id));
+      const dataUrl = localStorage.getItem(renderedStorageKey(key, layer.id)) ?? localStorage.getItem(storageKey(key, layer.id));
       if (!dataUrl) continue;
       layers[layer.id] = {
         label: layer.label,
         role: layer.role,
         animation: layer.animation,
         file: `${key}_${layer.id}.png`,
-        width: 512,
+        width: 512 * actorSpan,
         height: 512,
         dataUrl
       };
@@ -1218,15 +1958,17 @@ function buildActorPack() {
       states,
       compositeFile: `${key}_composite.png`,
       animationMode: meta.animationMode ?? "card",
-      pivot: { x: 256, y: 300 },
-      bounds: { x: 48, y: 48, width: 416, height: 416 },
+      pivot: { x: 256 * actorSpan, y: 300 },
+      bounds: { x: 48, y: 48, width: 512 * actorSpan - 96, height: 416 },
       clips: meta.clips ?? {},
+      objects: meta.objects ?? [],
       layers
     };
   }
   return {
     version: 4,
     format: "jieting-actor-animation-pack",
+    assetRevision: Date.now(),
     canvas: { width: 512, height: 512, safePadding: 48 },
     layerOrder: LAYERS.map((layer) => layer.id),
     animationContract: {
@@ -1324,14 +2066,28 @@ function updateManifestPreview() {
 
 function compositeCanvas() {
   const output = document.createElement("canvas");
-  output.width = 512;
-  output.height = 512;
+  output.width = activeCanvas().width;
+  output.height = activeCanvas().height;
   const outputCtx = output.getContext("2d");
+  if (selected[2] === "generalFormation") outputCtx.drawImage(formationBaseCanvas, 0, 0);
   for (const layer of LAYERS) {
     const canvas = layerCanvases.get(layer.id);
     if (!canvas || canvas.classList.contains("hidden")) continue;
     outputCtx.drawImage(canvas, 0, 0);
+    for (const object of editableObjects.filter((item) => item.layer === layer.id)) drawEditableObject(outputCtx, object);
   }
+  return output;
+}
+
+function compositeLayerCanvas(layerId) {
+  const output = document.createElement("canvas");
+  output.width = activeCanvas().width;
+  output.height = activeCanvas().height;
+  const context = output.getContext("2d");
+  if (layerId === "ink" && selected[2] === "generalFormation") context.drawImage(formationBaseCanvas, 0, 0);
+  const canvas = layerCanvases.get(layerId);
+  if (canvas) context.drawImage(canvas, 0, 0);
+  for (const object of editableObjects.filter((item) => item.layer === layerId)) drawEditableObject(context, object);
   return output;
 }
 
@@ -1373,11 +2129,16 @@ function downloadObjectUrl(url, filename) {
 }
 
 function hasSavedGlyph(key) {
-  return LAYERS.some((layer) => Boolean(localStorage.getItem(storageKey(key, layer.id))));
+  const meta = safeJson(localStorage.getItem(metaKey(key)));
+  return LAYERS.some((layer) => Boolean(localStorage.getItem(storageKey(key, layer.id)) || localStorage.getItem(renderedStorageKey(key, layer.id)))) || Boolean(meta?.objects?.length);
 }
 
 function storageKey(key, layerId) {
   return `${STORAGE_PREFIX}${key}.${layerId}`;
+}
+
+function renderedStorageKey(key, layerId) {
+  return `${STORAGE_PREFIX}${key}.${layerId}.rendered`;
 }
 
 function metaKey(key) {
