@@ -10,8 +10,8 @@ const ORIGINAL_GLYPHS = {
   // The captured bow animation points upward. The original game rotates the
   // complete animation container toward the target before playing it.
   gong: { sheet: "gong-attack-sheet.png", frames: 30, frameWidth: 74, frameHeight: 95, bounds: [21, 1, 48, 53], visualScale: 0.76, aimOffset: Math.PI / 2 },
-  qiang: { sheet: "qiang-full-review-sheet.png", frames: 21, frameWidth: 224, frameHeight: 224, bounds: [34, 20, 184, 198] },
-  qi: { sheet: "qi-attack-sheet.png", frames: 19, frameWidth: 263, frameHeight: 294, bounds: [106, 116, 183, 177] }
+  qiang: { sheet: "qiang-full-review-sheet.png", frames: 21, frameWidth: 224, frameHeight: 224, bounds: [34, 20, 184, 198], visualScale: 0.924 },
+  qi: { sheet: "qi-attack-sheet.png", frames: 19, frameWidth: 263, frameHeight: 294, bounds: [106, 116, 183, 177], visualScale: 0.924 }
 };
 
 const ATTACK_TIMING = {
