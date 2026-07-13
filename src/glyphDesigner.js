@@ -1,5 +1,7 @@
 import { FORMATION_RECIPES, GLYPH_ACTORS, LEGACY_ACTOR_ALIASES, SOURCE_DISPLAY_POLICY, SOURCE_STRUCTURES, STATE_PROFILES, stateMatrixForActor } from "./actorAssetSchema.js";
 
+const BASE_URL = import.meta.env?.BASE_URL || "/";
+
 const LEGACY_KEYS = { 马: "ma", 谡: "su", 王: "wang", 平: "ping", 诸: "zhu", 葛: "ge", 亮: "liang", 赵: "zhao", 云: "yun", 张: "zhang", 飞: "fei", 超: "chao", 黄: "huang", 忠: "zhong" };
 const EXTRA_ACTORS = [
   ["郃", "glyph.he"], ["司", "glyph.si"], ["懿", "glyph.yi"], ["魏", "glyph.wei"], ["军", "glyph.jun"],
@@ -78,10 +80,10 @@ const ASSETS = [
   ...[
     ["刀·攻击", "dao", 19, 120, 129], ["枪·攻击", "qiang", 21, 80, 80],
     ["弓·攻击", "gong", 30, 74, 95], ["骑·攻击", "qi", 19, 263, 294]
-  ].map(([name, key, frames, frameWidth, frameHeight]) => ({ id: `glyph-${key}`, actorId: `unit.${key}`, name, type: "glyph", path: `/original-glyphs/${key}-attack-sheet.png`, frames, frameWidth, frameHeight, sourceStructure: SOURCE_STRUCTURES[`unit.${key}`] ?? { kind: "bakedComposite", editableParts: false }, tags: `${name} 兵种 序列帧 原版` })),
+  ].map(([name, key, frames, frameWidth, frameHeight]) => ({ id: `glyph-${key}`, actorId: `unit.${key}`, name, type: "glyph", path: `${BASE_URL}original-glyphs/${key}-attack-sheet.png`, frames, frameWidth, frameHeight, sourceStructure: SOURCE_STRUCTURES[`unit.${key}`] ?? { kind: "bakedComposite", editableParts: false }, tags: `${name} 兵种 序列帧 原版` })),
   ...[
     ["刀·命中", "knife", 1], ["枪·命中", "pike", 1], ["弓·命中", "bow", 3], ["骑·命中", "cavalry", 2]
-  ].map(([name, key, frames]) => ({ id: `effect-${key}`, name, type: "effect", path: `/original-effects/${key}-hit-sheet.png`, frames, frameWidth: 96, frameHeight: 96, tags: `${name} 特效 命中 序列帧` })),
+  ].map(([name, key, frames]) => ({ id: `effect-${key}`, name, type: "effect", path: `${BASE_URL}original-effects/${key}-hit-sheet.png`, frames, frameWidth: 96, frameHeight: 96, tags: `${name} 特效 命中 序列帧` })),
   ...[
     ["赵云", "zhaoYun", ["attack1", "attack2", "attack4", "shouye", "zhan1", "zhan2"]],
     ["阿斗", "aDou", ["attack", "dakai", "dou", "hejiu", "pao", "tu", "zhan", "zhan2"]],
@@ -95,13 +97,13 @@ const ASSETS = [
     ["旧 Boss 2", "boss2", ["attackcao", "attackdian", "attackdun", "gocao", "godian", "goxia"]]
   ].map(([name, key, animations]) => {
     const actorId = LEGACY_ACTOR_ALIASES[key];
-    return { id: `spine-${key}`, actorId, name, type: "spine", path: `/spine-assets/${key}/skeleton.png`, frames: 1, animations, sourceStructure: SOURCE_STRUCTURES[actorId] ?? { kind: "spine", editableParts: true }, tags: `${name} 角色 骨骼 Spine 原版` };
+    return { id: `spine-${key}`, actorId, name, type: "spine", path: `${BASE_URL}spine-assets/${key}/skeleton.png`, frames: 1, animations, sourceStructure: SOURCE_STRUCTURES[actorId] ?? { kind: "spine", editableParts: true }, tags: `${name} 角色 骨骼 Spine 原版` };
   }),
   ...[
     ["拒马", "trap_1.png"], ["伏火", "landmine_1.png"], ["疑兵墨阵", "inkstone_1.png"],
     ["火焰 1", "fire0.png"], ["火焰 2", "fire1.png"], ["陨石", "meteor_1.png"],
     ["农兵", "farmer_1.png"], ["铲", "shovel_1.png"], ["墨点", "ink.png"], ["脚印", "footprint.png"]
-  ].map(([name, file]) => ({ id: `prop-${file}`, name, type: "prop", path: `/original-props/${file}`, frames: 1, tags: `${name} 道具 单位 原版` }))
+  ].map(([name, file]) => ({ id: `prop-${file}`, name, type: "prop", path: `${BASE_URL}original-props/${file}`, frames: 1, tags: `${name} 道具 单位 原版` }))
 ];
 
 const libraryState = { filter: "all", search: "", playing: true, frame: 0, last: 0, compare: [null, null] };
@@ -240,7 +242,7 @@ function renderExternalSourceFrame() {
     const structure = sourceAsset.sourceStructure;
     const paired = structure?.kind === "spineParts" && structure.parts?.length > 1;
     const animation = paired ? structure.parts[0][clipSelect.value] ?? sourceAnimationForClip(sourceAsset, clipSelect.value) : sourceAnimationForClip(sourceAsset, clipSelect.value);
-    const nextSrc = `/spine-animation-review.html?embed=1&character=${encodeURIComponent(assetKey)}&animation=${encodeURIComponent(animation)}`;
+    const nextSrc = `${BASE_URL}spine-animation-review.html?embed=1&character=${encodeURIComponent(assetKey)}&animation=${encodeURIComponent(animation)}`;
     if (!sourceSpinePreview.src.endsWith(nextSrc)) sourceSpinePreview.src = nextSrc;
     sourceSpinePreview.hidden = false;
     sourceSpinePreview.classList.toggle("paired-a", paired);
@@ -248,7 +250,7 @@ function renderExternalSourceFrame() {
       sourceSpinePreview.style.transform = "";
       sourceSpinePreview.style.transformOrigin = "";
       const secondAnimation = structure.parts[1][clipSelect.value] ?? animation;
-      const secondSrc = `/spine-animation-review.html?embed=1&character=${encodeURIComponent(assetKey)}&animation=${encodeURIComponent(secondAnimation)}`;
+      const secondSrc = `${BASE_URL}spine-animation-review.html?embed=1&character=${encodeURIComponent(assetKey)}&animation=${encodeURIComponent(secondAnimation)}`;
       if (!sourceSpinePreviewB.src.endsWith(secondSrc)) sourceSpinePreviewB.src = secondSrc;
       sourceSpinePreviewB.hidden = false;
       sourceSpinePreviewB.classList.add("paired-b");
@@ -989,7 +991,7 @@ async function writeActorPackToProject() {
   try {
     saveCurrent();
     await new Promise((resolve) => requestAnimationFrame(resolve));
-    const response = await fetch("/__jieting/save-actor-pack", {
+    const response = await fetch(`${BASE_URL}__jieting/save-actor-pack`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(buildActorPack())

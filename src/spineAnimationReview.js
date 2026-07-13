@@ -14,6 +14,7 @@ const characters = {
 };
 
 const query = new URLSearchParams(location.search);
+const BASE_URL = import.meta.env?.BASE_URL || "/";
 if (query.get("embed") === "1") document.body.classList.add("embed");
 
 const characterSelect = document.querySelector("#character");
@@ -74,7 +75,7 @@ function loadCharacter() {
     placeSkeleton();
     play();
   });
-  skeleton.source = `/spine-assets/${characterSelect.value}/skeleton.json?v=3`;
+  skeleton.source = `${BASE_URL}spine-assets/${characterSelect.value}/skeleton.json?v=3`;
 }
 
 async function init() {

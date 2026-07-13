@@ -28,7 +28,8 @@ import {
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
-const AUDIO_ROOT = "/original-audio/";
+const BASE_URL = import.meta.env?.BASE_URL || "/";
+const AUDIO_ROOT = `${BASE_URL}original-audio/`;
 const audioEngine = {
   unlocked: false,
   muted: false,

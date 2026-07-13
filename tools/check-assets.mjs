@@ -1,4 +1,4 @@
-import { accessSync } from "node:fs";
+import { accessSync, readFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 
 const requiredFiles = [
@@ -81,5 +81,20 @@ if (animationReferenceSyntax.status !== 0) process.exit(animationReferenceSyntax
 
 const viteConfigSyntax = spawnSync("node", ["--check", "vite.config.js"], { stdio: "inherit" });
 if (viteConfigSyntax.status !== 0) process.exit(viteConfigSyntax.status ?? 1);
+
+const deploymentPathChecks = [
+  ["index.html", /<script[^>]+src="\/vendor\//],
+  ["spine-animation-review.html", /<script[^>]+src="\/vendor\//],
+  ["src/handdrawnGlyphAssets.js", /["'`]\/handdrawn-glyphs\//],
+  ["src/spineGameLayer.js", /["'`]\/spine-assets\//],
+  ["src/spineAnimationReview.js", /["'`]\/spine-assets\//],
+  ["src/main.js", /["'`]\/original-audio\//]
+];
+
+for (const [file, pattern] of deploymentPathChecks) {
+  if (pattern.test(readFileSync(file, "utf8"))) {
+    throw new Error(`${file} contains a root-relative runtime asset path that breaks GitHub Pages subdirectory deployments`);
+  }
+}
 
 console.log("Project files and JavaScript syntax look good.");

@@ -23,6 +23,8 @@ export const ENEMY_CONFIG = {
   caoCao: { asset: "boss2", scale: 0.64, walk: ["gocao"], hit: ["attackcao"] }
 };
 
+const BASE_URL = import.meta.env?.BASE_URL || "/";
+
 const instances = new Map();
 const enemyInstances = new Map();
 let initialized = false;
@@ -246,7 +248,7 @@ function createGeneralInstance(item, config) {
   right.once(Laya.Event.READY, null, () => {
     instance.rightReady = true;
   });
-  const source = `/spine-assets/${config.asset}/skeleton.json?v=4`;
+  const source = `${BASE_URL}spine-assets/${config.asset}/skeleton.json?v=4`;
   left.source = source;
   right.source = source;
   return instance;
@@ -262,7 +264,7 @@ function createEnemyInstance(item, config) {
     instance.ready = true;
     skeleton.visible = instance.active;
   });
-  skeleton.source = `/spine-assets/${config.asset}/skeleton.json?v=3`;
+  skeleton.source = `${BASE_URL}spine-assets/${config.asset}/skeleton.json?v=3`;
   return instance;
 }
 
@@ -276,6 +278,6 @@ function createADouInstance(key, hp) {
     instance.ready = true;
     skeleton.visible = true;
   });
-  skeleton.source = "/spine-assets/aDou/skeleton.json?v=3";
+  skeleton.source = `${BASE_URL}spine-assets/aDou/skeleton.json?v=3`;
   return instance;
 }

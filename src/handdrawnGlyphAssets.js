@@ -1,5 +1,6 @@
-const PACK_URL = "/handdrawn-glyphs/jieting-actor-animation-pack.json";
-const IMAGE_ROOT = "/handdrawn-glyphs/";
+const BASE_URL = import.meta.env?.BASE_URL || "/";
+const PACK_URL = `${BASE_URL}handdrawn-glyphs/jieting-actor-animation-pack.json`;
+const IMAGE_ROOT = `${BASE_URL}handdrawn-glyphs/`;
 
 const actorsByGlyph = new Map();
 const JIETING_RUNTIME_GLYPHS = new Set([
