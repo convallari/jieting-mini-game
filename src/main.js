@@ -29,6 +29,7 @@ const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 const MOBILE_RENDER_MODE = window.matchMedia("(pointer: coarse)").matches || window.innerWidth <= 600;
 const MOBILE_FRAME_INTERVAL = 1000 / 30;
+const ENEMY_MOVE_SPEED_MULTIPLIER = 1.2;
 
 const BASE_URL = import.meta.env?.BASE_URL || "/";
 const AUDIO_ROOT = `${BASE_URL}original-audio/`;
@@ -1090,7 +1091,7 @@ function updateEnemies(dt) {
     const inspireMultiplier = enemy.inspireLeft > 0 ? 1.3 : 1;
     const segment = currentPathSegment(enemy);
     const segmentPixels = Math.max(1, Math.hypot(segment.dir.x * layout.cellW, segment.dir.y * layout.cellH));
-    enemy.t += (enemy.speedPx ? enemy.speedPx / segmentPixels : enemy.speed) * dt * controlMultiplier * inspireMultiplier;
+    enemy.t += (enemy.speedPx ? enemy.speedPx / segmentPixels : enemy.speed) * dt * controlMultiplier * inspireMultiplier * ENEMY_MOVE_SPEED_MULTIPLIER;
     enemy.hitFlash = Math.max(0, enemy.hitFlash - dt);
     enemy.hitAge += dt;
     if (enemy.bossIndex != null && !enemy.endpointAttackStarted) {
