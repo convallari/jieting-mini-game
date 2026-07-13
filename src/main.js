@@ -28,7 +28,7 @@ import {
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 const MOBILE_RENDER_MODE = window.matchMedia("(pointer: coarse)").matches || window.innerWidth <= 600;
-const MOBILE_FRAME_INTERVAL = 1000 / 45;
+const MOBILE_FRAME_INTERVAL = 1000 / 30;
 
 const BASE_URL = import.meta.env?.BASE_URL || "/";
 const AUDIO_ROOT = `${BASE_URL}original-audio/`;
@@ -36,32 +36,49 @@ const audioEngine = {
   unlocked: false,
   muted: false,
   pending: [],
+  pools: new Map(),
+  lastPlayed: new Map(),
   unlock() {
     this.unlocked = true;
     const pending = this.pending.splice(0);
-    for (const event of pending) this._play(event.name, event.ext, event.volume);
+    for (const event of pending) this._play(event.name, event.ext, event.volume, event.cooldown);
   },
-  _play(name, ext, volume) {
+  _play(name, ext, volume, cooldown = 0.06) {
     if (this.muted || !name) return;
-    const audio = new Audio(`${AUDIO_ROOT}${name}.${ext}`);
+    const key = `${name}.${ext}`;
+    const now = performance.now();
+    const cooldownMs = Math.max(MOBILE_RENDER_MODE ? 80 : 35, cooldown * 1000);
+    if (now - (this.lastPlayed.get(key) ?? -Infinity) < cooldownMs) return;
+    this.lastPlayed.set(key, now);
+    const pool = this.pools.get(key) ?? [];
+    let audio = pool.find((item) => item.paused || item.ended);
+    const maxChannels = MOBILE_RENDER_MODE ? 2 : 4;
+    if (!audio && pool.length < maxChannels) {
+      audio = new Audio(`${AUDIO_ROOT}${key}`);
+      audio.preload = "auto";
+      pool.push(audio);
+      this.pools.set(key, pool);
+    }
+    if (!audio) return;
     audio.volume = Math.max(0, Math.min(1, volume));
+    audio.currentTime = 0;
     audio.play().catch(() => {});
   },
-  play(name, volume = 0.42) {
+  play(name, volume = 0.42, cooldown = 0.06) {
     if (!name || this.muted) return;
     if (!this.unlocked) {
-      if (this.pending.length < 48) this.pending.push({ name, ext: "mp3", volume });
+      if (this.pending.length < 24) this.pending.push({ name, ext: "mp3", volume, cooldown });
       return;
     }
-    this._play(name, "mp3", volume);
+    this._play(name, "mp3", volume, cooldown);
   },
-  voice(name, volume = 0.5) {
+  voice(name, volume = 0.5, cooldown = 0.12) {
     if (!name || this.muted) return;
     if (!this.unlocked) {
-      if (this.pending.length < 48) this.pending.push({ name, ext: "wav", volume });
+      if (this.pending.length < 24) this.pending.push({ name, ext: "wav", volume, cooldown });
       return;
     }
-    this._play(name, "wav", volume);
+    this._play(name, "wav", volume, cooldown);
   }
 };
 
@@ -135,6 +152,7 @@ let state = createState();
 let layout = {};
 let lastTime = performance.now();
 let pointer = null;
+let mobileBackgroundCache = null;
 const debugParams = new URLSearchParams(window.location.search);
 const DEBUG_ATTACK = debugParams.has("debugAttack");
 const DEBUG_UNITS = debugParams.has("debugUnits");
@@ -307,12 +325,15 @@ function makeUnit(token, level = 1) {
 
 function resize() {
   const rect = canvas.getBoundingClientRect();
-  const dprCap = MOBILE_RENDER_MODE ? 1.5 : 2;
+  const dprCap = MOBILE_RENDER_MODE ? 1.25 : 2;
   const dpr = Math.max(1, Math.min(dprCap, window.devicePixelRatio || 1));
+  canvas.dataset.renderProfile = MOBILE_RENDER_MODE ? "mobile" : "desktop";
+  canvas.dataset.renderDpr = dpr.toFixed(2);
   canvas.width = Math.round(rect.width * dpr);
   canvas.height = Math.round(rect.height * dpr);
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   computeLayout(rect.width, rect.height);
+  mobileBackgroundCache = null;
   resizeSpineGameLayer(rect.width, rect.height);
 }
 
@@ -647,13 +668,19 @@ function setupDebugAttack() {
 if (DEBUG_ATTACK) startGame();
 
 let lastRenderedAt = 0;
+let lastDebugSnapshotAt = 0;
+let fpsWindowStartedAt = performance.now();
+let renderedFrames = 0;
+let frameWorkTotal = 0;
 
 function loop(now) {
-  if (MOBILE_RENDER_MODE && now - lastRenderedAt < MOBILE_FRAME_INTERVAL) {
+  if (MOBILE_RENDER_MODE && now - lastRenderedAt < MOBILE_FRAME_INTERVAL - 2) {
     requestAnimationFrame(loop);
     return;
   }
   lastRenderedAt = now;
+  const frameWorkStartedAt = performance.now();
+  renderedFrames += 1;
   const dt = Math.min(0.033, (now - lastTime) / 1000) * DEBUG_TIME_SCALE;
   lastTime = now;
   update(dt, now / 1000);
@@ -661,7 +688,18 @@ function loop(now) {
   syncOriginalGeneralLayer();
   syncOriginalEnemyLayer();
   syncOriginalADouLayer();
-  if (DEBUG_STATE || DEBUG_ATTACK) canvas.dataset.debugState = JSON.stringify(window.__jietingDebugState());
+  if ((DEBUG_STATE || DEBUG_ATTACK) && now - lastDebugSnapshotAt >= 250) {
+    lastDebugSnapshotAt = now;
+    canvas.dataset.debugState = JSON.stringify(window.__jietingDebugState());
+  }
+  frameWorkTotal += performance.now() - frameWorkStartedAt;
+  if (now - fpsWindowStartedAt >= 1000) {
+    canvas.dataset.renderFps = String(Math.round(renderedFrames * 1000 / (now - fpsWindowStartedAt)));
+    canvas.dataset.frameWorkMs = (frameWorkTotal / Math.max(1, renderedFrames)).toFixed(1);
+    fpsWindowStartedAt = now;
+    renderedFrames = 0;
+    frameWorkTotal = 0;
+  }
   requestAnimationFrame(loop);
 }
 drawStartupLoading();
@@ -1721,11 +1759,11 @@ function updateParticles(dt) {
   state.recruits = state.recruits.filter((r) => r.age < r.life);
   state.messages = state.messages.filter((m) => m.age < m.life);
   if (MOBILE_RENDER_MODE) {
-    trimOldest(state.particles, 96);
-    trimOldest(state.strokes, 48);
-    trimOldest(state.ghosts, 32);
-    trimOldest(state.pulses, 24);
-    trimOldest(state.floats, 24);
+    trimOldest(state.particles, 64);
+    trimOldest(state.strokes, 32);
+    trimOldest(state.ghosts, 16);
+    trimOldest(state.pulses, 16);
+    trimOldest(state.floats, 16);
   }
 }
 
@@ -2254,6 +2292,10 @@ function drawComboMeter() {
 }
 
 function drawBackground(time) {
+  if (MOBILE_RENDER_MODE) {
+    drawCachedMobileBackground();
+    return;
+  }
   const g = ctx.createLinearGradient(0, 0, 0, layout.h);
   g.addColorStop(0, "#e6dcc5");
   g.addColorStop(0.38, "#bccfba");
@@ -2467,6 +2509,45 @@ function drawRecruitChoices(time) {
     drawCentered("选择", rect.x + rect.w / 2, rect.y + 136, 10, "#785b43", "700");
   });
   ctx.restore();
+}
+
+function drawCachedMobileBackground() {
+  if (!mobileBackgroundCache) {
+    const cached = document.createElement("canvas");
+    cached.width = Math.ceil(layout.w);
+    cached.height = Math.ceil(layout.h);
+    const background = cached.getContext("2d", { alpha: false });
+    const gradient = background.createLinearGradient(0, 0, 0, layout.h);
+    gradient.addColorStop(0, "#e6dcc5");
+    gradient.addColorStop(0.38, "#bccfba");
+    gradient.addColorStop(0.68, "#d2b88f");
+    gradient.addColorStop(1, "#efe0c8");
+    background.fillStyle = gradient;
+    background.fillRect(0, 0, layout.w, layout.h);
+    background.globalAlpha = 0.16;
+    background.strokeStyle = "#5a4a3d";
+    background.lineWidth = 2;
+    for (let i = 0; i < 9; i++) {
+      const y = 38 + i * 74;
+      background.beginPath();
+      background.moveTo(-30, y);
+      background.bezierCurveTo(layout.w * 0.24, y - 34, layout.w * 0.42, y + 32, layout.w + 30, y - 8);
+      background.stroke();
+    }
+    background.globalAlpha = 0.18;
+    background.fillStyle = "#566e55";
+    for (let i = 0; i < 5; i++) {
+      const baseX = layout.w * (0.12 + i * 0.2);
+      const baseY = layout.h * (0.22 + (i % 2) * 0.11);
+      background.beginPath();
+      background.moveTo(baseX - 80, baseY + 96);
+      background.quadraticCurveTo(baseX - 18, baseY - 38, baseX + 58, baseY + 96);
+      background.closePath();
+      background.fill();
+    }
+    mobileBackgroundCache = cached;
+  }
+  ctx.drawImage(mobileBackgroundCache, 0, 0, layout.w, layout.h);
 }
 
 function tutorialBriefingRects() {
@@ -2830,7 +2911,7 @@ function drawDropHighlight(time) {
   ctx.globalAlpha = pulse;
   ctx.strokeStyle = "#f4cf45";
   ctx.shadowColor = "#ffd94d";
-  ctx.shadowBlur = Math.max(6, layout.cell * 0.2);
+  ctx.shadowBlur = MOBILE_RENDER_MODE ? 0 : Math.max(6, layout.cell * 0.2);
   ctx.lineWidth = 2.2;
   for (let r = 0; r < BOARD_ROWS; r++) {
     for (let c = 0; c < BOARD_COLS; c++) {
@@ -2847,7 +2928,7 @@ function drawDropHighlight(time) {
   ctx.globalAlpha = 0.72 + Math.sin(time * 12) * 0.18;
   ctx.strokeStyle = canDropOn(hover, state.drag.unit) ? "#f2d04f" : "#d94738";
   ctx.shadowColor = canDropOn(hover, state.drag.unit) ? "#ffe46a" : "transparent";
-  ctx.shadowBlur = canDropOn(hover, state.drag.unit) ? 10 : 0;
+  ctx.shadowBlur = !MOBILE_RENDER_MODE && canDropOn(hover, state.drag.unit) ? 10 : 0;
   ctx.lineWidth = 3.5;
   roundRect(p.x + 3, p.y + 3, p.w - 6, p.h - 6, 5, false, true);
   ctx.restore();
@@ -3338,8 +3419,8 @@ function drawUnitCard(unit, cx, cy, size, time, dragging) {
   const y = cy - s / 2;
   ctx.save();
   ctx.shadowColor = dragging ? "rgba(0,0,0,0.35)" : "rgba(0,0,0,0.12)";
-  ctx.shadowBlur = dragging ? 10 : 4 + pose.shadow * 3 + pose.glow * 5;
-  ctx.shadowOffsetY = dragging ? 8 : 2;
+  ctx.shadowBlur = MOBILE_RENDER_MODE ? 0 : dragging ? 10 : 4 + pose.shadow * 3 + pose.glow * 5;
+  ctx.shadowOffsetY = MOBILE_RENDER_MODE ? 0 : dragging ? 8 : 2;
 
   ctx.globalAlpha = pose.alpha;
   const showCard = !dragging && !isOnBoard(unit);
@@ -4206,7 +4287,7 @@ function getShake(time) {
 
 function drawButton(rect, text, fill, stroke, glow) {
   ctx.save();
-  if (glow) {
+  if (glow && !MOBILE_RENDER_MODE) {
     ctx.shadowColor = "rgba(245,190,80,0.45)";
     ctx.shadowBlur = 18;
   }
