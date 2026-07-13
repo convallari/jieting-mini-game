@@ -601,7 +601,7 @@ function setupDebugAttack() {
   state.enemies.push({
     id: idSeq++,
     t: 5.35,
-    pathSide: "right",
+    pathSide: DEBUG_BOSS_INDEX === 0 ? "left" : "right",
     speed: 0.045,
     hp: 5000,
     maxHp: 5000,
@@ -765,11 +765,11 @@ function updateDebugEnemySpawns(dt) {
 
 function spawnCampaignBosses() {
   if (state.wave === 2) spawnEnemy(true, 0, 1, "left");
-  if (state.wave === 4) spawnEnemy(true, 0, 0, "right");
+  if (state.wave === 4) spawnEnemy(true, 0, 0, "left");
   if (state.wave === 8 && state.endingRoute === "retreat") spawnEnemy(true, 0, 2, "right");
   if (state.wave === 8 && state.endingRoute === "hold") {
     spawnEnemy(true, 0, 2, "left");
-    spawnEnemy(true, 0, 0, "right");
+    spawnEnemy(true, 0, 0, "left");
   }
 }
 
