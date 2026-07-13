@@ -1917,14 +1917,14 @@ function rebuildFormations() {
         const wasActive = previous.has(memoryKey);
         const formation = previous.get(memoryKey) ?? remembered ?? {
           id: idSeq++, type: "general", token: recipe.displayName, actorId: recipe.id,
-          attackTimer: 0, experience: 0, action: "form", actionAge: 0, actionLife: 0.56,
+          level: 1, attackTimer: 0, experience: 0, action: "form", actionAge: 0, actionLife: 0.56,
           actionDx: 0, actionDy: 0, attackSerial: 0, wobble: Math.random() * Math.PI * 2
         };
         formation.memoryKey = memoryKey;
         formation.memberKeys = memberKeys;
         formation.memberIds = members.map((unit) => unit.id);
         formation.span = recipe.span;
-        formation.level = Math.max(...members.map((unit) => unit.level ?? 1));
+        formation.level = Math.max(1, formation.level ?? 1);
         formation.anchorKey = memberKeys[0];
         formation.placedAt = Math.max(...members.map((unit) => unit.placedAt ?? 0));
         if (remembered && !wasActive) setUnitAction(formation, "form", 0.32, 0, -1);
@@ -2068,12 +2068,6 @@ function addGeneralExperience(unit, amount) {
   }
   if (level <= unit.level) return;
   unit.level = level;
-  if (unit.type === "general") {
-    for (const memberKey of unit.memberKeys ?? []) {
-      const member = state.board.get(memberKey);
-      if (member) member.level = Math.max(member.level ?? 1, level);
-    }
-  }
   unit.confused = false;
   unit.rained = false;
   unit.charmed = false;

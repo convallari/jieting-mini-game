@@ -26,6 +26,7 @@ const required = [
   ["屯田产粮反馈", "floatText(\"军粮+1\""],
   ["精英将领经验", "const ELITE_GENERAL_EXP = [0, 10, 35, 75, 130]"],
   ["普通将领经验", "const REGULAR_GENERAL_EXP = [0, 8, 23]"],
+  ["新将领阵型固定从一级开始", "level: 1, attackTimer: 0, experience: 0"],
   ["我方整体伤害系数", "const PLAYER_DAMAGE_FACTOR = 0.8"],
   ["雨天攻速因子", "const RAIN_ATTACK_SPEED_FACTOR = 0.8"],
   ["断汲道军粮奖励", "return state.waterBreached ? 0 : 1"],
@@ -59,5 +60,8 @@ for (const [name, text] of propChecks) {
 if (!source.includes("enemy.slowLeft = Math.max(enemy.slowLeft ?? 0, ink.life - ink.age)")) {
   throw new Error("Battle value checks failed: dynamic inkstone area effect");
 }
+if (source.includes("member.level = Math.max(member.level ?? 1, level)")) {
+  throw new Error("Battle value checks failed: general level must not leak into glyph members");
+}
 
-console.log(`Battle values OK: ${required.length + weaponChecks.length + propChecks.length + 1} canonical checks`);
+console.log(`Battle values OK: ${required.length + weaponChecks.length + propChecks.length + 2} canonical checks`);
