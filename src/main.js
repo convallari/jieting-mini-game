@@ -1,6 +1,6 @@
 import { combinePoses, getHanziAsset, sampleMotion } from "./hanziAssets.js";
 import { drawVectorHanzi, hasVectorHanzi } from "./vectorHanzi.js";
-import { drawHanddrawnGlyph, preloadHanddrawnGlyphs } from "./handdrawnGlyphAssets.js";
+import { drawHanddrawnGlyph, isJietingHanddrawnText, preloadHanddrawnGlyphs } from "./handdrawnGlyphAssets.js";
 import { drawWeaponGlyphSprite, getWeaponAnimationTiming, hasWeaponGlyphSprite, preloadWeaponGlyphSprites } from "./weaponGlyphSprites.js";
 import { drawOriginalHitEffect, getOriginalHitEffectTiming, hitEffectForToken, preloadOriginalHitEffects } from "./originalHitEffects.js";
 import { drawOriginalFarmer, preloadOriginalUnitSprites } from "./originalUnitSprites.js";
@@ -196,8 +196,9 @@ preloadWeaponGlyphSprites();
 preloadOriginalHitEffects();
 preloadOriginalUnitSprites();
 preloadOriginalPropSprites();
-preloadHanddrawnGlyphs().then((count) => {
+const handdrawnGlyphsReady = preloadHanddrawnGlyphs().then((count) => {
   canvas.dataset.handdrawnGlyphs = String(count);
+  return count;
 });
 initSpineGameLayer(canvas.clientWidth, canvas.clientHeight);
 
@@ -651,7 +652,23 @@ function loop(now) {
   if (DEBUG_STATE || DEBUG_ATTACK) canvas.dataset.debugState = JSON.stringify(window.__jietingDebugState());
   requestAnimationFrame(loop);
 }
-requestAnimationFrame(loop);
+drawStartupLoading();
+handdrawnGlyphsReady.finally(() => {
+  lastTime = performance.now();
+  requestAnimationFrame(loop);
+});
+
+function drawStartupLoading() {
+  ctx.save();
+  ctx.fillStyle = "#eee3cc";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#4a3529";
+  ctx.font = `700 ${Math.max(16, Math.min(24, canvas.width * 0.055))}px "Microsoft YaHei", sans-serif`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("正在整军……", canvas.width / 2, canvas.height / 2);
+  ctx.restore();
+}
 
 function update(dt, time) {
   updateParticles(dt);
@@ -3141,17 +3158,35 @@ function drawGlyphLayer(text, x, y, size, color, pose = {}) {
   ctx.transform(1, 0, pose.skewX ?? 0, 1, 0, 0);
   ctx.rotate(pose.rotate ?? 0);
   ctx.scale(pose.scaleX ?? 1, pose.scaleY ?? 1);
-  const drawn = drawHanddrawnGlyph(ctx, text, size) || drawVectorHanzi(ctx, text, size, color, {
-    jitter: pose.jitter ?? 0,
-    stroke: pose.stroke,
-    breathe: Math.abs((pose.glyphScaleX ?? 1) - (pose.glyphScaleY ?? 1)) + Math.abs(pose.rotate ?? 0),
-    attack: pose.glow ?? 0,
-    merge: Math.max(0, ((pose.glyphScaleX ?? 1) - 1) * 0.8),
-    phase: performance.now() * 0.001,
-    action: pose.action,
-    actionProgress: pose.actionProgress
-  });
+  let drawn = drawHanddrawnGlyph(ctx, text, size);
+  if (!drawn && isJietingHanddrawnText(text)) {
+    drawReadableGlyphFallback(text, size, color);
+    drawn = true;
+  } else if (!drawn) {
+    drawn = drawVectorHanzi(ctx, text, size, color, {
+      jitter: pose.jitter ?? 0,
+      stroke: pose.stroke,
+      breathe: Math.abs((pose.glyphScaleX ?? 1) - (pose.glyphScaleY ?? 1)) + Math.abs(pose.rotate ?? 0),
+      attack: pose.glow ?? 0,
+      merge: Math.max(0, ((pose.glyphScaleX ?? 1) - 1) * 0.8),
+      phase: performance.now() * 0.001,
+      action: pose.action,
+      actionProgress: pose.actionProgress
+    });
+  }
   if (!drawn) drawInkSigil(size, color);
+  ctx.restore();
+}
+
+function drawReadableGlyphFallback(text, size, color) {
+  const chars = [...String(text)];
+  const fontSize = chars.length > 1 ? size * Math.min(0.82, 1.55 / chars.length) : size;
+  ctx.save();
+  ctx.fillStyle = color;
+  ctx.font = `900 ${fontSize}px "KaiTi", "STKaiti", "Microsoft YaHei", sans-serif`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(text, 0, 0);
   ctx.restore();
 }
 

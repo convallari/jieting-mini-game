@@ -61,6 +61,11 @@ export function hasHanddrawnGlyph(text) {
   return chars.length > 0 && chars.every((char) => actorsByGlyph.has(char));
 }
 
+export function isJietingHanddrawnText(text) {
+  const chars = [...String(text ?? "")];
+  return chars.length > 0 && chars.every((char) => JIETING_RUNTIME_GLYPHS.has(char));
+}
+
 export function drawHanddrawnGlyph(ctx, text, size) {
   const chars = [...String(text ?? "")];
   if (!chars.length || !chars.every((char) => actorsByGlyph.has(char))) return false;
