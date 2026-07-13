@@ -17,6 +17,7 @@ const required = [
   ["高血量演示需显式开启单位", "const DEBUG_ATTACK_PREVIEW = DEBUG_ATTACK && DEBUG_UNITS"],
   ["敌军按阶段围山断水", "state.wave <= 3"],
   ["普通敌军战役速度", "isBoss ? 12 : 24 * archetype.speed"],
+  ["敌军统一行进倍率", "const ENEMY_MOVE_SPEED_MULTIPLIER = 1.44"],
   ["所有非道路荒地均可开垦", "&& !JIETING_TERRAIN.camp.has(key)"],
   ["攻击调试敌人从入口生成", "if (!DEBUG_UNITS || DEBUG_GENERAL_IDLE) return"],
   ["兵种等级倍率", "const SOLDIER_LEVEL_MULTIPLIERS = [1, 1.5, 2.1, 2.73, 3.4125]"],
@@ -27,7 +28,7 @@ const required = [
   ["精英将领经验", "const ELITE_GENERAL_EXP = [0, 10, 35, 75, 130]"],
   ["普通将领经验", "const REGULAR_GENERAL_EXP = [0, 8, 23]"],
   ["新将领阵型固定从一级开始", "level: 1, attackTimer: 0, experience: 0"],
-  ["我方整体伤害系数", "const PLAYER_DAMAGE_FACTOR = 0.576"],
+  ["我方整体伤害系数", "const PLAYER_DAMAGE_FACTOR = 0.4608"],
   ["雨天攻速因子", "const RAIN_ATTACK_SPEED_FACTOR = 0.8"],
   ["断汲道军粮奖励", "return state.waterBreached ? 0 : 1"],
   ["双路线汇入同一营寨生命", "const gate = \"left\""]

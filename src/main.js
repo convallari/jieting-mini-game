@@ -29,7 +29,7 @@ const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 const MOBILE_RENDER_MODE = window.matchMedia("(pointer: coarse)").matches || window.innerWidth <= 600;
 const MOBILE_FRAME_INTERVAL = 1000 / 30;
-const ENEMY_MOVE_SPEED_MULTIPLIER = 1.2;
+const ENEMY_MOVE_SPEED_MULTIPLIER = 1.44;
 
 const BASE_URL = import.meta.env?.BASE_URL || "/";
 const AUDIO_ROOT = `${BASE_URL}original-audio/`;
@@ -116,7 +116,7 @@ const FARMER_CYCLE_SECONDS = [40, 30, 20, 15, 10];
 const RAIN_ATTACK_SPEED_FACTOR = 0.8;
 const ELITE_GENERAL_EXP = [0, 10, 35, 75, 130];
 const REGULAR_GENERAL_EXP = [0, 8, 23];
-const PLAYER_DAMAGE_FACTOR = 0.576;
+const PLAYER_DAMAGE_FACTOR = 0.4608;
 const ENEMY_HP_BY_LEVEL = [12, 15, 20, 26, 33, 42, 54, 72];
 const ENEMY_COUNT_BY_LEVEL = [20, 24, 28, 32, 36, 40, 44, 52];
 const BEST_WAVE_STORAGE_KEY = "jieting.bestWave";
