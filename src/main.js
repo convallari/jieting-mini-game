@@ -27,6 +27,8 @@ import {
 
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
+const MOBILE_RENDER_MODE = window.matchMedia("(pointer: coarse)").matches || window.innerWidth <= 600;
+const MOBILE_FRAME_INTERVAL = 1000 / 45;
 
 const BASE_URL = import.meta.env?.BASE_URL || "/";
 const AUDIO_ROOT = `${BASE_URL}original-audio/`;
@@ -200,7 +202,7 @@ const handdrawnGlyphsReady = preloadHanddrawnGlyphs().then((count) => {
   canvas.dataset.handdrawnGlyphs = String(count);
   return count;
 });
-initSpineGameLayer(canvas.clientWidth, canvas.clientHeight);
+if (!MOBILE_RENDER_MODE) initSpineGameLayer(canvas.clientWidth, canvas.clientHeight);
 
 function createState() {
   return {
@@ -305,7 +307,8 @@ function makeUnit(token, level = 1) {
 
 function resize() {
   const rect = canvas.getBoundingClientRect();
-  const dpr = Math.max(1, Math.min(2.5, window.devicePixelRatio || 1));
+  const dprCap = MOBILE_RENDER_MODE ? 1.5 : 2;
+  const dpr = Math.max(1, Math.min(dprCap, window.devicePixelRatio || 1));
   canvas.width = Math.round(rect.width * dpr);
   canvas.height = Math.round(rect.height * dpr);
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -318,15 +321,17 @@ function computeLayout(w, h) {
   const topH = Math.max(88, Math.min(102, h * 0.115));
   const bottomH = Math.max(142, Math.min(174, h * 0.19));
   const availableH = h - topH - bottomH - 20;
-  const cell = Math.min(w / BOARD_COLS, availableH / BOARD_ROWS);
-  const boardW = cell * BOARD_COLS;
-  const boardH = cell * BOARD_ROWS;
-  const boardX = Math.round((w - boardW) / 2);
+  const cellW = w / BOARD_COLS;
+  const cellH = Math.min(cellW, availableH / BOARD_ROWS);
+  const cell = Math.sqrt(cellW * cellH);
+  const boardW = w;
+  const boardH = cellH * BOARD_ROWS;
+  const boardX = 0;
   const boardY = Math.round(topH + Math.max(4, (availableH - boardH) * 0.2));
   const campY = boardY + boardH + 12;
   const slot = Math.min(55, Math.floor((w - 92) / CAMP_SIZE));
   layout = {
-    w, h, safeTop, topH, bottomH, cell, boardX, boardY, boardW, boardH,
+    w, h, safeTop, topH, bottomH, cell, cellW, cellH, boardX, boardY, boardW, boardH,
     campY, slot,
     campX: Math.round((w - slot * CAMP_SIZE - 10 * (CAMP_SIZE - 1)) / 2 + 20),
     recruit: { x: Math.round(w / 2 - 76), y: campY + slot + 14, w: 152, h: 68 },
@@ -641,7 +646,14 @@ function setupDebugAttack() {
 // Keeping the menu in front made repeated cadence checks unnecessarily ambiguous.
 if (DEBUG_ATTACK) startGame();
 
+let lastRenderedAt = 0;
+
 function loop(now) {
+  if (MOBILE_RENDER_MODE && now - lastRenderedAt < MOBILE_FRAME_INTERVAL) {
+    requestAnimationFrame(loop);
+    return;
+  }
+  lastRenderedAt = now;
   const dt = Math.min(0.033, (now - lastTime) / 1000) * DEBUG_TIME_SCALE;
   lastTime = now;
   update(dt, now / 1000);
@@ -1037,7 +1049,9 @@ function updateEnemies(dt) {
     }
     const controlMultiplier = enemy.endpointAttackStarted || enemy.bossCastingLeft > 0 || enemy.bossRecoveryLeft > 0 || enemy.stunLeft > 0 ? 0 : enemy.slowLeft > 0 ? 0.8 : 1;
     const inspireMultiplier = enemy.inspireLeft > 0 ? 1.3 : 1;
-    enemy.t += (enemy.speedPx ? enemy.speedPx / layout.cell : enemy.speed) * dt * controlMultiplier * inspireMultiplier;
+    const segment = currentPathSegment(enemy);
+    const segmentPixels = Math.max(1, Math.hypot(segment.dir.x * layout.cellW, segment.dir.y * layout.cellH));
+    enemy.t += (enemy.speedPx ? enemy.speedPx / segmentPixels : enemy.speed) * dt * controlMultiplier * inspireMultiplier;
     enemy.hitFlash = Math.max(0, enemy.hitFlash - dt);
     enemy.hitAge += dt;
     if (enemy.bossIndex != null && !enemy.endpointAttackStarted) {
@@ -1182,7 +1196,7 @@ function castBossSkill(enemy) {
       .filter(({ unit }) => !unit.knockedDown)
       .filter(({ r, c, offsetX = 0 }) => {
         const center = cellCenter(r, c);
-        center.x += offsetX * layout.cell;
+        center.x += offsetX * layout.cellW;
         return Math.hypot(center.x - origin.x, center.y - origin.y) <= boss.range * layout.cell;
       });
     const target = candidates[Math.floor(Math.random() * candidates.length)];
@@ -1192,7 +1206,7 @@ function castBossSkill(enemy) {
     }
     enemy.bossChargeTargetId = target.unit.id;
     const center = cellCenter(target.r, target.c);
-    center.x += (target.offsetX ?? 0) * layout.cell;
+    center.x += (target.offsetX ?? 0) * layout.cellW;
     const side = origin.x >= center.x ? 1 : -1;
     const desired = { x: center.x + side * layout.cell * 0.75, y: center.y };
     const dx = desired.x - origin.x;
@@ -1237,7 +1251,7 @@ function applyBossSkill(enemy) {
     let affected = 0;
     for (const { unit, r, c, offsetX = 0 } of combatBoardEntities()) {
       const center = cellCenter(r, c);
-      center.x += offsetX * layout.cell;
+      center.x += offsetX * layout.cellW;
       if (Math.hypot(center.x - origin.x, center.y - origin.y) > boss.range * layout.cell) continue;
       const duration = state.commandOrder === "steady" && hasSteadyAura(unit) ? 5 * COMMAND_ORDERS.steady.controlDuration : 5;
       unit.mergeLockedLeft = Math.max(unit.mergeLockedLeft ?? 0, duration);
@@ -1393,7 +1407,7 @@ function applyBossSkill(enemy) {
   const nearbyUnits = combatBoardEntities()
     .filter(({ r, c, offsetX = 0 }) => {
       const center = cellCenter(r, c);
-      center.x += offsetX * layout.cell;
+      center.x += offsetX * layout.cellW;
       return Math.hypot(center.x - origin.x, center.y - origin.y) <= boss.range * layout.cell;
     });
   if (boss.skill === "halberd") {
@@ -1706,6 +1720,17 @@ function updateParticles(dt) {
   state.shakes = state.shakes.filter((s) => s.age < s.life);
   state.recruits = state.recruits.filter((r) => r.age < r.life);
   state.messages = state.messages.filter((m) => m.age < m.life);
+  if (MOBILE_RENDER_MODE) {
+    trimOldest(state.particles, 96);
+    trimOldest(state.strokes, 48);
+    trimOldest(state.ghosts, 32);
+    trimOldest(state.pulses, 24);
+    trimOldest(state.floats, 24);
+  }
+}
+
+function trimOldest(items, limit) {
+  if (items.length > limit) items.splice(0, items.length - limit);
 }
 
 function updateBuns(dt) {
@@ -1735,7 +1760,7 @@ function setUnitAction(unit, action, life, dx = 0, dy = 0) {
 function fireAt(unit, cell, enemy) {
   audioEngine.play(ATTACK_SOUND_BY_TOKEN[unit.token] ?? "knife_attack", unit.type === "general" ? 0.22 : 0.14, 0.08);
   const from = cellCenter(cell.r, cell.c);
-  from.x += (cell.offsetX ?? 0) * layout.cell;
+  from.x += (cell.offsetX ?? 0) * layout.cellW;
   const to = enemyPosition(enemy);
   const damage = Math.round(getUnitDamage(unit) * 100) / 100;
   const len = Math.max(1, Math.hypot(to.x - from.x, to.y - from.y));
@@ -1812,8 +1837,8 @@ function damageDefense(enemy) {
   const endpoint = pathForEnemy(enemy).at(-1);
   floatText(
     SCENARIO_TEXT.defenseHit,
-    layout.boardX + (endpoint[1] + 0.5) * layout.cell,
-    layout.boardY + (endpoint[0] + 0.5) * layout.cell,
+    layout.boardX + (endpoint[1] + 0.5) * layout.cellW,
+    layout.boardY + (endpoint[0] + 0.5) * layout.cellH,
     "#d12d25",
     18
   );
@@ -1968,7 +1993,7 @@ function hasSteadyAura(unit, key = boardKeyForUnit(unit)) {
     if (candidate.token !== "王平") continue;
     const candidateCell = keyToCell(candidate.anchorKey);
     const auraCenter = cellCenter(candidateCell.r, candidateCell.c);
-    auraCenter.x += ((candidate.span - 1) / 2) * layout.cell;
+    auraCenter.x += ((candidate.span - 1) / 2) * layout.cellW;
     if (Math.hypot(center.x - auraCenter.x, center.y - auraCenter.y) <= layout.cell * 2.8) return true;
   }
   return false;
@@ -2020,7 +2045,7 @@ function addGeneralExperience(unit, amount) {
   if (key) {
     const { r, c } = keyToCell(key);
     const center = cellCenter(r, c);
-    floatText(`Lv.${level}`, center.x + ((unit.span - 1) / 2) * layout.cell, center.y - layout.cell * 0.42, "#d19622", 18);
+    floatText(`Lv.${level}`, center.x + ((unit.span - 1) / 2) * layout.cellW, center.y - layout.cell * 0.42, "#d19622", 18);
   }
 }
 
@@ -2072,7 +2097,7 @@ function findTarget(r, c, range, offsetX = 0, policy = "nearest", defendedPath =
   let best = null;
   let bestScore = policy === "closest_end" ? -Infinity : Infinity;
   const unitPos = cellCenter(r, c);
-  unitPos.x += offsetX * layout.cell;
+  unitPos.x += offsetX * layout.cellW;
   for (const enemy of state.enemies) {
     if (enemy.dead || enemy.dying) continue;
     const pos = enemyPosition(enemy);
@@ -2140,8 +2165,8 @@ function enemyPosition(enemy) {
 function enemyGridPosition(enemy) {
   const pos = enemyPosition(enemy);
   return {
-    r: Math.max(0, Math.min(BOARD_ROWS - 1, Math.floor((pos.y - layout.boardY) / layout.cell))),
-    c: Math.max(0, Math.min(BOARD_COLS - 1, Math.floor((pos.x - layout.boardX) / layout.cell)))
+    r: Math.max(0, Math.min(BOARD_ROWS - 1, Math.floor((pos.y - layout.boardY) / layout.cellH))),
+    c: Math.max(0, Math.min(BOARD_COLS - 1, Math.floor((pos.x - layout.boardX) / layout.cellW)))
   };
 }
 
@@ -2652,8 +2677,8 @@ function drawBoard(time) {
   for (let r = 0; r < BOARD_ROWS; r++) {
     for (let c = 0; c < BOARD_COLS; c++) {
       const key = `${r},${c}`;
-      const x = c * layout.cell;
-      const y = r * layout.cell;
+      const x = c * layout.cellW;
+      const y = r * layout.cellH;
       if (state.bossBlocked.has(key)) ctx.fillStyle = "#3f3835";
       else if (JIETING_TERRAIN.camp.has(key)) ctx.fillStyle = "#dfc289";
       else if (pathKeySet.has(key) && JIETING_TERRAIN.water.has(key)) ctx.fillStyle = state.waterPressure ? "#6f9eaa" : "#91b9bc";
@@ -2662,46 +2687,46 @@ function drawBoard(time) {
       else if (JIETING_TERRAIN.waterDefense.has(key)) ctx.fillStyle = "#c8ded8";
       else if (isCultivatedCell(key)) ctx.fillStyle = "#f3eddf";
       else ctx.fillStyle = "#505a54";
-      ctx.fillRect(x, y, layout.cell, layout.cell);
+      ctx.fillRect(x, y, layout.cellW, layout.cellH);
       ctx.strokeStyle = "#34312e";
       ctx.lineWidth = 1.15;
-      ctx.strokeRect(x + 0.5, y + 0.5, layout.cell - 1, layout.cell - 1);
+      ctx.strokeRect(x + 0.5, y + 0.5, layout.cellW - 1, layout.cellH - 1);
       if (state.bossBlocked.has(key)) {
         ctx.strokeStyle = "rgba(238,157,183,0.72)";
         ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.moveTo(x + 5, y + 5);
-        ctx.lineTo(x + layout.cell - 5, y + layout.cell - 5);
-        ctx.moveTo(x + layout.cell - 5, y + 5);
-        ctx.lineTo(x + 5, y + layout.cell - 5);
+        ctx.lineTo(x + layout.cellW - 5, y + layout.cellH - 5);
+        ctx.moveTo(x + layout.cellW - 5, y + 5);
+        ctx.lineTo(x + 5, y + layout.cellH - 5);
         ctx.stroke();
       }
       if (!pathKeySet.has(key) && isCultivatedCell(key) && !state.board.has(key)) {
         ctx.strokeStyle = "rgba(82,111,75,0.55)";
         ctx.lineWidth = 1.5;
         ctx.setLineDash([3, 3]);
-        ctx.strokeRect(x + 4, y + 4, layout.cell - 8, layout.cell - 8);
+        ctx.strokeRect(x + 4, y + 4, layout.cellW - 8, layout.cellH - 8);
         ctx.setLineDash([]);
       }
       if (JIETING_TERRAIN.mountain.has(key)) {
-        line(x + layout.cell * 0.18, y + layout.cell * 0.72, x + layout.cell * 0.5, y + layout.cell * 0.22, "rgba(49,69,43,0.42)", 2);
-        line(x + layout.cell * 0.5, y + layout.cell * 0.22, x + layout.cell * 0.82, y + layout.cell * 0.72, "rgba(49,69,43,0.42)", 2);
+        line(x + layout.cellW * 0.18, y + layout.cellH * 0.72, x + layout.cellW * 0.5, y + layout.cellH * 0.22, "rgba(49,69,43,0.42)", 2);
+        line(x + layout.cellW * 0.5, y + layout.cellH * 0.22, x + layout.cellW * 0.82, y + layout.cellH * 0.72, "rgba(49,69,43,0.42)", 2);
       } else if (JIETING_TERRAIN.water.has(key)) {
-        line(x + layout.cell * 0.18, y + layout.cell * 0.52, x + layout.cell * 0.82, y + layout.cell * 0.5, "rgba(31,82,102,0.38)", 2);
+        line(x + layout.cellW * 0.18, y + layout.cellH * 0.52, x + layout.cellW * 0.82, y + layout.cellH * 0.5, "rgba(31,82,102,0.38)", 2);
       } else if (JIETING_TERRAIN.waterDefense.has(key)) {
         ctx.strokeStyle = "rgba(50,112,94,0.58)";
         ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.moveTo(x + layout.cell * 0.5, y + layout.cell * 0.22);
-        ctx.lineTo(x + layout.cell * 0.72, y + layout.cell * 0.34);
-        ctx.lineTo(x + layout.cell * 0.64, y + layout.cell * 0.7);
-        ctx.lineTo(x + layout.cell * 0.5, y + layout.cell * 0.79);
-        ctx.lineTo(x + layout.cell * 0.36, y + layout.cell * 0.7);
-        ctx.lineTo(x + layout.cell * 0.28, y + layout.cell * 0.34);
+        ctx.moveTo(x + layout.cellW * 0.5, y + layout.cellH * 0.22);
+        ctx.lineTo(x + layout.cellW * 0.72, y + layout.cellH * 0.34);
+        ctx.lineTo(x + layout.cellW * 0.64, y + layout.cellH * 0.7);
+        ctx.lineTo(x + layout.cellW * 0.5, y + layout.cellH * 0.79);
+        ctx.lineTo(x + layout.cellW * 0.36, y + layout.cellH * 0.7);
+        ctx.lineTo(x + layout.cellW * 0.28, y + layout.cellH * 0.34);
         ctx.closePath();
         ctx.stroke();
       } else if (key === "9,2") {
-        drawGlyphLayer("蜀", x + layout.cell / 2, y + layout.cell * 0.68, layout.cell * 0.68, "rgba(113,41,31,0.78)");
+        drawGlyphLayer("蜀", x + layout.cellW / 2, y + layout.cellH * 0.68, layout.cell * 0.68, "rgba(113,41,31,0.78)");
       }
     }
   }
@@ -2743,8 +2768,8 @@ function drawRouteStones(time) {
     ctx.beginPath();
     for (let i = 0; i < path.length; i++) {
       const [r, c] = path[i];
-      const x = c * layout.cell + layout.cell / 2;
-      const y = r * layout.cell + layout.cell / 2;
+      const x = c * layout.cellW + layout.cellW / 2;
+      const y = r * layout.cellH + layout.cellH / 2;
       if (i === 0) ctx.moveTo(x, y);
       else ctx.lineTo(x, y);
     }
@@ -2755,7 +2780,7 @@ function drawRouteStones(time) {
   for (const path of Object.values(GAME_PATHS)) {
     for (let i = 0; i < path.length; i += 2) {
       const [r, c] = path[i];
-      circle(c * layout.cell + layout.cell / 2, r * layout.cell + layout.cell / 2, 2.2, true, false);
+      circle(c * layout.cellW + layout.cellW / 2, r * layout.cellH + layout.cellH / 2, 2.2, true, false);
     }
   }
 }
@@ -2764,13 +2789,13 @@ function drawRouteEntrances(time) {
   const pulse = 0.78 + Math.sin(time * 5) * 0.16;
   for (const path of Object.values(GAME_PATHS)) {
     const [r, c] = path[0];
-    const x = (c + 0.5) * layout.cell;
-    const y = (r + 0.16) * layout.cell;
+    const x = (c + 0.5) * layout.cellW;
+    const y = (r + 0.16) * layout.cellH;
     ctx.save();
     ctx.globalAlpha = pulse;
     ctx.fillStyle = "#a83a2d";
     ctx.beginPath();
-    ctx.moveTo(x, y + layout.cell * 0.26);
+    ctx.moveTo(x, y + layout.cellH * 0.26);
     ctx.lineTo(x - layout.cell * 0.13, y);
     ctx.lineTo(x + layout.cell * 0.13, y);
     ctx.closePath();
@@ -2782,8 +2807,8 @@ function drawRouteEntrances(time) {
 function drawMapSideLabels() {
   for (const [gate, path] of Object.entries(GAME_PATHS)) {
     const [r, c] = path.at(-1);
-    const x = layout.boardX + (c + 0.5) * layout.cell;
-    const y = layout.boardY + (r + 0.5) * layout.cell;
+    const x = layout.boardX + (c + 0.5) * layout.cellW;
+    const y = layout.boardY + (r + 0.5) * layout.cellH;
     if (gate === "left") {
       ctx.save();
       ctx.globalAlpha = 0.82;
@@ -2890,7 +2915,7 @@ function drawUnitBoard(board, time, draggable) {
     if (draggable && state.drag?.source?.kind === "board" && state.drag.source.key === key) continue;
     const { r, c } = keyToCell(key);
     const rect = cellRect(r, c);
-    drawUnitCard(unit, rect.x + rect.w / 2, rect.y + rect.h / 2, rect.w * 0.9, time, false);
+    drawUnitCard(unit, rect.x + rect.w / 2, rect.y + rect.h / 2, Math.min(rect.w, rect.h) * 0.9, time, false);
   }
   if (board === state.board) drawFormationOverlays(time);
 }
@@ -3897,8 +3922,8 @@ function hitBoard(p) {
   if (p.x < layout.boardX || p.y < layout.boardY || p.x >= layout.boardX + layout.boardW || p.y >= layout.boardY + layout.boardH) return null;
   return {
     kind: "board",
-    c: Math.floor((p.x - layout.boardX) / layout.cell),
-    r: Math.floor((p.y - layout.boardY) / layout.cell)
+    c: Math.floor((p.x - layout.boardX) / layout.cellW),
+    r: Math.floor((p.y - layout.boardY) / layout.cellH)
   };
 }
 
@@ -3929,11 +3954,11 @@ function keyToHover(key) {
 }
 
 function cellRect(r, c) {
-  return { x: layout.boardX + c * layout.cell, y: layout.boardY + r * layout.cell, w: layout.cell, h: layout.cell };
+  return { x: layout.boardX + c * layout.cellW, y: layout.boardY + r * layout.cellH, w: layout.cellW, h: layout.cellH };
 }
 
 function cellCenter(r, c) {
-  return { x: layout.boardX + c * layout.cell + layout.cell / 2, y: layout.boardY + r * layout.cell + layout.cell / 2 };
+  return { x: layout.boardX + c * layout.cellW + layout.cellW / 2, y: layout.boardY + r * layout.cellH + layout.cellH / 2 };
 }
 
 function campSlotRect(i) {
@@ -4411,7 +4436,7 @@ function syncOriginalGeneralLayer() {
       const center = cellCenter(r, c);
       return {
         ...formation,
-        x: center.x + ((formation.span - 1) / 2) * layout.cell,
+        x: center.x + ((formation.span - 1) / 2) * layout.cellW,
         y: center.y + layout.cell * 0.16
       };
     });
