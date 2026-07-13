@@ -2393,12 +2393,14 @@ function drawTopBar() {
   drawPauseButton();
   drawTopCurrency();
   drawCentered(SCENARIO_TEXT.stageName, layout.w / 2, layout.safeTop + 19, 26, "#3b241d", "900");
-  const waveLabel = state.wavePhase === "prepare"
-    ? `备战 ${Math.ceil(state.waveTimer)}秒`
+  const displayedWave = state.wavePhase === "prepare" ? 1 : Math.max(1, state.wave);
+  const phaseLabel = state.wavePhase === "prepare"
+    ? `备战${Math.ceil(state.waveTimer)}秒`
     : state.wavePhase === "gap"
-      ? `整备 ${Math.ceil(state.waveTimer)}秒`
-      : `第${state.wave}波`;
-  drawCentered(`${waveLabel} · 营♥${state.douHp.left}`, layout.w / 2, layout.safeTop + 45, 18, "#14110f", "900");
+      ? `整备${Math.ceil(state.waveTimer)}秒`
+      : state.wavePhase === "decision" ? "抉择" : "";
+  const progressLabel = `第${displayedWave}波 / 共${MAX_WAVE}波`;
+  drawCentered(`${progressLabel}${phaseLabel ? ` · ${phaseLabel}` : ""} · 营♥${state.douHp.left}`, layout.w / 2, layout.safeTop + 45, 16, "#14110f", "900");
   drawCampaignHud();
 }
 
@@ -2576,7 +2578,7 @@ function drawTutorialBriefing() {
 
 function drawTutorialGoal({ box, next }) {
   drawCentered("守住街亭", layout.w / 2, box.y + 42, 29, "#382820", "900");
-  drawCentered("战役目标", layout.w / 2, box.y + 72, 14, "#765848", "700");
+  drawCentered(`战役目标 · 全程共${MAX_WAVE}波`, layout.w / 2, box.y + 72, 14, "#765848", "700");
   const y = box.y + 164;
   const xs = [box.x + 64, layout.w / 2, box.x + box.w - 64];
   [["魏", "#a83a2d"], ["水", "#417d88"], ["蜀营", "#a06b2c"]].forEach(([label, color], index) => {

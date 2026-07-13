@@ -7,13 +7,13 @@ export const SCENARIO_TEXT = {
   resourceName: "军粮",
   defenseName: "蜀营",
   defenseHit: "营 -1",
-  startHint: "点击征兵自动补充，再拖到黄光阵地",
+  startHint: "全程共8波 · 点击征兵，再拖到黄光阵地",
   recruitInsufficient: "军粮不足",
   victoryTitle: "守住街亭",
   victorySub: "成功守住街亭八波魏军",
   defeatTitle: "街亭失守",
   defeatSub: "蜀军营寨被攻破",
-  waveIncoming: (wave) => `第${wave}波魏军来袭`
+  waveIncoming: (wave) => `第${wave}波 / 共8波 · 魏军来袭`
 };
 
 export const COMMAND_ORDERS = {

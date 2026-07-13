@@ -19,6 +19,7 @@ const required = [
   ["普通敌军战役速度", "isBoss ? 12 : 24 * archetype.speed"],
   ["敌军统一行进倍率", "const ENEMY_MOVE_SPEED_MULTIPLIER = 1.44"],
   ["张郃从左路进军", "if (state.wave === 4) spawnEnemy(true, 0, 0, \"left\")"],
+  ["顶部持续显示总波数", "const progressLabel = `第${displayedWave}波 / 共${MAX_WAVE}波`"],
   ["所有非道路荒地均可开垦", "&& !JIETING_TERRAIN.camp.has(key)"],
   ["攻击调试敌人从入口生成", "if (!DEBUG_UNITS || DEBUG_GENERAL_IDLE) return"],
   ["兵种等级倍率", "const SOLDIER_LEVEL_MULTIPLIERS = [1, 1.5, 2.1, 2.73, 3.4125]"],
