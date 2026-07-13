@@ -5,7 +5,7 @@ const scenarioSource = fs.readFileSync(new URL("../src/scenarioJieting.js", impo
 const propSource = fs.readFileSync(new URL("../src/originalPropSprites.js", import.meta.url), "utf8");
 
 const required = [
-  ["八波强化生命表", "const ENEMY_HP_BY_LEVEL = [6, 9, 14, 20, 27, 36, 48, 66]"],
+  ["八波强化生命表", "const ENEMY_HP_BY_LEVEL = [9, 12, 17, 23, 30, 39, 51, 69]"],
   ["八波双倍出怪表", "const ENEMY_COUNT_BY_LEVEL = [20, 24, 28, 32, 36, 40, 44, 52]"],
   ["首轮固定核心阵型和铲子", "[\"马\", \"谡\", \"王\", \"平\", \"铲\"]"],
   ["首轮中文牌转换为内部铲子", "makeUnit(internalToken(guaranteed[i]))"],
@@ -27,7 +27,7 @@ const required = [
   ["精英将领经验", "const ELITE_GENERAL_EXP = [0, 10, 35, 75, 130]"],
   ["普通将领经验", "const REGULAR_GENERAL_EXP = [0, 8, 23]"],
   ["新将领阵型固定从一级开始", "level: 1, attackTimer: 0, experience: 0"],
-  ["我方整体伤害系数", "const PLAYER_DAMAGE_FACTOR = 0.8"],
+  ["我方整体伤害系数", "const PLAYER_DAMAGE_FACTOR = 0.72"],
   ["雨天攻速因子", "const RAIN_ATTACK_SPEED_FACTOR = 0.8"],
   ["断汲道军粮奖励", "return state.waterBreached ? 0 : 1"],
   ["双路线汇入同一营寨生命", "const gate = \"left\""]
