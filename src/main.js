@@ -318,7 +318,7 @@ function computeLayout(w, h) {
   const topH = Math.max(88, Math.min(102, h * 0.115));
   const bottomH = Math.max(142, Math.min(174, h * 0.19));
   const availableH = h - topH - bottomH - 20;
-  const cell = Math.floor(Math.min((w - 22) / BOARD_COLS, availableH / BOARD_ROWS));
+  const cell = Math.min(w / BOARD_COLS, availableH / BOARD_ROWS);
   const boardW = cell * BOARD_COLS;
   const boardH = cell * BOARD_ROWS;
   const boardX = Math.round((w - boardW) / 2);
@@ -329,7 +329,7 @@ function computeLayout(w, h) {
     w, h, safeTop, topH, bottomH, cell, boardX, boardY, boardW, boardH,
     campY, slot,
     campX: Math.round((w - slot * CAMP_SIZE - 10 * (CAMP_SIZE - 1)) / 2 + 20),
-    recruit: { x: Math.round(w / 2 - 76), y: campY + slot + 14, w: 152, h: 54 },
+    recruit: { x: Math.round(w / 2 - 76), y: campY + slot + 14, w: 152, h: 68 },
     start: { x: Math.round(w / 2 - 108), y: Math.round(h * 0.68), w: 216, h: 64 },
     pause: { x: 14, y: safeTop + 4, r: 17 },
     codex: { x: 15, y: campY + 10, w: 42, h: 42 }
@@ -3016,9 +3016,23 @@ function drawCamp(time) {
       drawUnitCard(state.camp[i], rect.x + rect.w / 2, rect.y + rect.h / 2, rect.w * 0.88, time, false);
     }
   }
-  drawButton(layout.recruit, "征兵", state.buns >= state.refreshCost ? "#bf6d52" : "#6e625d", "#4a2c26", false);
-  drawBun(layout.recruit.x + layout.recruit.w / 2 - 15, layout.recruit.y + layout.recruit.h - 13, 9);
-  drawText(String(state.refreshCost), layout.recruit.x + layout.recruit.w / 2 + 8, layout.recruit.y + layout.recruit.h - 8, 14, "#fff7ea", "900", "left");
+  drawRecruitButton();
+}
+
+function drawRecruitButton() {
+  const rect = layout.recruit;
+  ctx.save();
+  ctx.fillStyle = state.buns >= state.refreshCost ? "#bf6d52" : "#6e625d";
+  roundRect(rect.x, rect.y, rect.w, rect.h, 6, true, false);
+  ctx.strokeStyle = "#4a2c26";
+  ctx.lineWidth = 4;
+  roundRect(rect.x, rect.y, rect.w, rect.h, 6, false, true);
+  ctx.fillStyle = "rgba(255,255,255,0.1)";
+  ctx.fillRect(rect.x + 6, rect.y + 6, rect.w - 12, 15);
+  drawCentered("征兵", rect.x + rect.w / 2, rect.y + 20, 24, "#fff5e5", "900");
+  drawBun(rect.x + rect.w / 2 - 15, rect.y + 50, 9);
+  drawText(String(state.refreshCost), rect.x + rect.w / 2 + 8, rect.y + 50, 14, "#fff7ea", "900", "left");
+  ctx.restore();
 }
 
 function drawDrag(time) {
