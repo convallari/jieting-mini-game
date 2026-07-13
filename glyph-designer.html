@@ -42,6 +42,17 @@
           <button id="toggleReference" class="tool" type="button" title="参考图">◉</button>
         </header>
 
+        <div class="creative-tray" aria-label="彩墨与拼装素材">
+          <div id="colorSwatches" class="color-swatches" aria-label="彩墨笔"></div>
+          <div id="stampPalette" class="stamp-palette" aria-label="可拼装元素与特效"></div>
+          <label class="tray-control" title="拼装元素尺寸">尺寸
+            <input id="stampSize" type="range" min="32" max="220" value="96" />
+          </label>
+          <label class="tray-control" title="拼装元素旋转">旋转
+            <input id="stampRotation" type="range" min="-180" max="180" value="0" />
+          </label>
+        </div>
+
         <div id="canvasZone" class="canvas-zone">
           <iframe id="sourceSpinePreview" title="Spine 动画源预览" hidden></iframe>
           <iframe id="sourceSpinePreviewB" title="Spine 动画第二部件预览" hidden></iframe>
@@ -96,6 +107,7 @@
         </div>
         <div id="formationPreview" class="formation-preview" aria-label="阵型占格预览"></div>
         <div id="stateMatrix" class="state-matrix"></div>
+        <section id="productionGuide" class="production-guide" aria-label="动画制作清单"></section>
         <label class="export-field">
           <span>动画用途</span>
           <select id="animationMode">

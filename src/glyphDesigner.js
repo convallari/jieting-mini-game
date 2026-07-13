@@ -23,6 +23,34 @@ const LAYERS = [
   { id: "fx", label: "光效", role: "effect", color: "#d7aa3a", animation: "pulse, additive glow" }
 ];
 
+const COLOR_SWATCHES = [
+  ["玄墨", "#17120f"], ["蜀红", "#a83227"], ["魏蓝", "#294b70"], ["山青", "#486b3e"],
+  ["水青", "#3c8192"], ["军金", "#d7aa3a"], ["烟灰", "#756b61"], ["亮白", "#fff4d8"]
+];
+
+const STAMP_DEFINITIONS = [
+  { id: "flag", icon: "⚑", label: "军旗", layer: "accent", color: "#a83227" },
+  { id: "shield", icon: "盾", label: "盾纹", layer: "accent", color: "#486b3e" },
+  { id: "slash", icon: "╱", label: "刀光", layer: "fx", color: "#d7aa3a" },
+  { id: "spear", icon: "↗", label: "枪芒", layer: "fx", color: "#fff4d8" },
+  { id: "arrow", icon: "➤", label: "箭矢", layer: "fx", color: "#17120f" },
+  { id: "ring", icon: "◎", label: "阵环", layer: "fx", color: "#d7aa3a" },
+  { id: "inkBurst", icon: "✹", label: "墨爆", layer: "fx", color: "#17120f" },
+  { id: "smoke", icon: "☁", label: "烟尘", layer: "shadow", color: "#756b61" },
+  { id: "water", icon: "≋", label: "水纹", layer: "fx", color: "#3c8192" },
+  { id: "spark", icon: "✦", label: "火星", layer: "fx", color: "#d7aa3a" }
+];
+
+const ANIMATION_REQUIREMENTS = {
+  generalGlyph: { required: ["neutral"], optional: ["idle", "drag", "drop", "link", "unlink"] },
+  generalFormation: { required: ["neutral", "form", "idle", "attack", "hit", "death", "skill", "break"], optional: [] },
+  unit: { required: ["neutral", "idle", "attack", "hit", "death"], optional: ["drag", "drop", "merge", "sleep"] },
+  enemy: { required: ["neutral", "move", "attack", "hit", "death"], optional: ["cast"] },
+  terrain: { required: ["neutral"], optional: ["idle", "activate", "damaged", "destroy"] },
+  prop: { required: ["neutral", "place", "trigger", "expire"], optional: ["armed"] },
+  effect: { required: ["play"], optional: [] }
+};
+
 const STORAGE_PREFIX = "jieting.glyphDesigner.v2.";
 const canvasZone = document.getElementById("canvasZone");
 const referenceCanvas = document.getElementById("referenceCanvas");
@@ -37,6 +65,10 @@ const undoButton = document.getElementById("undoButton");
 const clearButton = document.getElementById("clearButton");
 const brushSize = document.getElementById("brushSize");
 const inkColor = document.getElementById("inkColor");
+const colorSwatches = document.getElementById("colorSwatches");
+const stampPalette = document.getElementById("stampPalette");
+const stampSize = document.getElementById("stampSize");
+const stampRotation = document.getElementById("stampRotation");
 const referenceInput = document.getElementById("referenceInput");
 const toggleReference = document.getElementById("toggleReference");
 const saveGlyph = document.getElementById("saveGlyph");
@@ -49,6 +81,7 @@ const previewSmall = document.getElementById("previewSmall");
 const animationMode = document.getElementById("animationMode");
 const formationPreview = document.getElementById("formationPreview");
 const stateMatrix = document.getElementById("stateMatrix");
+const productionGuide = document.getElementById("productionGuide");
 const assetGrid = document.getElementById("assetGrid");
 const assetFilters = document.getElementById("assetFilters");
 const assetSearch = document.getElementById("assetSearch");
@@ -114,6 +147,7 @@ const assetImages = new Map();
 let selected = GLYPHS[0];
 let activeLayerId = "ink";
 let tool = "brush";
+let selectedStamp = STAMP_DEFINITIONS[0].id;
 let drawing = false;
 let last = null;
 let undoStack = [];
@@ -122,12 +156,59 @@ const layerCanvases = new Map();
 function init() {
   migrateLegacyLocalStorage();
   createLayerCanvases();
+  initCreativeTray();
   renderGlyphList();
   renderLayerList();
   bindEvents();
   initAssetLibrary();
   selectGlyph(selected[1]);
   requestAnimationFrame(tickTimeline);
+}
+
+function initCreativeTray() {
+  for (const [label, color] of COLOR_SWATCHES) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "color-swatch";
+    button.dataset.color = color;
+    button.style.setProperty("--swatch", color);
+    button.title = `${label} ${color}`;
+    button.setAttribute("aria-label", label);
+    button.addEventListener("click", () => {
+      inkColor.value = color;
+      setTool("brush");
+      updateCreativeSelection();
+    });
+    colorSwatches.appendChild(button);
+  }
+
+  for (const stamp of STAMP_DEFINITIONS) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "stamp-button";
+    button.dataset.stamp = stamp.id;
+    button.textContent = stamp.icon;
+    button.title = `${stamp.label} · 自动放入${LAYERS.find((layer) => layer.id === stamp.layer)?.label ?? stamp.layer}图层`;
+    button.setAttribute("aria-label", stamp.label);
+    button.addEventListener("click", () => {
+      selectedStamp = stamp.id;
+      selectLayer(stamp.layer);
+      inkColor.value = stamp.color;
+      setTool("stamp");
+      updateCreativeSelection();
+    });
+    stampPalette.appendChild(button);
+  }
+  updateCreativeSelection();
+}
+
+function updateCreativeSelection() {
+  for (const button of colorSwatches.children) {
+    button.classList.toggle("active", button.dataset.color.toLowerCase() === inkColor.value.toLowerCase() && tool === "brush");
+  }
+  for (const button of stampPalette.children) {
+    button.classList.toggle("active", button.dataset.stamp === selectedStamp && tool === "stamp");
+  }
 }
 
 function initAssetLibrary() {
@@ -368,6 +449,7 @@ function bindEvents() {
   saveProjectPack.addEventListener("click", writeActorPackToProject);
   toggleReference.addEventListener("click", () => referenceCanvas.classList.toggle("hidden"));
   referenceInput.addEventListener("change", loadReference);
+  inkColor.addEventListener("input", updateCreativeSelection);
   animationMode.addEventListener("change", updateManifestPreview);
   animationPlay.addEventListener("click", toggleTimelinePlayback);
   clipSelect.addEventListener("change", loadSelectedClip);
@@ -520,12 +602,49 @@ function renderStateMatrix() {
     chip.textContent = `${state}:${matrix[state].status}`;
     stateMatrix.appendChild(chip);
   }
+  renderProductionGuide(meta);
+}
+
+function renderProductionGuide(meta = {}) {
+  const actorType = selected[2] ?? "unit";
+  const requirements = ANIMATION_REQUIREMENTS[actorType] ?? ANIMATION_REQUIREMENTS.unit;
+  const authored = new Set(Object.keys(meta.clips ?? timelineState.clips ?? {}));
+  const rows = [
+    ...requirements.required.map((state) => ({ state, priority: "required" })),
+    ...requirements.optional.map((state) => ({ state, priority: "optional" }))
+  ];
+  productionGuide.innerHTML = `
+    <div class="guide-heading"><strong>制作清单</strong><span>${actorType}</span></div>
+    <div class="guide-locations">
+      <span><b>主画布</b> neutral 与四图层</span>
+      <span><b>拼装条</b> accent / shadow / fx</span>
+      <span><b>时间轴</b> 动作关键帧</span>
+    </div>
+    <div class="guide-states"></div>
+  `;
+  const list = productionGuide.querySelector(".guide-states");
+  for (const item of rows) {
+    const button = document.createElement("button");
+    button.type = "button";
+    const complete = item.state === "neutral" ? hasSavedGlyph(selected[1]) : authored.has(item.state);
+    button.className = `guide-state ${item.priority}${complete ? " complete" : ""}${clipSelect.value === item.state ? " current" : ""}`;
+    button.innerHTML = `<strong>${item.state}</strong><span>${item.priority === "required" ? "必做" : "建议"} · ${item.state === "neutral" ? "主画布" : "时间轴"}</span>`;
+    button.addEventListener("click", () => {
+      if ([...clipSelect.options].some((option) => option.value === item.state)) {
+        clipSelect.value = item.state;
+        loadSelectedClip();
+      }
+      document.querySelector(".animation-panel")?.scrollIntoView({ block: "nearest" });
+    });
+    list.appendChild(button);
+  }
 }
 
 function selectLayer(layerId) {
   activeLayerId = layerId;
   const layer = LAYERS.find((item) => item.id === layerId) ?? LAYERS[0];
   inkColor.value = layer.color;
+  updateCreativeSelection();
   for (const item of layerList.querySelectorAll(".layer-item")) {
     item.classList.toggle("active", item.dataset.layer === layerId);
   }
@@ -564,6 +683,7 @@ function loadSelectedClip() {
   setTimelineFrame(0);
   renderTimelineTracks();
   renderExternalSourceFrame();
+  renderProductionGuide(safeJson(localStorage.getItem(metaKey(selected[1]))) ?? { clips: timelineState.clips });
 }
 
 function updateClipSettings() {
@@ -721,11 +841,17 @@ function setTool(nextTool) {
   tool = nextTool;
   brushTool.classList.toggle("active", tool === "brush");
   eraserTool.classList.toggle("active", tool === "eraser");
+  updateCreativeSelection();
 }
 
 function startStroke(event) {
   event.preventDefault();
   pushUndo();
+  if (tool === "stamp") {
+    drawStamp(pointFromEvent(event));
+    updatePreview();
+    return;
+  }
   drawing = true;
   last = pointFromEvent(event);
   drawDot(last);
@@ -774,6 +900,165 @@ function drawLine(from, to) {
   context.lineTo(to.x, to.y);
   context.stroke();
   context.restore();
+}
+
+function drawStamp(point) {
+  const context = activeCtx();
+  const size = Number(stampSize.value) || 96;
+  const rotation = (Number(stampRotation.value) || 0) * Math.PI / 180;
+  context.save();
+  context.translate(point.x, point.y);
+  context.rotate(rotation);
+  context.strokeStyle = inkColor.value;
+  context.fillStyle = inkColor.value;
+  context.lineWidth = Math.max(3, size * 0.065);
+  context.lineCap = "round";
+  context.lineJoin = "round";
+
+  if (selectedStamp === "flag") drawFlagStamp(context, size);
+  else if (selectedStamp === "shield") drawShieldStamp(context, size);
+  else if (selectedStamp === "slash") drawSlashStamp(context, size);
+  else if (selectedStamp === "spear") drawSpearStamp(context, size);
+  else if (selectedStamp === "arrow") drawArrowStamp(context, size);
+  else if (selectedStamp === "ring") drawRingStamp(context, size);
+  else if (selectedStamp === "inkBurst") drawInkBurstStamp(context, size);
+  else if (selectedStamp === "smoke") drawSmokeStamp(context, size);
+  else if (selectedStamp === "water") drawWaterStamp(context, size);
+  else drawSparkStamp(context, size);
+  context.restore();
+}
+
+function drawFlagStamp(context, size) {
+  context.beginPath();
+  context.moveTo(-size * 0.34, size * 0.44);
+  context.lineTo(-size * 0.34, -size * 0.45);
+  context.stroke();
+  context.beginPath();
+  context.moveTo(-size * 0.29, -size * 0.39);
+  context.quadraticCurveTo(size * 0.05, -size * 0.5, size * 0.34, -size * 0.28);
+  context.lineTo(size * 0.13, -size * 0.02);
+  context.quadraticCurveTo(-size * 0.05, -size * 0.2, -size * 0.29, -size * 0.1);
+  context.closePath();
+  context.fill();
+}
+
+function drawShieldStamp(context, size) {
+  context.beginPath();
+  context.moveTo(0, -size * 0.43);
+  context.lineTo(size * 0.34, -size * 0.27);
+  context.lineTo(size * 0.27, size * 0.15);
+  context.quadraticCurveTo(0, size * 0.47, -size * 0.27, size * 0.15);
+  context.lineTo(-size * 0.34, -size * 0.27);
+  context.closePath();
+  context.stroke();
+  context.beginPath();
+  context.moveTo(0, -size * 0.3);
+  context.lineTo(0, size * 0.28);
+  context.moveTo(-size * 0.2, -size * 0.08);
+  context.lineTo(size * 0.2, -size * 0.08);
+  context.stroke();
+}
+
+function drawSlashStamp(context, size) {
+  for (let index = -1; index <= 1; index += 1) {
+    context.globalAlpha = index === 0 ? 1 : 0.48;
+    context.lineWidth = Math.max(2, size * (index === 0 ? 0.09 : 0.045));
+    context.beginPath();
+    context.moveTo(-size * 0.43, size * (0.28 + index * 0.12));
+    context.quadraticCurveTo(0, -size * (0.08 - index * 0.05), size * 0.43, -size * (0.34 - index * 0.1));
+    context.stroke();
+  }
+}
+
+function drawSpearStamp(context, size) {
+  context.beginPath();
+  context.moveTo(-size * 0.42, size * 0.37);
+  context.lineTo(size * 0.29, -size * 0.3);
+  context.stroke();
+  context.beginPath();
+  context.moveTo(size * 0.18, -size * 0.34);
+  context.lineTo(size * 0.46, -size * 0.47);
+  context.lineTo(size * 0.34, -size * 0.18);
+  context.closePath();
+  context.fill();
+}
+
+function drawArrowStamp(context, size) {
+  context.beginPath();
+  context.moveTo(-size * 0.44, size * 0.18);
+  context.lineTo(size * 0.32, -size * 0.2);
+  context.stroke();
+  context.beginPath();
+  context.moveTo(size * 0.18, -size * 0.32);
+  context.lineTo(size * 0.46, -size * 0.27);
+  context.lineTo(size * 0.31, -size * 0.03);
+  context.closePath();
+  context.fill();
+  context.beginPath();
+  context.moveTo(-size * 0.33, size * 0.13);
+  context.lineTo(-size * 0.42, -size * 0.02);
+  context.moveTo(-size * 0.3, size * 0.1);
+  context.lineTo(-size * 0.25, size * 0.28);
+  context.stroke();
+}
+
+function drawRingStamp(context, size) {
+  context.lineWidth = Math.max(2, size * 0.055);
+  context.beginPath();
+  context.ellipse(0, 0, size * 0.43, size * 0.25, -0.12, 0, Math.PI * 2);
+  context.stroke();
+  context.globalAlpha = 0.5;
+  context.beginPath();
+  context.ellipse(0, 0, size * 0.29, size * 0.16, -0.12, 0, Math.PI * 2);
+  context.stroke();
+}
+
+function drawInkBurstStamp(context, size) {
+  const rays = [0, 0.52, 1.18, 1.9, 2.54, 3.14, 3.8, 4.45, 5.12, 5.72];
+  for (const angle of rays) {
+    const inner = size * 0.12;
+    const outer = size * (0.3 + (Math.sin(angle * 7) + 1) * 0.08);
+    context.lineWidth = Math.max(2, size * 0.045);
+    context.beginPath();
+    context.moveTo(Math.cos(angle) * inner, Math.sin(angle) * inner);
+    context.lineTo(Math.cos(angle) * outer, Math.sin(angle) * outer);
+    context.stroke();
+  }
+  context.beginPath();
+  context.arc(0, 0, size * 0.14, 0, Math.PI * 2);
+  context.fill();
+}
+
+function drawSmokeStamp(context, size) {
+  context.globalAlpha = 0.42;
+  for (const [x, y, radius] of [[-0.25, 0.12, 0.22], [0, -0.06, 0.3], [0.25, 0.1, 0.2], [0.08, 0.24, 0.22]]) {
+    context.beginPath();
+    context.arc(x * size, y * size, radius * size, 0, Math.PI * 2);
+    context.fill();
+  }
+}
+
+function drawWaterStamp(context, size) {
+  for (let row = -1; row <= 1; row += 1) {
+    context.globalAlpha = 1 - Math.abs(row) * 0.25;
+    context.beginPath();
+    context.moveTo(-size * 0.45, row * size * 0.18);
+    context.bezierCurveTo(-size * 0.23, -size * 0.12 + row * size * 0.18, -size * 0.05, size * 0.12 + row * size * 0.18, size * 0.14, row * size * 0.18);
+    context.bezierCurveTo(size * 0.28, -size * 0.1 + row * size * 0.18, size * 0.38, -size * 0.06 + row * size * 0.18, size * 0.45, row * size * 0.18);
+    context.stroke();
+  }
+}
+
+function drawSparkStamp(context, size) {
+  const rays = 8;
+  for (let index = 0; index < rays; index += 1) {
+    const angle = index / rays * Math.PI * 2;
+    context.lineWidth = index % 2 ? Math.max(2, size * 0.03) : Math.max(2, size * 0.055);
+    context.beginPath();
+    context.moveTo(Math.cos(angle) * size * 0.09, Math.sin(angle) * size * 0.09);
+    context.lineTo(Math.cos(angle) * size * (index % 2 ? 0.28 : 0.44), Math.sin(angle) * size * (index % 2 ? 0.28 : 0.44));
+    context.stroke();
+  }
 }
 
 function pointFromEvent(event) {
