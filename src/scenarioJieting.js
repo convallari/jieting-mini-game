@@ -124,7 +124,7 @@ export const BOSS_SOUND_BY_SKILL = {
 };
 
 export const BOSS_ROSTER = [
-  { name: "张郃", spineType: "zhangLiang", hp: 9, range: 2.5, skillCooldown: 8, skill: "pressure", castDuration: 1.2, effectAt: 0.45, color: "#b9362f" },
+  { name: "张郃", spineType: "zhangLiang", hp: 10.8, range: 2.5, skillCooldown: 8, skill: "pressure", castDuration: 1.2, effectAt: 0.45, color: "#b9362f" },
   { name: "锋", spineType: "boss2", hp: 8, range: 0, skillCooldown: 9, skill: "waterCut", castDuration: 0.8, effectAt: 0.35, color: "#416f8f" },
   { name: "司马懿", spineType: "caoCao", hp: 14, range: 10, skillCooldown: 13, skill: "command", castDuration: 1.7, effectAt: 0.8, color: "#1b2f69" }
 ];

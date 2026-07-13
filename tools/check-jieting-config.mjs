@@ -58,6 +58,7 @@ if (SOURCE_DISPLAY_POLICY.allowImplicitSplit || SOURCE_DISPLAY_POLICY.allowImpli
 for (const boss of BOSS_ROSTER) {
   if (!boss.name || !boss.skill || !boss.spineType) throw new Error(`Incomplete boss config: ${JSON.stringify(boss)}`);
 }
+if (BOSS_ROSTER.find((boss) => boss.name === "张郃")?.hp !== 10.8) throw new Error("Invalid Zhang He health multiplier");
 
 if (JIETING_CAMPAIGN.maxWave !== 8 || JIETING_CAMPAIGN.branchWave !== 8 || JIETING_CAMPAIGN.acts.length !== 3) {
   throw new Error("Invalid 8-wave campaign structure");

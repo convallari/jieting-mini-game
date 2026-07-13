@@ -5,7 +5,7 @@ const scenarioSource = fs.readFileSync(new URL("../src/scenarioJieting.js", impo
 const propSource = fs.readFileSync(new URL("../src/originalPropSprites.js", import.meta.url), "utf8");
 
 const required = [
-  ["八波强化生命表", "const ENEMY_HP_BY_LEVEL = [12, 15, 20, 26, 33, 42, 54, 72]"],
+  ["八波强化生命表", "const ENEMY_HP_BY_LEVEL = [15, 18, 23, 29, 36, 45, 57, 75]"],
   ["八波双倍出怪表", "const ENEMY_COUNT_BY_LEVEL = [20, 24, 28, 32, 36, 40, 44, 52]"],
   ["首轮固定核心阵型和铲子", "[\"马\", \"谡\", \"王\", \"平\", \"铲\"]"],
   ["首轮中文牌转换为内部铲子", "makeUnit(internalToken(guaranteed[i]))"],
