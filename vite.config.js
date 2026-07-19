@@ -72,6 +72,7 @@ export default defineConfig({
       input: {
         main: "index.html",
         glyphDesigner: "glyph-designer.html",
+        suGlyphAnimation: "su-glyph-animation.html",
         animationLab: "animation-lab.html",
         originalAnimationReview: "original-animation-review.html",
         spineAnimationReview: "spine-animation-review.html"

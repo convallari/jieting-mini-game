@@ -88,8 +88,7 @@ const BOARD_ROWS = PLAYER_MAP_GRID[0].length;
 const CAMP_SIZE = 5;
 
 const GAME_PATHS = {
-  left: [[0, 0], [1, 0], [2, 0], [2, 1], [2, 2], [3, 2], [4, 2], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3]],
-  right: [[0, 7], [1, 7], [2, 7], [3, 7], [4, 7], [5, 7], [5, 6], [5, 5], [5, 4], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3]]
+  left: [[0, 0], [1, 0], [2, 0], [2, 1], [2, 2], [3, 2], [4, 2], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3]]
 };
 
 const pathKeySet = new Set(Object.values(GAME_PATHS).flat().map(([r, c]) => `${r},${c}`));
@@ -272,7 +271,7 @@ function createState() {
     tutorialReplay: false,
     firstRecruitGuaranteed: true,
     lastRecruitBasics: [],
-    douHp: { left: 3, right: 3 },
+    douHp: { left: 3 },
     paused: false,
     cultivated: new Set([...initialCultivated, ...JIETING_TERRAIN.mountain, ...JIETING_TERRAIN.openingDeployment]),
     board: new Map(),
@@ -608,7 +607,7 @@ function setupDebugAttack() {
   state.enemies.push({
     id: idSeq++,
     t: 5.35,
-    pathSide: DEBUG_BOSS_INDEX === 0 ? "left" : "right",
+    pathSide: "left",
     speed: 0.045,
     hp: 5000,
     maxHp: 5000,
@@ -629,7 +628,7 @@ function setupDebugAttack() {
   if (DEBUG_BOSS_INDEX === 1) {
     for (let i = 0; i < 3; i++) {
       state.enemies.push({
-        id: idSeq++, t: 4.95 + i * 0.22, pathSide: "right", speed: 0.015,
+        id: idSeq++, t: 4.95 + i * 0.22, pathSide: "left", speed: 0.015,
         hp: 40, maxHp: 40, glyph: "军", spineType: "thief", lane: (i - 1) * 0.12,
         wobble: 3 + i, hitFlash: 0, hitAge: 99, hitDx: 0, hitDy: 0,
         spawnAge: 1, dead: false, reviveTestVictim: true
@@ -639,7 +638,7 @@ function setupDebugAttack() {
   if (DEBUG_BOSS_INDEX === 2) {
     for (let i = 0; i < 2; i++) {
       state.enemies.push({
-        id: idSeq++, t: 5.05 + i * 0.35, pathSide: "right", speed: 0.01,
+        id: idSeq++, t: 5.05 + i * 0.35, pathSide: "left", speed: 0.01,
         hp: 1000, maxHp: 1000, glyph: "魏", spineType: "thief", lane: (i - 0.5) * 0.14,
         wobble: 5 + i, hitFlash: 0, hitAge: 99, hitDx: 0, hitDy: 0,
         spawnAge: 1, dead: false, inspireTestAlly: true
@@ -666,7 +665,7 @@ function setupDebugAttack() {
     dead: false
   });
   state.enemies.push({
-    id: idSeq++, t: 8.1, pathSide: "right", speed: 0.035, hp: 760, maxHp: 760, glyph: "锋", spineType: "boss2", spineVariant: 2,
+    id: idSeq++, t: 8.1, pathSide: "left", speed: 0.035, hp: 760, maxHp: 760, glyph: "锋", spineType: "boss2", spineVariant: 2,
     lane: -0.08, wobble: 3.6, hitFlash: 0, hitAge: 99, hitDx: 0, hitDy: 0,
     spawnAge: 1, dead: false
   });
@@ -760,20 +759,18 @@ function updateDebugEnemySpawns(dt) {
   state.debugEnemySpawnTimer -= dt;
   const activeMarchers = state.enemies.filter((enemy) => !enemy.dying && enemy.bossIndex == null).length;
   if (state.debugEnemySpawnTimer > 0 || activeMarchers >= 10) return;
-  for (const pathSide of ["left", "right"]) {
-    spawnEnemy(false, pathSide === "left" ? -0.12 : 0.12, 0, pathSide);
-    const enemy = state.enemies.at(-1);
-    enemy.hp = 520;
-    enemy.maxHp = 520;
-    enemy.speedPx = 22;
-  }
+  spawnEnemy(false, 0, 0, "left");
+  const enemy = state.enemies.at(-1);
+  enemy.hp = 520;
+  enemy.maxHp = 520;
+  enemy.speedPx = 22;
   state.debugEnemySpawnTimer = 1.4;
 }
 
 function spawnCampaignBosses() {
   if (state.wave === 2) spawnEnemy(true, 0, 1, "left");
   if (state.wave === 4) spawnEnemy(true, 0, 0, "left");
-  if (state.wave === 8 && state.endingRoute === "retreat") spawnEnemy(true, 0, 2, "right");
+  if (state.wave === 8 && state.endingRoute === "retreat") spawnEnemy(true, 0, 2, "left");
   if (state.wave === 8 && state.endingRoute === "hold") {
     spawnEnemy(true, 0, 2, "left");
     spawnEnemy(true, 0, 0, "left");
@@ -861,10 +858,7 @@ function updateWaveFlow(dt) {
 
   if (state.wavePhase === "spawning") {
     if (state.waveTimer <= 0 && state.spawnLeft > 0) {
-      const pathSide = state.wave <= 3
-        ? (state.spawnSequence % 3 === 2 ? "right" : "left")
-        : (state.spawnSequence % 3 === 0 ? "left" : "right");
-      spawnEnemy(false, 0, 0, pathSide);
+      spawnEnemy(false, 0, 0, "left");
       state.spawnSequence += 1;
       state.spawnLeft -= 1;
       state.waveTimer = state.spawnLeft > 0 ? SPAWN_INTERVAL_SECONDS : 0;
@@ -2244,7 +2238,7 @@ function currentPathSegment(enemy) {
 }
 
 function pathForEnemy(enemy) {
-  return enemy.pathSide === "right" ? GAME_PATHS.right : GAME_PATHS.left;
+  return GAME_PATHS.left;
 }
 
 function draw(time) {

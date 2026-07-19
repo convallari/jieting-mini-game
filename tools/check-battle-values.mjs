@@ -15,7 +15,7 @@ const required = [
   ["开局两次征兵资源", "buns: 24"],
   ["攻击调试默认空地图", "const previewUnits = DEBUG_UNITS ? ["],
   ["高血量演示需显式开启单位", "const DEBUG_ATTACK_PREVIEW = DEBUG_ATTACK && DEBUG_UNITS"],
-  ["敌军按阶段围山断水", "state.wave <= 3"],
+  ["敌军固定从单一路线进攻", "spawnEnemy(false, 0, 0, \"left\")"],
   ["普通敌军战役速度", "isBoss ? 12 : 24 * archetype.speed"],
   ["敌军统一行进倍率", "const ENEMY_MOVE_SPEED_MULTIPLIER = 1.44"],
   ["张郃从左路进军", "if (state.wave === 4) spawnEnemy(true, 0, 0, \"left\")"],
@@ -35,7 +35,7 @@ const required = [
   ["我方整体伤害系数", "const PLAYER_DAMAGE_FACTOR = 0.4608"],
   ["雨天攻速因子", "const RAIN_ATTACK_SPEED_FACTOR = 0.8"],
   ["断汲道军粮奖励", "return state.waterBreached ? 0 : 1"],
-  ["双路线汇入同一营寨生命", "const gate = \"left\""]
+  ["单一路线扣除营寨生命", "const gate = \"left\""]
 ];
 
 const missing = required.filter(([, text]) => !source.includes(text));
