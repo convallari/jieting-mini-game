@@ -1,0 +1,12 @@
+{
+  "id": "be_feng_08_02_target_water_drop_base",
+  "width": 96,
+  "height": 128,
+  "pivot": {
+    "x": 48,
+    "y": 120
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

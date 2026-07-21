@@ -1,0 +1,12 @@
+{
+  "id": "be_smy_06_05_name_complete_glow_base",
+  "width": 768,
+  "height": 256,
+  "pivot": {
+    "x": 384,
+    "y": 128
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

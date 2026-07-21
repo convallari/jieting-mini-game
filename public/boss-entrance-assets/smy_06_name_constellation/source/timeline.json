@@ -1,0 +1,22 @@
+{
+  "name": "smy_06_name_constellation",
+  "fps": 12,
+  "width": 1024,
+  "height": 512,
+  "frames": 18,
+  "loop": false,
+  "pivot": {
+    "x": 512,
+    "y": 256
+  },
+  "mode": "constellation",
+  "eventFrames": {},
+  "assets": [
+    "public/boss-entrance-elements/simayi/smy_06/be_smy_06_01_name_star_small_base.png",
+    "public/boss-entrance-elements/simayi/smy_06/be_smy_06_02_name_star_large_base.png",
+    "public/boss-entrance-elements/simayi/smy_06/be_smy_06_03_name_line_short_base.png",
+    "public/boss-entrance-elements/simayi/smy_06/be_smy_06_04_name_line_long_base.png",
+    "public/boss-entrance-elements/simayi/smy_06/be_smy_06_05_name_complete_glow_base.png"
+  ],
+  "externalReferences": []
+}

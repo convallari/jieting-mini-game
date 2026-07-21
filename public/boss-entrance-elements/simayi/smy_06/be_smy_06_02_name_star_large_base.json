@@ -1,0 +1,12 @@
+{
+  "id": "be_smy_06_02_name_star_large_base",
+  "width": 40,
+  "height": 40,
+  "pivot": {
+    "x": 20,
+    "y": 20
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

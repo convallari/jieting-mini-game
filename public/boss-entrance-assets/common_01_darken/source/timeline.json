@@ -1,0 +1,19 @@
+{
+  "name": "common_01_darken",
+  "fps": 12,
+  "width": 512,
+  "height": 512,
+  "frames": 6,
+  "loop": false,
+  "pivot": {
+    "x": 256,
+    "y": 256
+  },
+  "mode": "fade",
+  "eventFrames": {},
+  "assets": [
+    "public/boss-entrance-elements/common/common_01/be_com_01_01_corner_vignette_base.png",
+    "public/boss-entrance-elements/common/common_01/be_com_01_02_center_dim_base.png"
+  ],
+  "externalReferences": []
+}

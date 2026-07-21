@@ -1,0 +1,12 @@
+{
+  "id": "be_feng_06_01_speed_streak_base",
+  "width": 256,
+  "height": 48,
+  "pivot": {
+    "x": 248,
+    "y": 24
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

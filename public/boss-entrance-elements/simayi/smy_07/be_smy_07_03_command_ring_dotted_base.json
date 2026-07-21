@@ -1,0 +1,12 @@
+{
+  "id": "be_smy_07_03_command_ring_dotted_base",
+  "width": 384,
+  "height": 384,
+  "pivot": {
+    "x": 192,
+    "y": 192
+  },
+  "tintable": true,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

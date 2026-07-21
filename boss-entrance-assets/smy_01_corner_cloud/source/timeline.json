@@ -1,0 +1,21 @@
+{
+  "name": "smy_01_corner_cloud",
+  "fps": 12,
+  "width": 512,
+  "height": 512,
+  "frames": 14,
+  "loop": false,
+  "pivot": {
+    "x": 256,
+    "y": 256
+  },
+  "mode": "corner",
+  "eventFrames": {},
+  "assets": [
+    "public/boss-entrance-elements/simayi/smy_01/be_smy_01_01_cloud_body_base.png",
+    "public/boss-entrance-elements/simayi/smy_01/be_smy_01_02_cloud_curl_a_base.png",
+    "public/boss-entrance-elements/simayi/smy_01/be_smy_01_03_cloud_curl_b_base.png",
+    "public/boss-entrance-elements/simayi/smy_01/be_smy_01_04_cloud_speck_base.png"
+  ],
+  "externalReferences": []
+}

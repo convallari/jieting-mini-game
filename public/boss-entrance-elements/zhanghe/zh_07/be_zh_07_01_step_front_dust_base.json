@@ -1,0 +1,12 @@
+{
+  "id": "be_zh_07_01_step_front_dust_base",
+  "width": 192,
+  "height": 96,
+  "pivot": {
+    "x": 96,
+    "y": 88
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

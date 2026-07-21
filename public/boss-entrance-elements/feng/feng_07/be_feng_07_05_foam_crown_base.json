@@ -1,0 +1,12 @@
+{
+  "id": "be_feng_07_05_foam_crown_base",
+  "width": 96,
+  "height": 64,
+  "pivot": {
+    "x": 48,
+    "y": 56
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

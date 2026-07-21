@@ -1,0 +1,23 @@
+{
+  "name": "smy_02_star_board_appear",
+  "fps": 12,
+  "width": 512,
+  "height": 512,
+  "frames": 16,
+  "loop": false,
+  "pivot": {
+    "x": 256,
+    "y": 256
+  },
+  "mode": "starBoard",
+  "eventFrames": {},
+  "assets": [
+    "public/boss-entrance-elements/simayi/smy_02/be_smy_02_01_orbit_outer_base.png",
+    "public/boss-entrance-elements/simayi/smy_02/be_smy_02_02_orbit_middle_base.png",
+    "public/boss-entrance-elements/simayi/smy_02/be_smy_02_03_orbit_inner_base.png",
+    "public/boss-entrance-elements/simayi/smy_02/be_smy_02_04_radial_line_base.png",
+    "public/boss-entrance-elements/simayi/smy_02/be_smy_02_05_star_dot_small_base.png",
+    "public/boss-entrance-elements/simayi/smy_02/be_smy_02_06_star_dot_large_base.png"
+  ],
+  "externalReferences": []
+}

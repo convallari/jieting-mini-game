@@ -1,0 +1,9 @@
+{
+  "id": "be_com_03_02_dust_plume_left_base",
+  "width": 128,
+  "height": 160,
+  "pivot": { "x": 112, "y": 144 },
+  "tintable": true,
+  "defaultOpacity": 1,
+  "notes": "向左上扬起的单团尘；底部右侧为支点，可镜像复用"
+}

@@ -1,0 +1,20 @@
+{
+  "name": "zh_02_red_brush_slash",
+  "fps": 12,
+  "width": 1024,
+  "height": 512,
+  "frames": 8,
+  "loop": false,
+  "pivot": {
+    "x": 512,
+    "y": 256
+  },
+  "mode": "brushSweep",
+  "eventFrames": {},
+  "assets": [
+    "public/boss-entrance-elements/zhanghe/zh_02/be_zh_02_01_brush_head_base.png",
+    "public/boss-entrance-elements/zhanghe/zh_02/be_zh_02_02_brush_body_stretch_base.png",
+    "public/boss-entrance-elements/zhanghe/zh_02/be_zh_02_03_brush_tail_base.png"
+  ],
+  "externalReferences": []
+}

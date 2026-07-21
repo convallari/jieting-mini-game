@@ -1,0 +1,19 @@
+{
+  "name": "zh_01_red_footprint",
+  "fps": 12,
+  "width": 512,
+  "height": 512,
+  "frames": 8,
+  "loop": false,
+  "pivot": {
+    "x": 256,
+    "y": 256
+  },
+  "mode": "pop",
+  "eventFrames": {},
+  "assets": [
+    "public/boss-entrance-elements/zhanghe/zh_01/be_zh_01_01_boot_print_base.png",
+    "public/boss-entrance-elements/zhanghe/zh_01/be_zh_01_02_print_ink_spike_base.png"
+  ],
+  "externalReferences": []
+}

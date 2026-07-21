@@ -1,0 +1,12 @@
+{
+  "id": "be_smy_04_03_shadow_blue_edge_base",
+  "width": 192,
+  "height": 256,
+  "pivot": {
+    "x": 96,
+    "y": 8
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

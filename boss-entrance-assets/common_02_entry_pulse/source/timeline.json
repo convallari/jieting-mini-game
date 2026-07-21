@@ -1,0 +1,19 @@
+{
+  "name": "common_02_entry_pulse",
+  "fps": 12,
+  "width": 512,
+  "height": 512,
+  "frames": 12,
+  "loop": true,
+  "pivot": {
+    "x": 256,
+    "y": 256
+  },
+  "mode": "expand",
+  "eventFrames": {},
+  "assets": [
+    "public/boss-entrance-elements/common/common_02/be_com_02_01_ink_ring_base.png",
+    "public/boss-entrance-elements/common/common_02/be_com_02_02_ring_speck_base.png"
+  ],
+  "externalReferences": []
+}

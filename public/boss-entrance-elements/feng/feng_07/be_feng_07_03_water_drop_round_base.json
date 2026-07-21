@@ -1,0 +1,12 @@
+{
+  "id": "be_feng_07_03_water_drop_round_base",
+  "width": 40,
+  "height": 48,
+  "pivot": {
+    "x": 20,
+    "y": 24
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

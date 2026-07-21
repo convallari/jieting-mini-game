@@ -1,0 +1,23 @@
+{
+  "name": "feng_06_boss_dash_stop",
+  "fps": 12,
+  "width": 512,
+  "height": 512,
+  "frames": 14,
+  "loop": false,
+  "pivot": {
+    "x": 256,
+    "y": 400
+  },
+  "mode": "role",
+  "eventFrames": {
+    "hardStop": "7"
+  },
+  "assets": [
+    "public/boss-entrance-elements/feng/feng_06/be_feng_06_01_speed_streak_base.png",
+    "public/boss-entrance-elements/feng/feng_06/be_feng_06_02_stop_ground_mark_base.png"
+  ],
+  "externalReferences": [
+    "Canvas glyph: 锋"
+  ]
+}

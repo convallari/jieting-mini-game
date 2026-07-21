@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="384" height="384" viewBox="0 0 384 384">
+  <defs>
+    <filter id="rough" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.035 0.11" numOctaves="2" seed="21" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <mask id="breaks">
+      <rect width="384" height="384" fill="white"/>
+      <path d="M49 129l48 25M269 55l-20 47M302 276l-42-19" stroke="black" stroke-width="18" stroke-linecap="round"/>
+    </mask>
+  </defs>
+  <g fill="none" stroke="#fff" mask="url(#breaks)" filter="url(#rough)">
+    <circle cx="192" cy="192" r="160" stroke-width="15" opacity=".88" stroke-dasharray="68 8 116 12 52 7"/>
+    <circle cx="192" cy="192" r="153" stroke-width="3" opacity=".42" stroke-dasharray="22 17 91 13"/>
+  </g>
+  <g fill="#fff" opacity=".7">
+    <circle cx="59" cy="104" r="3"/><circle cx="68" cy="96" r="2"/><circle cx="302" cy="104" r="3"/>
+    <circle cx="318" cy="245" r="2.5"/><circle cx="93" cy="309" r="2"/>
+  </g>
+</svg>

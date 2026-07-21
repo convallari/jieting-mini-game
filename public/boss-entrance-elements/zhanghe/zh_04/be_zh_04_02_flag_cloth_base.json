@@ -1,0 +1,12 @@
+{
+  "id": "be_zh_04_02_flag_cloth_base",
+  "width": 224,
+  "height": 160,
+  "pivot": {
+    "x": 20,
+    "y": 24
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

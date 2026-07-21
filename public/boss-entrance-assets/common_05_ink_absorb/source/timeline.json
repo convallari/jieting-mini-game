@@ -1,0 +1,20 @@
+{
+  "name": "common_05_ink_absorb",
+  "fps": 12,
+  "width": 512,
+  "height": 512,
+  "frames": 10,
+  "loop": false,
+  "pivot": {
+    "x": 256,
+    "y": 256
+  },
+  "mode": "absorb",
+  "eventFrames": {},
+  "assets": [
+    "public/boss-entrance-elements/common/common_05/be_com_05_01_ink_chip_round_base.png",
+    "public/boss-entrance-elements/common/common_05/be_com_05_02_ink_chip_long_base.png",
+    "public/boss-entrance-elements/common/common_05/be_com_05_03_ink_chip_splash_base.png"
+  ],
+  "externalReferences": []
+}

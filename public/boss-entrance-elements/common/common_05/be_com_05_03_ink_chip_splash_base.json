@@ -1,0 +1,12 @@
+{
+  "id": "be_com_05_03_ink_chip_splash_base",
+  "width": 40,
+  "height": 40,
+  "pivot": {
+    "x": 20,
+    "y": 20
+  },
+  "tintable": true,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

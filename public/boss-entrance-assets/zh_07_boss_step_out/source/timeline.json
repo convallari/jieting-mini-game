@@ -1,0 +1,23 @@
+{
+  "name": "zh_07_boss_step_out",
+  "fps": 12,
+  "width": 512,
+  "height": 512,
+  "frames": 14,
+  "loop": false,
+  "pivot": {
+    "x": 256,
+    "y": 400
+  },
+  "mode": "role",
+  "eventFrames": {
+    "footstep": "7"
+  },
+  "assets": [
+    "public/boss-entrance-elements/zhanghe/zh_07/be_zh_07_01_step_front_dust_base.png",
+    "public/boss-entrance-elements/zhanghe/zh_07/be_zh_07_02_armor_glint_base.png"
+  ],
+  "externalReferences": [
+    "Spine: boss1 / 张郃"
+  ]
+}

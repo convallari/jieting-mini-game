@@ -1,0 +1,22 @@
+{
+  "name": "zh_05_flag_flutter",
+  "fps": 12,
+  "width": 512,
+  "height": 512,
+  "frames": 12,
+  "loop": true,
+  "pivot": {
+    "x": 256,
+    "y": 256
+  },
+  "mode": "flutter",
+  "eventFrames": {},
+  "assets": [
+    "public/boss-entrance-elements/zhanghe/zh_04/be_zh_04_01_flag_pole_base.png",
+    "public/boss-entrance-elements/zhanghe/zh_04/be_zh_04_02_flag_cloth_base.png",
+    "public/boss-entrance-elements/zhanghe/zh_04/be_zh_04_03_flag_wei_emblem_base.png",
+    "public/boss-entrance-elements/zhanghe/zh_04/be_zh_04_04_pole_impact_spark_base.png",
+    "public/boss-entrance-elements/zhanghe/zh_05/be_zh_05_01_flag_back_shadow_base.png"
+  ],
+  "externalReferences": []
+}

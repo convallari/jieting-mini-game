@@ -1,0 +1,30 @@
+{
+  "format": "jieting-curated-animation-assets",
+  "sourceDirectory": "C:\\Users\\zhangxiaoyu\\Desktop\\游戏动画\\我的资产",
+  "generatedAt": "2026-07-21T04:22:23.691Z",
+  "applied": {
+    "camp": [
+      "camp-static.png"
+    ],
+    "zhanghe": [
+      "zhanghe-energy-ring.png",
+      "zhanghe-slash-trail.png"
+    ],
+    "generalGlyphs": [
+      "glyph-ma.png",
+      "glyph-su.png",
+      "glyph-wang.png",
+      "glyph-ping.png"
+    ],
+    "generalEffects": [
+      "masu-explosion-a.png",
+      "masu-explosion-b.png",
+      "wangping-ground-impact.png"
+    ]
+  },
+  "rejected": {
+    "马谡资产.png": "采用红色爆炸；人物拆件、风暴、炸弹本体和水滴等元素不采用",
+    "王平资产.png": "采用地裂冲击；空甲、风暴和重复姓名不采用",
+    "张郃资产.png": "保留枪势环和斩击拖尾；姓名、武器、披风与既有 Boss 入场资产重复"
+  }
+}

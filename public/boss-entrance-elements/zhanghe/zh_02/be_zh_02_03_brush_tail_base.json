@@ -1,0 +1,12 @@
+{
+  "id": "be_zh_02_03_brush_tail_base",
+  "width": 160,
+  "height": 144,
+  "pivot": {
+    "x": 152,
+    "y": 72
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

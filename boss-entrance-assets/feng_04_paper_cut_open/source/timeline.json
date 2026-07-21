@@ -1,0 +1,20 @@
+{
+  "name": "feng_04_paper_cut_open",
+  "fps": 12,
+  "width": 1024,
+  "height": 512,
+  "frames": 10,
+  "loop": false,
+  "pivot": {
+    "x": 512,
+    "y": 256
+  },
+  "mode": "paperOpen",
+  "eventFrames": {},
+  "assets": [
+    "public/boss-entrance-elements/feng/feng_04/be_feng_04_01_torn_edge_upper_base.png",
+    "public/boss-entrance-elements/feng/feng_04/be_feng_04_02_torn_edge_lower_base.png",
+    "public/boss-entrance-elements/feng/feng_04/be_feng_04_03_torn_fiber_base.png"
+  ],
+  "externalReferences": []
+}

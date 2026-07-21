@@ -1,0 +1,12 @@
+{
+  "id": "be_zh_03_04_zhang_stroke_04_base",
+  "width": 92,
+  "height": 168,
+  "pivot": {
+    "x": 72,
+    "y": 12
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "张字独立真实笔画，支点为实际起笔"
+}

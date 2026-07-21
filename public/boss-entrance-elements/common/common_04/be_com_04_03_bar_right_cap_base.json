@@ -1,0 +1,12 @@
+{
+  "id": "be_com_04_03_bar_right_cap_base",
+  "width": 192,
+  "height": 112,
+  "pivot": {
+    "x": 8,
+    "y": 56
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

@@ -1,0 +1,12 @@
+{
+  "id": "be_zh_06_02_wei_ground_shadow_base",
+  "width": 160,
+  "height": 48,
+  "pivot": {
+    "x": 80,
+    "y": 24
+  },
+  "tintable": false,
+  "defaultOpacity": 0.25,
+  "notes": "按最小元素资产规范制作"
+}

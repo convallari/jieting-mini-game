@@ -1,0 +1,12 @@
+{
+  "id": "be_zh_06_01_wei_echo_base",
+  "width": 224,
+  "height": 256,
+  "pivot": {
+    "x": 112,
+    "y": 232
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

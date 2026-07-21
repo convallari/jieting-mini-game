@@ -1,0 +1,22 @@
+{
+  "name": "feng_03_giant_feng_slash",
+  "fps": 12,
+  "width": 1024,
+  "height": 512,
+  "frames": 9,
+  "loop": false,
+  "pivot": {
+    "x": 512,
+    "y": 256
+  },
+  "mode": "fengDrop",
+  "eventFrames": {
+    "cut": "5"
+  },
+  "assets": [
+    "public/boss-entrance-elements/feng/feng_03/be_feng_03_01_feng_glyph_base.png",
+    "public/boss-entrance-elements/feng/feng_03/be_feng_03_02_feng_afterimage_base.png",
+    "public/boss-entrance-elements/feng/feng_03/be_feng_03_03_cut_chip_base.png"
+  ],
+  "externalReferences": []
+}

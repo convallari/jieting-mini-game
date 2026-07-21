@@ -1,0 +1,12 @@
+{
+  "id": "be_zh_09_03_scan_edge_glow_base",
+  "width": 128,
+  "height": 64,
+  "pivot": {
+    "x": 64,
+    "y": 32
+  },
+  "tintable": true,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

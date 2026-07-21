@@ -1,0 +1,22 @@
+{
+  "name": "zh_09_square_scan_ring",
+  "fps": 12,
+  "width": 512,
+  "height": 512,
+  "frames": 16,
+  "loop": false,
+  "pivot": {
+    "x": 256,
+    "y": 256
+  },
+  "mode": "squareScan",
+  "eventFrames": {
+    "rangePreviewMax": "12"
+  },
+  "assets": [
+    "public/boss-entrance-elements/zhanghe/zh_09/be_zh_09_01_square_cell_base.png",
+    "public/boss-entrance-elements/zhanghe/zh_09/be_zh_09_02_square_corner_base.png",
+    "public/boss-entrance-elements/zhanghe/zh_09/be_zh_09_03_scan_edge_glow_base.png"
+  ],
+  "externalReferences": []
+}

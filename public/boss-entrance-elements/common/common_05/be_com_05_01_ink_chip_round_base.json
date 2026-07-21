@@ -1,0 +1,12 @@
+{
+  "id": "be_com_05_01_ink_chip_round_base",
+  "width": 32,
+  "height": 32,
+  "pivot": {
+    "x": 16,
+    "y": 16
+  },
+  "tintable": true,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

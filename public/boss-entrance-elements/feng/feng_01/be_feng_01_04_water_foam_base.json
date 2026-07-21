@@ -1,0 +1,12 @@
+{
+  "id": "be_feng_01_04_water_foam_base",
+  "width": 64,
+  "height": 48,
+  "pivot": {
+    "x": 32,
+    "y": 24
+  },
+  "tintable": true,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

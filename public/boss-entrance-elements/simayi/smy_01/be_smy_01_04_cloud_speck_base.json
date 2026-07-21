@@ -1,0 +1,12 @@
+{
+  "id": "be_smy_01_04_cloud_speck_base",
+  "width": 64,
+  "height": 64,
+  "pivot": {
+    "x": 32,
+    "y": 32
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

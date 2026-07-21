@@ -1,0 +1,12 @@
+{
+  "id": "be_smy_02_03_orbit_inner_base",
+  "width": 208,
+  "height": 208,
+  "pivot": {
+    "x": 104,
+    "y": 104
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

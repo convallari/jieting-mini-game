@@ -32,6 +32,7 @@ let initPromise;
 let stageWidth = 0;
 let stageHeight = 0;
 const aDouInstances = new Map();
+let bossEntranceInstance = null;
 
 export function hasOriginalGeneralAnimation(token) {
   return Boolean(GENERAL_CONFIG[token]);
@@ -160,7 +161,8 @@ export function syncEnemyAnimations(enemies, cellSize) {
   if (!initialized) return;
   const present = new Set();
   for (const item of enemies) {
-    const config = ENEMY_CONFIG[item.spineType] ?? ENEMY_CONFIG.thief;
+    const config = ENEMY_CONFIG[item.spineType];
+    if (!config) continue;
     present.add(item.id);
     let instance = enemyInstances.get(item.id);
     if (!instance) instance = createEnemyInstance(item, config);
@@ -200,6 +202,44 @@ export function syncEnemyAnimations(enemies, cellSize) {
       enemyInstances.delete(id);
     }
   }
+}
+
+export function syncBossEntranceAnimation(item) {
+  if (!initialized) return false;
+  if (!item) {
+    if (bossEntranceInstance) bossEntranceInstance.skeleton.visible = false;
+    return false;
+  }
+  const config = ENEMY_CONFIG[item.spineType];
+  if (!config) {
+    if (bossEntranceInstance) bossEntranceInstance.skeleton.visible = false;
+    return false;
+  }
+  if (!bossEntranceInstance || bossEntranceInstance.asset !== config.asset) {
+    if (bossEntranceInstance) bossEntranceInstance.skeleton.destroy(true);
+    const skeleton = new Laya.SpineSkeleton();
+    skeleton.visible = false;
+    Laya.stage.addChild(skeleton);
+    bossEntranceInstance = { skeleton, asset: config.asset, ready: false, stateKey: "" };
+    skeleton.once(Laya.Event.READY, null, () => {
+      if (!bossEntranceInstance || bossEntranceInstance.skeleton !== skeleton) return;
+      bossEntranceInstance.ready = true;
+      skeleton.visible = true;
+    });
+    skeleton.source = `${BASE_URL}spine-assets/${config.asset}/skeleton.json?v=3`;
+  }
+  const instance = bossEntranceInstance;
+  instance.skeleton.visible = instance.ready;
+  instance.skeleton.pos(item.x, item.y);
+  const scale = item.scale ?? config.scale * 1.7;
+  instance.skeleton.scale(scale, scale);
+  instance.skeleton.alpha = item.alpha ?? 1;
+  const animation = config.walk[Math.abs(item.variant ?? 0) % config.walk.length];
+  if (instance.ready && instance.stateKey !== animation) {
+    instance.stateKey = animation;
+    instance.skeleton.play(animation, true);
+  }
+  return instance.ready;
 }
 
 export function syncADouAnimation(item) {

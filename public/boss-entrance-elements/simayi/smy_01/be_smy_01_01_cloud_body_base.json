@@ -1,0 +1,12 @@
+{
+  "id": "be_smy_01_01_cloud_body_base",
+  "width": 384,
+  "height": 384,
+  "pivot": {
+    "x": 0,
+    "y": 0
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

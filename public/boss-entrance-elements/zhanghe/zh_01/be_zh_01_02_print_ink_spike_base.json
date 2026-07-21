@@ -1,0 +1,12 @@
+{
+  "id": "be_zh_01_02_print_ink_spike_base",
+  "width": 80,
+  "height": 80,
+  "pivot": {
+    "x": 40,
+    "y": 40
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

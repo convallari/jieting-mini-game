@@ -1,0 +1,12 @@
+{
+  "id": "be_feng_08_03_target_glow_base",
+  "width": 160,
+  "height": 160,
+  "pivot": {
+    "x": 80,
+    "y": 80
+  },
+  "tintable": true,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

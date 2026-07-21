@@ -1,0 +1,12 @@
+{
+  "id": "be_feng_05_03_river_bubble_base",
+  "width": 48,
+  "height": 48,
+  "pivot": {
+    "x": 24,
+    "y": 24
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

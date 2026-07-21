@@ -1,0 +1,12 @@
+{
+  "id": "be_zh_02_01_brush_head_base",
+  "width": 192,
+  "height": 160,
+  "pivot": {
+    "x": 184,
+    "y": 80
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

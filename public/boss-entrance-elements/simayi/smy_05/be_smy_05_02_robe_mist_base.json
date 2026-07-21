@@ -1,0 +1,12 @@
+{
+  "id": "be_smy_05_02_robe_mist_base",
+  "width": 320,
+  "height": 112,
+  "pivot": {
+    "x": 160,
+    "y": 104
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

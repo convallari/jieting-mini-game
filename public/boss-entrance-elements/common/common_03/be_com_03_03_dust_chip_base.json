@@ -1,0 +1,9 @@
+{
+  "id": "be_com_03_03_dust_chip_base",
+  "width": 48,
+  "height": 48,
+  "pivot": { "x": 24, "y": 24 },
+  "tintable": true,
+  "defaultOpacity": 1,
+  "notes": "5颗碎屑，可由程序复制旋转"
+}

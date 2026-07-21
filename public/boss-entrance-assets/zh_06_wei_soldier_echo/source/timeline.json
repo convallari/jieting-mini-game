@@ -1,0 +1,19 @@
+{
+  "name": "zh_06_wei_soldier_echo",
+  "fps": 12,
+  "width": 512,
+  "height": 512,
+  "frames": 10,
+  "loop": false,
+  "pivot": {
+    "x": 256,
+    "y": 256
+  },
+  "mode": "slide",
+  "eventFrames": {},
+  "assets": [
+    "public/boss-entrance-elements/zhanghe/zh_06/be_zh_06_01_wei_echo_base.png",
+    "public/boss-entrance-elements/zhanghe/zh_06/be_zh_06_02_wei_ground_shadow_base.png"
+  ],
+  "externalReferences": []
+}

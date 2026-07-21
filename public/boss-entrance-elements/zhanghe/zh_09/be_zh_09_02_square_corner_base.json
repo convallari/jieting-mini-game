@@ -1,0 +1,12 @@
+{
+  "id": "be_zh_09_02_square_corner_base",
+  "width": 64,
+  "height": 64,
+  "pivot": {
+    "x": 8,
+    "y": 56
+  },
+  "tintable": true,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

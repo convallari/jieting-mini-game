@@ -1,0 +1,12 @@
+{
+  "id": "be_zh_08_01_smoke_left_base",
+  "width": 256,
+  "height": 384,
+  "pivot": {
+    "x": 248,
+    "y": 376
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

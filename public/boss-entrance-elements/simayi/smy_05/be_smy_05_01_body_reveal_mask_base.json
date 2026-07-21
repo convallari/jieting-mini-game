@@ -1,0 +1,12 @@
+{
+  "id": "be_smy_05_01_body_reveal_mask_base",
+  "width": 320,
+  "height": 416,
+  "pivot": {
+    "x": 160,
+    "y": 408
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "白色显示区软遮罩"
+}

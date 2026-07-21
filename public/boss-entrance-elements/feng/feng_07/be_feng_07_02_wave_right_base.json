@@ -1,0 +1,12 @@
+{
+  "id": "be_feng_07_02_wave_right_base",
+  "width": 256,
+  "height": 256,
+  "pivot": {
+    "x": 8,
+    "y": 248
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

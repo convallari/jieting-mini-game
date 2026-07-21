@@ -1,0 +1,12 @@
+{
+  "id": "be_zh_07_02_armor_glint_base",
+  "width": 96,
+  "height": 96,
+  "pivot": {
+    "x": 48,
+    "y": 48
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

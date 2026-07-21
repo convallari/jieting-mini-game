@@ -1,0 +1,23 @@
+{
+  "name": "zh_04_flag_drop",
+  "fps": 12,
+  "width": 512,
+  "height": 512,
+  "frames": 10,
+  "loop": false,
+  "pivot": {
+    "x": 256,
+    "y": 256
+  },
+  "mode": "flagDrop",
+  "eventFrames": {
+    "impact": "4"
+  },
+  "assets": [
+    "public/boss-entrance-elements/zhanghe/zh_04/be_zh_04_01_flag_pole_base.png",
+    "public/boss-entrance-elements/zhanghe/zh_04/be_zh_04_02_flag_cloth_base.png",
+    "public/boss-entrance-elements/zhanghe/zh_04/be_zh_04_03_flag_wei_emblem_base.png",
+    "public/boss-entrance-elements/zhanghe/zh_04/be_zh_04_04_pole_impact_spark_base.png"
+  ],
+  "externalReferences": []
+}

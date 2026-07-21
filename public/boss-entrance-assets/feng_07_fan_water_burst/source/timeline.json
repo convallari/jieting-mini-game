@@ -1,0 +1,24 @@
+{
+  "name": "feng_07_fan_water_burst",
+  "fps": 12,
+  "width": 512,
+  "height": 512,
+  "frames": 12,
+  "loop": false,
+  "pivot": {
+    "x": 256,
+    "y": 256
+  },
+  "mode": "burst",
+  "eventFrames": {
+    "splashPeak": "4"
+  },
+  "assets": [
+    "public/boss-entrance-elements/feng/feng_07/be_feng_07_01_wave_left_base.png",
+    "public/boss-entrance-elements/feng/feng_07/be_feng_07_02_wave_right_base.png",
+    "public/boss-entrance-elements/feng/feng_07/be_feng_07_03_water_drop_round_base.png",
+    "public/boss-entrance-elements/feng/feng_07/be_feng_07_04_water_drop_long_base.png",
+    "public/boss-entrance-elements/feng/feng_07/be_feng_07_05_foam_crown_base.png"
+  ],
+  "externalReferences": []
+}

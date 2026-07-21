@@ -1,0 +1,21 @@
+{
+  "name": "feng_02_water_crack",
+  "fps": 12,
+  "width": 512,
+  "height": 512,
+  "frames": 10,
+  "loop": false,
+  "pivot": {
+    "x": 256,
+    "y": 256
+  },
+  "mode": "reveal",
+  "eventFrames": {},
+  "assets": [
+    "public/boss-entrance-elements/feng/feng_02/be_feng_02_01_crack_trunk_base.png",
+    "public/boss-entrance-elements/feng/feng_02/be_feng_02_02_crack_branch_a_base.png",
+    "public/boss-entrance-elements/feng/feng_02/be_feng_02_03_crack_branch_b_base.png",
+    "public/boss-entrance-elements/feng/feng_02/be_feng_02_04_crack_chip_base.png"
+  ],
+  "externalReferences": []
+}

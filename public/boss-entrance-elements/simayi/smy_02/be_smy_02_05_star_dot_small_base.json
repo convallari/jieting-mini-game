@@ -1,0 +1,12 @@
+{
+  "id": "be_smy_02_05_star_dot_small_base",
+  "width": 24,
+  "height": 24,
+  "pivot": {
+    "x": 12,
+    "y": 12
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

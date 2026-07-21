@@ -1,0 +1,20 @@
+{
+  "name": "feng_05_blue_river_strip",
+  "fps": 12,
+  "width": 1024,
+  "height": 512,
+  "frames": 12,
+  "loop": true,
+  "pivot": {
+    "x": 512,
+    "y": 256
+  },
+  "mode": "tile",
+  "eventFrames": {},
+  "assets": [
+    "public/boss-entrance-elements/feng/feng_05/be_feng_05_01_river_base_tile.png",
+    "public/boss-entrance-elements/feng/feng_05/be_feng_05_02_river_highlight_tile.png",
+    "public/boss-entrance-elements/feng/feng_05/be_feng_05_03_river_bubble_base.png"
+  ],
+  "externalReferences": []
+}

@@ -1,0 +1,12 @@
+{
+  "id": "be_smy_02_02_orbit_middle_base",
+  "width": 336,
+  "height": 336,
+  "pivot": {
+    "x": 168,
+    "y": 168
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

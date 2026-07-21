@@ -1,0 +1,12 @@
+{
+  "id": "be_com_04_04_bar_shadow_base",
+  "width": 768,
+  "height": 96,
+  "pivot": {
+    "x": 384,
+    "y": 48
+  },
+  "tintable": false,
+  "defaultOpacity": 0.3,
+  "notes": "按最小元素资产规范制作"
+}

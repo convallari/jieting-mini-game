@@ -1,0 +1,12 @@
+{
+  "id": "be_zh_03_19_name_ink_glow_base",
+  "width": 640,
+  "height": 256,
+  "pivot": {
+    "x": 320,
+    "y": 128
+  },
+  "tintable": false,
+  "defaultOpacity": 0.7,
+  "notes": "名字外缘薄光"
+}

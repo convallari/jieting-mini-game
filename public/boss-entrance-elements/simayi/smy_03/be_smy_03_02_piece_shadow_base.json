@@ -1,0 +1,12 @@
+{
+  "id": "be_smy_03_02_piece_shadow_base",
+  "width": 112,
+  "height": 40,
+  "pivot": {
+    "x": 56,
+    "y": 20
+  },
+  "tintable": false,
+  "defaultOpacity": 0.35,
+  "notes": "按最小元素资产规范制作"
+}

@@ -1,0 +1,12 @@
+{
+  "id": "be_smy_03_03_piece_impact_ring_base",
+  "width": 192,
+  "height": 96,
+  "pivot": {
+    "x": 96,
+    "y": 48
+  },
+  "tintable": true,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

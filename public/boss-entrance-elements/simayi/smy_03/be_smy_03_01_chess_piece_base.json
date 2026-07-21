@@ -1,0 +1,12 @@
+{
+  "id": "be_smy_03_01_chess_piece_base",
+  "width": 112,
+  "height": 112,
+  "pivot": {
+    "x": 56,
+    "y": 56
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

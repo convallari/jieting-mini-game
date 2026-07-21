@@ -1,0 +1,9 @@
+{
+  "id": "be_com_03_01_dust_ring_base",
+  "width": 384,
+  "height": 128,
+  "pivot": { "x": 192, "y": 64 },
+  "tintable": true,
+  "defaultOpacity": 1,
+  "notes": "不对称扁椭圆空心尘圈，几何中心为扩散支点"
+}

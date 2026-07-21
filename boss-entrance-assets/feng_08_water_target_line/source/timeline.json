@@ -1,0 +1,20 @@
+{
+  "name": "feng_08_water_target_line",
+  "fps": 12,
+  "width": 1024,
+  "height": 512,
+  "frames": 18,
+  "loop": false,
+  "pivot": {
+    "x": 512,
+    "y": 256
+  },
+  "mode": "grow",
+  "eventFrames": {},
+  "assets": [
+    "public/boss-entrance-elements/feng/feng_08/be_feng_08_01_dash_segment_base.png",
+    "public/boss-entrance-elements/feng/feng_08/be_feng_08_02_target_water_drop_base.png",
+    "public/boss-entrance-elements/feng/feng_08/be_feng_08_03_target_glow_base.png"
+  ],
+  "externalReferences": []
+}

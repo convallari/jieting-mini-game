@@ -1,0 +1,23 @@
+{
+  "name": "smy_03_chess_piece_drop",
+  "fps": 12,
+  "width": 512,
+  "height": 512,
+  "frames": 9,
+  "loop": false,
+  "pivot": {
+    "x": 256,
+    "y": 256
+  },
+  "mode": "pieceDrop",
+  "eventFrames": {
+    "pieceHit": "5"
+  },
+  "assets": [
+    "public/boss-entrance-elements/simayi/smy_03/be_smy_03_01_chess_piece_base.png",
+    "public/boss-entrance-elements/simayi/smy_03/be_smy_03_02_piece_shadow_base.png",
+    "public/boss-entrance-elements/simayi/smy_03/be_smy_03_03_piece_impact_ring_base.png",
+    "public/boss-entrance-elements/simayi/smy_03/be_smy_03_04_piece_afterimage_base.png"
+  ],
+  "externalReferences": []
+}

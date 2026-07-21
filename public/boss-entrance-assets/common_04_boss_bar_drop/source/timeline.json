@@ -1,0 +1,21 @@
+{
+  "name": "common_04_boss_bar_drop",
+  "fps": 12,
+  "width": 1024,
+  "height": 512,
+  "frames": 10,
+  "loop": false,
+  "pivot": {
+    "x": 512,
+    "y": 256
+  },
+  "mode": "barDrop",
+  "eventFrames": {},
+  "assets": [
+    "public/boss-entrance-elements/common/common_04/be_com_04_01_bar_left_cap_base.png",
+    "public/boss-entrance-elements/common/common_04/be_com_04_02_bar_center_stretch_base.png",
+    "public/boss-entrance-elements/common/common_04/be_com_04_03_bar_right_cap_base.png",
+    "public/boss-entrance-elements/common/common_04/be_com_04_04_bar_shadow_base.png"
+  ],
+  "externalReferences": []
+}

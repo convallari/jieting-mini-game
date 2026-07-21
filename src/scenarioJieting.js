@@ -61,10 +61,10 @@ export const JIETING_CAMPAIGN = {
 
 export const JIETING_TERRAIN = {
   mountain: new Set(["2,3", "2,4", "2,5", "3,3", "3,4", "3,5"]),
-  openingDeployment: new Set(["1,2", "1,3", "1,4", "1,5", "2,3", "2,4", "2,5", "3,3", "3,4", "3,5", "4,4", "4,5", "4,6", "6,1", "6,2", "7,1", "7,2", "8,1", "8,2"]),
-  water: new Set(["4,3", "5,3", "6,3", "7,3", "8,3"]),
+  openingDeployment: new Set(["1,2", "1,3", "1,4", "1,5", "2,3", "2,4", "2,5", "3,3", "3,4", "3,5", "4,4", "4,5", "4,6", "6,1", "6,2", "7,1", "7,2", "8,1", "8,2", "8,6", "8,7", "9,6", "9,7"]),
+  water: new Set(["4,3", "5,3", "6,3", "7,3"]),
   waterDefense: new Set(["6,1", "6,2", "7,1", "7,2"]),
-  camp: new Set(["8,2", "8,3", "9,2", "9,3"]),
+  camp: new Set(["8,6", "8,7", "9,6", "9,7"]),
   waterPressureWaves: new Set([4, 5, 6, 7, 8])
 };
 
@@ -125,6 +125,6 @@ export const BOSS_SOUND_BY_SKILL = {
 
 export const BOSS_ROSTER = [
   { name: "张郃", spineType: "zhangLiang", hp: 10.8, range: 2.5, skillCooldown: 8, skill: "pressure", castDuration: 1.2, effectAt: 0.45, color: "#b9362f" },
-  { name: "锋", spineType: "boss2", hp: 8, range: 0, skillCooldown: 9, skill: "waterCut", castDuration: 0.8, effectAt: 0.35, color: "#416f8f" },
-  { name: "司马懿", spineType: "caoCao", hp: 14, range: 10, skillCooldown: 13, skill: "command", castDuration: 1.7, effectAt: 0.8, color: "#1b2f69" }
+  { name: "锋", spineType: null, displayMode: "glyph", hp: 8, range: 0, skillCooldown: 9, skill: "waterCut", castDuration: 0.8, effectAt: 0.35, color: "#416f8f" },
+  { name: "司马懿", spineType: null, displayMode: "glyph", hp: 14, range: 10, skillCooldown: 13, skill: "command", castDuration: 1.7, effectAt: 0.8, color: "#1b2f69" }
 ];

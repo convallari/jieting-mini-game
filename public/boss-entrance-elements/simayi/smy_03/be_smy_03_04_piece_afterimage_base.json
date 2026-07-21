@@ -1,0 +1,12 @@
+{
+  "id": "be_smy_03_04_piece_afterimage_base",
+  "width": 96,
+  "height": 192,
+  "pivot": {
+    "x": 48,
+    "y": 184
+  },
+  "tintable": false,
+  "defaultOpacity": 0.55,
+  "notes": "按最小元素资产规范制作"
+}

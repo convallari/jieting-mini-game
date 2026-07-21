@@ -1,0 +1,20 @@
+{
+  "name": "smy_04_long_shadow_extend",
+  "fps": 12,
+  "width": 512,
+  "height": 512,
+  "frames": 12,
+  "loop": false,
+  "pivot": {
+    "x": 256,
+    "y": 256
+  },
+  "mode": "shadowExtend",
+  "eventFrames": {},
+  "assets": [
+    "public/boss-entrance-elements/simayi/smy_04/be_smy_04_01_shadow_body_stretch_base.png",
+    "public/boss-entrance-elements/simayi/smy_04/be_smy_04_02_shadow_tip_base.png",
+    "public/boss-entrance-elements/simayi/smy_04/be_smy_04_03_shadow_blue_edge_base.png"
+  ],
+  "externalReferences": []
+}

@@ -1,0 +1,22 @@
+{
+  "name": "common_03_name_impact_dust",
+  "fps": 12,
+  "width": 512,
+  "height": 512,
+  "frames": 8,
+  "loop": false,
+  "pivot": {
+    "x": 256,
+    "y": 256
+  },
+  "mode": "impact",
+  "eventFrames": {
+    "impact": "2"
+  },
+  "assets": [
+    "public/boss-entrance-elements/common/common_03/be_com_03_01_dust_ring_base.png",
+    "public/boss-entrance-elements/common/common_03/be_com_03_02_dust_plume_left_base.png",
+    "public/boss-entrance-elements/common/common_03/be_com_03_03_dust_chip_base.png"
+  ],
+  "externalReferences": []
+}

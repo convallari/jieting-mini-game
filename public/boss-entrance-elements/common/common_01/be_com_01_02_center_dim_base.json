@@ -1,0 +1,12 @@
+{
+  "id": "be_com_01_02_center_dim_base",
+  "width": 256,
+  "height": 256,
+  "pivot": {
+    "x": 128,
+    "y": 128
+  },
+  "tintable": false,
+  "defaultOpacity": 0.45,
+  "notes": "中心薄雾"
+}

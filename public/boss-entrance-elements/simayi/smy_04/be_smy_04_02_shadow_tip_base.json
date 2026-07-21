@@ -1,0 +1,12 @@
+{
+  "id": "be_smy_04_02_shadow_tip_base",
+  "width": 96,
+  "height": 160,
+  "pivot": {
+    "x": 48,
+    "y": 8
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

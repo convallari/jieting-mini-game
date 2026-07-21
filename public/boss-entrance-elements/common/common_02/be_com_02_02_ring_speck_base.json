@@ -1,0 +1,9 @@
+{
+  "id": "be_com_02_02_ring_speck_base",
+  "width": 64,
+  "height": 64,
+  "pivot": { "x": 32, "y": 32 },
+  "tintable": true,
+  "defaultOpacity": 1,
+  "notes": "7颗碎墨，可由程序复制、旋转和染色"
+}

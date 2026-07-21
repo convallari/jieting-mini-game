@@ -1,0 +1,12 @@
+{
+  "id": "be_zh_05_01_flag_back_shadow_base",
+  "width": 224,
+  "height": 160,
+  "pivot": {
+    "x": 20,
+    "y": 24
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

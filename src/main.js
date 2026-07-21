@@ -5,7 +5,9 @@ import { drawWeaponGlyphSprite, getWeaponAnimationTiming, hasWeaponGlyphSprite, 
 import { drawOriginalHitEffect, getOriginalHitEffectTiming, hitEffectForToken, preloadOriginalHitEffects } from "./originalHitEffects.js";
 import { drawOriginalFarmer, preloadOriginalUnitSprites } from "./originalUnitSprites.js";
 import { ACTIVE_PROP_CONFIG, drawOriginalPropSprite, preloadOriginalPropSprites } from "./originalPropSprites.js";
-import { hasOriginalGeneralAnimation, initSpineGameLayer, isOriginalGeneralReady, resizeSpineGameLayer, syncADouAnimations, syncEnemyAnimations, syncGeneralAnimations } from "./spineGameLayer.js";
+import { drawCuratedCamp, drawCuratedGeneralFx, drawCuratedGeneralGlyph, drawCuratedZhangHeFx, preloadCuratedAnimationAssets } from "./curatedAnimationAssets.js";
+import { hasOriginalGeneralAnimation, initSpineGameLayer, isOriginalGeneralReady, resizeSpineGameLayer, syncADouAnimations, syncBossEntranceAnimation, syncEnemyAnimations, syncGeneralAnimations } from "./spineGameLayer.js";
+import { createBossEntrance } from "./bossEntrance.js";
 import { PLAYER_MAP_GRID, playerCellType } from "./originalMapConfig.js";
 import { animationPresetForUnit, effectRecipeForProjectile } from "./animationPresets.js";
 import {
@@ -88,7 +90,7 @@ const BOARD_ROWS = PLAYER_MAP_GRID[0].length;
 const CAMP_SIZE = 5;
 
 const GAME_PATHS = {
-  left: [[0, 0], [1, 0], [2, 0], [2, 1], [2, 2], [3, 2], [4, 2], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3]]
+  left: [[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [4, 1], [4, 2], [4, 3], [5, 3], [6, 3], [7, 3], [7, 4], [7, 5], [7, 6], [7, 7], [8, 7]]
 };
 
 const pathKeySet = new Set(Object.values(GAME_PATHS).flat().map(([r, c]) => `${r},${c}`));
@@ -169,7 +171,10 @@ const DEBUG_TUTORIAL = debugParams.has("debugTutorial");
 const DEBUG_ORDER_PROMPT = debugParams.has("debugOrderPrompt");
 const DEBUG_TIME_SCALE = Math.max(0.1, Math.min(20, Number(debugParams.get("debugTimeScale") ?? 1) || 1));
 const DEBUG_BOSS_INDEX = Math.max(0, Math.min(BOSS_ROSTER.length - 1, Number(debugParams.get("debugBoss") ?? 0) || 0));
-if (DEBUG_STATE || DEBUG_ATTACK) {
+const DEBUG_BOSS_ENTRANCE = debugParams.get("debugBossEntrance");
+const DEBUG_BOSS_ENTRANCE_VARIANT = debugParams.get("debugBossEntranceVariant") ?? "full";
+const DEBUG_BOSS_ENTRANCE_DELAY = Math.max(0, Number(debugParams.get("debugBossEntranceDelay") ?? 0) || 0);
+if (DEBUG_STATE || DEBUG_ATTACK || DEBUG_BOSS_ENTRANCE) {
   window.__jietingDebugState = () => ({
     mode: state.mode,
     paused: state.paused,
@@ -209,13 +214,76 @@ if (DEBUG_STATE || DEBUG_ATTACK) {
     banner: state.banner,
     tutorialStep: state.tutorialStep,
     freeOrderChoice: state.freeOrderChoice,
-    bestWave: state.bestWave
+    bestWave: state.bestWave,
+    bossEntrance: bossEntrance?.snapshot ?? null,
+    bossEntranceActor,
+    bossEntranceInputLocked: Boolean(bossEntrance?.active),
+    bossEntranceFinishCount,
+    bossEntranceEventAudit: [...bossEntranceEventAudit],
+    bossEntranceVariant: bossEntrance?.snapshot?.variant ?? null,
+    bossEntranceDragRestoreCount,
+    bossEntrancePointerReleaseCount
   });
 }
 preloadWeaponGlyphSprites();
 preloadOriginalHitEffects();
 preloadOriginalUnitSprites();
 preloadOriginalPropSprites();
+preloadCuratedAnimationAssets();
+let bossEntranceActor = null;
+let bossEntranceFinishCount = 0;
+let bossEntranceDragRestoreCount = 0;
+let bossEntrancePointerReleaseCount = 0;
+const bossEntranceEventAudit = [];
+// Boss1 contains Diao Chan/Sun Shangxiang/Zhen Fu and must never be used as
+// a stand-in for Zhang He. His entrance uses the authored glyph/effect layer.
+const BOSS_ENTRANCE_SPINE = {};
+const bossEntrance = createBossEntrance({
+  onAudio: (name, volume) => audioEngine.play(name, volume),
+  onShake: (life, strength) => shake(life, strength),
+  onRole: (config, enemy) => {
+    const spineType = config ? BOSS_ENTRANCE_SPINE[config.role] : null;
+    bossEntranceActor = config && spineType ? {
+      spineType,
+      name: config.name,
+      color: config.color,
+      bossIndex: config.index,
+      x: layout.boardX + Math.min(layout.boardW * .46, Math.max(150, layout.cellW * 2.25)),
+      y: layout.boardY + layout.cellH * 2.05,
+      scale: (layout.cell / 48) * .95,
+      alpha: 1,
+      variant: 0
+    } : null;
+  },
+  onEvent: (eventName, config) => {
+    bossEntranceEventAudit.push(`${config.name}:${eventName}`);
+    if (bossEntranceEventAudit.length > 24) bossEntranceEventAudit.shift();
+    const sharp = new Set(["impact", "cut", "hardStop", "footstep", "pieceHit"]);
+    audioEngine.play(sharp.has(eventName) ? "boss_entrance" : "popup_notification", sharp.has(eventName) ? .3 : .18, .08);
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches && sharp.has(eventName)) shake(.12, eventName === "hardStop" ? 1.5 : 2.5);
+  },
+  onFinish: () => { bossEntranceActor = null; bossEntranceFinishCount += 1; }
+});
+if (DEBUG_STATE || DEBUG_ATTACK || DEBUG_BOSS_ENTRANCE) {
+  window.__jietingDebug = {
+    triggerBossEntrance(key = "zhanghe", options = {}) {
+      const aliases = { zhanghe: 0, zh: 0, feng: 1, simayi: 2, smy: 2 };
+      const run = () => spawnEnemy(true, 0, aliases[key] ?? 0, "left", { repeat: Boolean(options.repeat) });
+      if (options.delay > 0) window.setTimeout(run, options.delay * 1000); else run();
+      return true;
+    },
+    setDragFixture() {
+      const unit = makeUnit("dao");
+      state.camp[0] = unit;
+      const rect = campSlotRect(0);
+      startDrag(unit, { kind: "camp", i: 0 }, { x: rect.x + rect.w / 2, y: rect.y + rect.h / 2 });
+      state.camp[0] = null;
+      pointer = { id: 2147483647 };
+      return { dragging: true, unitId: unit.id };
+    },
+    snapshot: () => window.__jietingDebugState?.()
+  };
+}
 const handdrawnGlyphsReady = preloadHanddrawnGlyphs().then((count) => {
   canvas.dataset.handdrawnGlyphs = String(count);
   return count;
@@ -339,9 +407,58 @@ function resize() {
 }
 
 function computeLayout(w, h) {
+  const desktop = w / h >= 1.25 && w >= 760;
   const safeTop = Math.max(8, Math.min(20, h * 0.018));
   const topH = Math.max(88, Math.min(102, h * 0.115));
   const bottomH = Math.max(142, Math.min(174, h * 0.19));
+  if (desktop) {
+    const boardY = 22;
+    const dockH = Math.max(84, Math.min(94, h * 0.11));
+    const boardH = Math.min(h - boardY - dockH - 14, h * 0.82);
+    const boardW = Math.min(w * 0.48, boardH * (BOARD_COLS / BOARD_ROWS) * 1.22);
+    const boardX = 18;
+    const railGap = 14;
+    const railW = w >= 1400 ? 100 : 96;
+    const railX = Math.round(boardX + boardW + railGap);
+    const panelX = railX + railW + 14;
+    const panelW = w - panelX - 30;
+    const slotGap = 10;
+    const slot = Math.min(70, Math.floor((boardW - 214) / CAMP_SIZE));
+    const campWidth = slot * CAMP_SIZE + slotGap * (CAMP_SIZE - 1);
+    const recruitWidth = 160;
+    const dockGap = 14;
+    const dockWidth = campWidth + dockGap + recruitWidth;
+    const campX = Math.round(boardX + Math.max(0, (boardW - dockWidth) / 2));
+    const campY = Math.round(boardY + boardH + 6);
+    const actionY = campY + 6;
+    const actionX = campX + campWidth + dockGap;
+    layout = {
+      desktop, w, h, safeTop, topH, bottomH,
+      cell: Math.sqrt((boardW / BOARD_COLS) * (boardH / BOARD_ROWS)),
+      cellW: boardW / BOARD_COLS, cellH: boardH / BOARD_ROWS,
+      boardX, boardY, boardW, boardH, railX, railW, panelX, panelW,
+      campY, slot, campGap: slotGap, campX,
+      recruit: { x: actionX, y: actionY, w: recruitWidth, h: 68 },
+      start: { x: Math.round(w / 2 - 108), y: Math.round(h * 0.7), w: 216, h: 64 },
+      pause: { x: railX + railW / 2, y: 38, r: 17 },
+      codex: { x: boardX - 48, y: campY + 10, w: 42, h: 42 }
+    };
+    layout.orderButtons = {
+      risky: { x: railX + 12, y: 91, w: railW - 24, h: 42 },
+      steady: { x: railX + 12, y: 141, w: railW - 24, h: 42 }
+    };
+    const statusGap = 10;
+    const statusX = panelX + 20;
+    const statusW = (panelW - 40 - statusGap * 2) / 3;
+    layout.statusCards = [0, 1, 2].map((index) => ({
+      x: statusX + index * (statusW + statusGap), y: 91, w: statusW, h: 79
+    }));
+    layout.supplyBar = { x: layout.statusCards[2].x + 12, y: 151, w: layout.statusCards[2].w - 24, h: 7 };
+    layout.propSlots = Object.keys(ACTIVE_PROP_CONFIG).map((key, index) => ({
+      key, x: railX + 17, y: 235 + index * 76, w: railW - 34, h: 64
+    }));
+    return;
+  }
   const availableH = h - topH - bottomH - 20;
   const cellW = w / BOARD_COLS;
   const cellH = Math.min(cellW, availableH / BOARD_ROWS);
@@ -360,6 +477,7 @@ function computeLayout(w, h) {
   const actionX = Math.round((w - actionWidth) / 2);
   const actionY = campY + slot + 14;
   layout = {
+    desktop,
     w, h, safeTop, topH, bottomH, cell, cellW, cellH, boardX, boardY, boardW, boardH,
     campY, slot,
     campX: Math.round((w - slot * CAMP_SIZE - 10 * (CAMP_SIZE - 1)) / 2 + 20),
@@ -433,6 +551,16 @@ function startGame() {
     }
   }
   toast(DEBUG_ATTACK_PREVIEW ? "攻击动画预览" : SCENARIO_TEXT.startHint, "#f3c037");
+  if (DEBUG_BOSS_ENTRANCE) {
+    const aliases = { zhanghe: 0, zh: 0, feng: 1, simayi: 2, smy: 2 };
+    const bossIndex = aliases[DEBUG_BOSS_ENTRANCE] ?? 0;
+    state.tutorialStep = -1;
+    state.freeOrderChoice = false;
+    state.wave = Math.max(1, state.wave);
+    const trigger = () => spawnEnemy(true, 0, bossIndex, "left", { repeat: DEBUG_BOSS_ENTRANCE_VARIANT === "repeat" });
+    if (DEBUG_BOSS_ENTRANCE_DELAY > 0) window.setTimeout(trigger, DEBUG_BOSS_ENTRANCE_DELAY * 1000);
+    else trigger();
+  }
 }
 
 function chooseCommandOrder(orderId) {
@@ -653,8 +781,8 @@ function setupDebugAttack() {
     hp: 680,
     maxHp: 680,
     glyph: "军",
-    spineType: "boss1",
-    spineVariant: 1,
+    spineType: null,
+    spineVariant: 0,
     lane: 0.08,
     wobble: 2.8,
     hitFlash: 0,
@@ -665,7 +793,7 @@ function setupDebugAttack() {
     dead: false
   });
   state.enemies.push({
-    id: idSeq++, t: 8.1, pathSide: "left", speed: 0.035, hp: 760, maxHp: 760, glyph: "锋", spineType: "boss2", spineVariant: 2,
+    id: idSeq++, t: 8.1, pathSide: "left", speed: 0.035, hp: 760, maxHp: 760, glyph: "锋", spineType: null, spineVariant: 0,
     lane: -0.08, wobble: 3.6, hitFlash: 0, hitAge: 99, hitDx: 0, hitDy: 0,
     spawnAge: 1, dead: false
   });
@@ -673,7 +801,7 @@ function setupDebugAttack() {
 
 // Debug review links should open directly on the animation under review.
 // Keeping the menu in front made repeated cadence checks unnecessarily ambiguous.
-if (DEBUG_ATTACK) startGame();
+if (DEBUG_ATTACK || DEBUG_BOSS_ENTRANCE) startGame();
 
 let lastRenderedAt = 0;
 let lastDebugSnapshotAt = 0;
@@ -696,7 +824,7 @@ function loop(now) {
   syncOriginalGeneralLayer();
   syncOriginalEnemyLayer();
   syncOriginalADouLayer();
-  if ((DEBUG_STATE || DEBUG_ATTACK) && now - lastDebugSnapshotAt >= 250) {
+  if ((DEBUG_STATE || DEBUG_ATTACK || DEBUG_BOSS_ENTRANCE) && now - lastDebugSnapshotAt >= 250) {
     lastDebugSnapshotAt = now;
     canvas.dataset.debugState = JSON.stringify(window.__jietingDebugState());
   }
@@ -729,6 +857,10 @@ function drawStartupLoading() {
 }
 
 function update(dt, time) {
+  if (bossEntrance.active) {
+    if (!state.paused) bossEntrance.update(dt);
+    return;
+  }
   updateParticles(dt);
   updateBuns(dt);
 
@@ -1019,7 +1151,7 @@ function recordCampaignResult(ending) {
   }
 }
 
-function spawnEnemy(isBoss = false, lane = 0, bossIndex = 0, pathSide = "left") {
+function spawnEnemy(isBoss = false, lane = 0, bossIndex = 0, pathSide = "left", entranceOptions = {}) {
   const baseHp = ENEMY_HP_BY_LEVEL[Math.min(ENEMY_HP_BY_LEVEL.length - 1, state.wave - 1)];
   const boss = BOSS_ROSTER[bossIndex] ?? BOSS_ROSTER[0];
   const archetype = isBoss ? null : chooseEnemyArchetype(state.wave);
@@ -1048,9 +1180,21 @@ function spawnEnemy(isBoss = false, lane = 0, bossIndex = 0, pathSide = "left") 
     dead: false
   });
   if (isBoss) {
+    const enemy = state.enemies.at(-1);
+    if (state.drag) {
+      restoreDrag();
+      bossEntranceDragRestoreCount += 1;
+      if (canvas.releasePointerCapture && pointer?.id != null) {
+        bossEntrancePointerReleaseCount += 1;
+        try { canvas.releasePointerCapture(pointer.id); } catch { /* capture may already be gone */ }
+      }
+      state.drag = null;
+    }
+    const entranceKey = ["zhanghe", "feng", "simayi"][bossIndex] ?? "zhanghe";
+    // The authored entrance package is PC-only. Coarse/mobile rendering skips
+    // directly to the normal enemy presentation so it cannot hide the board.
+    if (!MOBILE_RENDER_MODE) bossEntrance.start(entranceKey, enemy, entranceOptions);
     toast(`${boss.name}率军来袭`, boss.color);
-    audioEngine.play("boss_entrance", 0.3);
-    shake(0.16, 3);
   }
 }
 
@@ -1132,11 +1276,12 @@ function updateEnemies(dt) {
       enemy.t = path.length - 1;
       enemy.endpointAttackStarted = true;
       enemy.endpointAttackAge = 0;
+      enemy.endpointDamageDelay = 0;
       enemy.hitAge = 0;
     }
     if (enemy.endpointAttackStarted && !enemy.endpointDamageApplied) {
       enemy.endpointAttackAge += dt;
-      if (enemy.endpointAttackAge >= (enemy.bossIndex != null ? 0.8 : 0.5)) {
+      if (enemy.endpointAttackAge >= (enemy.endpointDamageDelay ?? (enemy.bossIndex != null ? 0.8 : 0.5))) {
         enemy.endpointDamageApplied = true;
         damageDefense(enemy);
         enemy.dying = true;
@@ -2118,9 +2263,17 @@ function dropBun(x, y, amount = 1, pathSide = "left") {
     return;
   }
   state.buns += amount;
-  const tx = 76;
-  state.floats.push({ type: "bun", sx: x, sy: y, tx, ty: layout.safeTop + 23, x, y, age: 0, life: 0.52 });
-  pulseAt(tx, layout.safeTop + 23, "#f1dfc2", 24);
+  const target = bunCounterAnchor();
+  state.floats.push({ type: "bun", sx: x, sy: y, tx: target.x, ty: target.y, x, y, age: 0, life: 0.52 });
+  pulseAt(target.x, target.y, "#f1dfc2", 24);
+}
+
+function bunCounterAnchor() {
+  if (layout.desktop && layout.statusCards?.[0]) {
+    const foodCard = layout.statusCards[0];
+    return { x: foodCard.x + foodCard.w / 2 - 22, y: foodCard.y + 49 };
+  }
+  return { x: 50, y: layout.safeTop + 24 };
 }
 
 function bunRewardForEnemy(enemy) {
@@ -2255,7 +2408,7 @@ function draw(time) {
   }
   ctx.save();
   ctx.translate(shakeOffset.x, shakeOffset.y);
-  drawTopBar();
+  if (!bossEntrance.active) drawTopBar();
   drawBoard(time);
   drawPlacedProps(time);
   drawEnemies(time);
@@ -2268,7 +2421,20 @@ function draw(time) {
   drawPropToolbar();
   drawDrag(time);
   ctx.restore();
-  drawMessages();
+  if (bossEntrance.active) {
+    const pathAnchors = GAME_PATHS.left.slice(0,3).map(([r,c]) => cellCenter(r,c));
+    const waterAnchors = [...JIETING_TERRAIN.water].map((key) => { const {r,c}=keyToCell(key); return cellCenter(r,c); });
+    const [campR,campC] = GAME_PATHS.left.at(-1);
+    const viewport = { x: 0, y: 0, w: layout.w, h: layout.h, anchors: {
+      entrance: pathAnchors[0], displayEntrance: { x: layout.boardX + Math.min(layout.boardW * .46, Math.max(150, layout.cellW * 2.25)), y: pathAnchors[0].y + layout.cellH * 1.55 }, path: pathAnchors, waters: waterAnchors, water: waterAnchors[0], camp: cellCenter(campR,campC),
+      supply: { x: layout.supplyBar.x + layout.supplyBar.w/2, y: layout.supplyBar.y + layout.supplyBar.h/2 }, hudBottom: layout.boardY - 4
+    } };
+    bossEntrance.drawBackdrop(ctx, viewport);
+    bossEntrance.drawForeground(ctx, viewport);
+    drawBossEntranceResourceHud();
+    drawMapSideLabels();
+  }
+  if (!bossEntrance.active) drawMessages();
   drawComboMeter();
   drawBossBlindness();
   if (state.tutorialStep >= 0) drawTutorialBriefing();
@@ -2327,6 +2493,16 @@ function drawBackground(time) {
     ctx.fill();
   }
   ctx.restore();
+
+  if (layout.desktop) {
+    ctx.save();
+    ctx.fillStyle = "rgba(244, 235, 215, 0.72)";
+    ctx.strokeStyle = "rgba(75, 57, 45, 0.38)";
+    ctx.lineWidth = 2;
+    roundRect(layout.railX, 14, layout.railW, layout.h - 28, 12, true, true);
+    roundRect(layout.panelX, 14, layout.panelW, layout.h - 28, 14, true, true);
+    ctx.restore();
+  }
 }
 
 function drawMenu(time) {
@@ -2392,8 +2568,6 @@ function drawMenuPanel() {
 
 function drawTopBar() {
   drawPauseButton();
-  drawTopCurrency();
-  drawCentered(SCENARIO_TEXT.stageName, layout.w / 2, layout.safeTop + 19, 26, "#3b241d", "900");
   const displayedWave = state.wavePhase === "prepare" ? 1 : Math.max(1, state.wave);
   const phaseLabel = state.wavePhase === "prepare"
     ? `备战${Math.ceil(state.waveTimer)}秒`
@@ -2401,11 +2575,48 @@ function drawTopBar() {
       ? `整备${Math.ceil(state.waveTimer)}秒`
       : state.wavePhase === "decision" ? "抉择" : "";
   const progressLabel = `第${displayedWave}波 / 共${MAX_WAVE}波`;
-  drawCentered(`${progressLabel}${phaseLabel ? ` · ${phaseLabel}` : ""} · 营♥${state.douHp.left}`, layout.w / 2, layout.safeTop + 45, 16, "#14110f", "900");
+  if (layout.desktop) {
+    const centerX = layout.panelX + layout.panelW / 2;
+    drawCentered(SCENARIO_TEXT.stageName, centerX, 45, 30, "#3b241d", "900");
+    drawCentered(`${progressLabel}${phaseLabel ? ` · ${phaseLabel}` : ""}`, centerX, 78, 17, "#14110f", "900");
+    drawDesktopResources();
+  } else {
+    drawTopCurrency();
+    drawCentered(SCENARIO_TEXT.stageName, layout.w / 2, layout.safeTop + 19, 26, "#3b241d", "900");
+    drawCentered(`${progressLabel}${phaseLabel ? ` · ${phaseLabel}` : ""} · 营♥${state.douHp.left}`, layout.w / 2, layout.safeTop + 45, 16, "#14110f", "900");
+  }
   drawCampaignHud();
+  if (layout.desktop) drawDesktopStatusPanel();
+}
+
+function drawDesktopResources() {
+  const [foodCard, campCard, supplyCard] = layout.statusCards;
+  for (const card of layout.statusCards) {
+    ctx.fillStyle = "rgba(255,250,238,0.5)";
+    ctx.strokeStyle = "rgba(91,65,49,0.26)";
+    ctx.lineWidth = 1.5;
+    roundRect(card.x, card.y, card.w, card.h, 9, true, true);
+  }
+
+  drawCentered(SCENARIO_TEXT.resourceName, foodCard.x + foodCard.w / 2, foodCard.y + 18, 13, "#665047", "900");
+  drawBun(foodCard.x + foodCard.w / 2 - 22, foodCard.y + 49, 13);
+  drawText(String(Math.round(state.displayedBuns)), foodCard.x + foodCard.w / 2 + 1, foodCard.y + 55, 21, "#34251f", "900", "left");
+
+  drawCentered("蜀营", campCard.x + campCard.w / 2, campCard.y + 18, 13, "#665047", "900");
+  const heartsX = campCard.x + campCard.w / 2 - 18;
+  for (let i = 0; i < 3; i++) {
+    drawHeart(heartsX + i * 18, campCard.y + 50, i < state.douHp.left ? "#d83435" : "#6b5d57");
+  }
+
+  drawCentered("汲道", supplyCard.x + supplyCard.w / 2, supplyCard.y + 18, 13, "#665047", "900");
+  drawCentered(`${Math.round(state.supplyIntegrity)} / ${SUPPLY_CONFIG.max}`, supplyCard.x + supplyCard.w / 2, supplyCard.y + 45, 18, "#34251f", "900");
 }
 
 function drawCampaignHud() {
+  if (layout.desktop) {
+    drawCentered("军令", layout.railX + layout.railW / 2, 75, 15, "#4a3027", "900");
+    drawCentered("道具", layout.railX + layout.railW / 2, 218, 15, "#4a3027", "900");
+  }
   for (const [id, rect] of Object.entries(layout.orderButtons)) {
     const order = COMMAND_ORDERS[id];
     const selected = state.commandOrder === id && state.orderActiveLeft > 0;
@@ -2417,7 +2628,9 @@ function drawCampaignHud() {
     roundRect(rect.x, rect.y, rect.w, rect.h, 5, false, true);
     drawCentered(cooldown > 0 && !selected ? String(Math.ceil(cooldown)) : order.shortLabel, rect.x + rect.w / 2, rect.y + rect.h / 2 + 1, 16, selected ? "#fff8e9" : "#44372f", "900");
   }
-  drawCentered(state.orderActiveLeft > 0 ? `${COMMAND_ORDERS[state.commandOrder].shortLabel}令 ${Math.ceil(state.orderActiveLeft)}秒` : "军令可用", layout.w - 58, layout.safeTop + 50, 12, "#4a3830", "900");
+  if (!layout.desktop) {
+    drawCentered(state.orderActiveLeft > 0 ? `${COMMAND_ORDERS[state.commandOrder].shortLabel}令 ${Math.ceil(state.orderActiveLeft)}秒` : "军令可用", layout.w - 58, layout.safeTop + 50, 12, "#4a3830", "900");
+  }
 
   const bar = layout.supplyBar;
   const ratio = Math.max(0, Math.min(1, state.supplyIntegrity / SUPPLY_CONFIG.max));
@@ -2425,7 +2638,35 @@ function drawCampaignHud() {
   roundRect(bar.x, bar.y, bar.w, bar.h, 4, true, false);
   ctx.fillStyle = ratio > 0.3 ? "#4d8a82" : "#a83a2d";
   roundRect(bar.x, bar.y, bar.w * ratio, bar.h, 4, true, false);
-  drawCentered(`汲道 ${Math.round(state.supplyIntegrity)} · ${campaignActLabel()}`, layout.w / 2, bar.y - 7, 10, "#3d342c", "800");
+  if (!layout.desktop) {
+    drawCentered(`汲道 ${Math.round(state.supplyIntegrity)} · ${campaignActLabel()}`, bar.x + bar.w / 2, bar.y - 9, 11, "#3d342c", "800");
+  }
+}
+
+function drawDesktopStatusPanel() {
+  const x = layout.panelX + 24;
+  const w = layout.panelW - 48;
+  const activeEnemies = state.enemies.filter((enemy) => !enemy.dying).length;
+  const deployed = state.board.size;
+  const orderStatus = state.orderActiveLeft > 0
+    ? `${COMMAND_ORDERS[state.commandOrder].label} · ${Math.ceil(state.orderActiveLeft)}秒`
+    : "军令待命";
+  ctx.save();
+  ctx.fillStyle = "rgba(255,250,238,0.46)";
+  ctx.strokeStyle = "rgba(91,65,49,0.24)";
+  ctx.lineWidth = 1.5;
+  roundRect(x, 188, w, 154, 10, true, true);
+  drawText("战况", x + 18, 220, 20, "#4a3027", "900", "left");
+  drawText(`当前敌军　${activeEnemies}`, x + 18, 257, 16, "#514239", "800", "left");
+  drawText(`已部署部队　${deployed}`, x + 18, 288, 16, "#514239", "800", "left");
+  drawText(orderStatus, x + 18, 319, 15, "#7b3f32", "800", "left");
+
+  ctx.fillStyle = "rgba(255,250,238,0.38)";
+  roundRect(x, 362, w, 132, 10, true, true);
+  drawText("当前目标", x + 18, 394, 18, "#4a3027", "900", "left");
+  drawText(campaignActLabel(), x + 18, 429, 22, "#8d3029", "900", "left");
+  drawText("阻敌于营门之外，守住汲道", x + 18, 464, 14, "#655248", "700", "left");
+  ctx.restore();
 }
 
 function campaignActLabel() {
@@ -2471,6 +2712,16 @@ function drawOrderChoiceCard(rect, title, benefit, risk, color) {
   drawCentered(benefit, rect.x + rect.w / 2, rect.y + 69, 13, "#fff4df", "800");
   drawCentered(risk, rect.x + rect.w / 2, rect.y + 96, 13, "#fff4df", "800");
   drawCentered("选择", rect.x + rect.w / 2, rect.y + 120, 11, "#f4dfbd", "700");
+}
+
+function drawBossEntranceResourceHud() {
+  const y = layout.safeTop + 8;
+  const wave = state.wavePhase === "prepare" ? 1 : Math.max(1, state.wave);
+  ctx.save();
+  ctx.fillStyle = "rgba(242,232,210,.94)";
+  roundRect(layout.w / 2 - Math.min(205, layout.w * .47), y - 5, Math.min(410, layout.w - 14), 38, 9, true, false);
+  drawCentered(`军粮 ${Math.round(state.displayedBuns)}　｜　第${wave}/${MAX_WAVE}波　｜　营寨 ♥${state.douHp.left}`, layout.w / 2, y + 15, Math.max(14, Math.min(18, layout.w * .043)), "#241a16", "900");
+  ctx.restore();
 }
 
 function recruitChoiceRects() {
@@ -2807,8 +3058,6 @@ function drawBoard(time) {
         ctx.lineTo(x + layout.cellW * 0.28, y + layout.cellH * 0.34);
         ctx.closePath();
         ctx.stroke();
-      } else if (key === "9,2") {
-        drawGlyphLayer("蜀", x + layout.cellW / 2, y + layout.cellH * 0.68, layout.cell * 0.68, "rgba(113,41,31,0.78)");
       }
     }
   }
@@ -2887,16 +3136,28 @@ function drawRouteEntrances(time) {
 }
 
 function drawMapSideLabels() {
+  const campCells = [...JIETING_TERRAIN.camp].map(keyToCell);
+  const minCampR = Math.min(...campCells.map(({ r }) => r));
+  const maxCampR = Math.max(...campCells.map(({ r }) => r));
+  const minCampC = Math.min(...campCells.map(({ c }) => c));
+  const maxCampC = Math.max(...campCells.map(({ c }) => c));
+  const campY = layout.boardY + ((minCampR + maxCampR + 1) / 2) * layout.cellH;
+  const shuX = layout.boardX + (minCampC + 0.5) * layout.cellW;
+  const yingX = layout.boardX + (maxCampC + 0.5) * layout.cellW;
+  const campCenterX = (shuX + yingX) / 2;
+  const usedCuratedCamp = drawCuratedCamp(ctx, campCenterX, campY + layout.cell * 0.04, layout.cellW * 1.9, layout.cellH * 1.82);
+  if (!usedCuratedCamp) {
+    ctx.save();
+    ctx.globalAlpha = 0.86;
+    drawGlyphLayer("蜀", shuX, campY + layout.cell * 0.12, layout.cell * 0.9, "#18110e");
+    drawGlyphLayer("营", yingX, campY + layout.cell * 0.12, layout.cell * 0.9, "#18110e");
+    ctx.restore();
+  }
+
   for (const [gate, path] of Object.entries(GAME_PATHS)) {
     const [r, c] = path.at(-1);
     const x = layout.boardX + (c + 0.5) * layout.cellW;
     const y = layout.boardY + (r + 0.5) * layout.cellH;
-    if (gate === "left") {
-      ctx.save();
-      ctx.globalAlpha = 0.82;
-      drawGlyphLayer("营", x, y + layout.cell * 0.18, layout.cell * 0.84, "#18110e");
-      ctx.restore();
-    }
     if (gate !== "left") continue;
     const heartsY = y - layout.cell * 0.48;
     for (let i = 0; i < 3; i++) {
@@ -2938,6 +3199,7 @@ function drawDropHighlight(time) {
 function drawEnemies(time) {
   for (const enemy of state.enemies) {
     if (enemy.dying) continue;
+    if (bossEntrance.snapshot?.bossId === enemy.id) continue;
     const pos = enemyPosition(enemy);
     const asset = getHanziAsset(enemy.glyph);
     const segment = currentPathSegment(enemy);
@@ -2950,6 +3212,7 @@ function drawEnemies(time) {
     const bossEnemy = enemy.bossIndex != null;
     ctx.save();
     ctx.translate(pos.x + laneX + pose.x - enemy.hitDx * (enemy.hitAge < 0.2 ? 5 : 0), pos.y + laneY + pose.y - enemy.hitDy * (enemy.hitAge < 0.2 ? 5 : 0));
+    drawCuratedZhangHeFx(ctx, 0, 0, layout.cell, enemy, time);
     if (bossEnemy) {
       ctx.save();
       ctx.globalAlpha = 0.6 + Math.sin(time * 5 + enemy.wobble) * 0.12;
@@ -2989,7 +3252,22 @@ function drawEnemies(time) {
 }
 
 function drawUnits(time) {
+  drawFormationAttackFx(time);
   drawUnitBoard(state.board, time, true);
+}
+
+function drawFormationAttackFx(time) {
+  for (const formation of state.formations) {
+    const first = keyToCell(formation.memberKeys[0]);
+    const last = keyToCell(formation.memberKeys.at(-1));
+    const a = cellCenter(first.r, first.c);
+    const b = cellCenter(last.r, last.c);
+    drawCuratedGeneralFx(ctx, formation.token, (a.x + b.x) / 2, (a.y + b.y) / 2, layout.cell * 2.35, {
+      action: formation.action,
+      progress: formation.action && formation.action !== "idle" ? formation.actionAge / Math.max(0.01, formation.actionLife) : 0,
+      time
+    });
+  }
 }
 
 function drawUnitBoard(board, time, draggable) {
@@ -3281,7 +3559,8 @@ function drawGlyphLayer(text, x, y, size, color, pose = {}) {
   ctx.rotate(pose.rotate ?? 0);
   ctx.scale(pose.scaleX ?? 1, pose.scaleY ?? 1);
   const renderColor = pose.tint === "formationGold" ? formationGoldGradient(size) : color;
-  let drawn = drawHanddrawnGlyph(ctx, text, size, { tint: pose.tint ?? null });
+  let drawn = drawCuratedGeneralGlyph(ctx, text, size);
+  if (!drawn) drawn = drawHanddrawnGlyph(ctx, text, size, { tint: pose.tint ?? null });
   if (!drawn && isJietingHanddrawnText(text)) {
     drawReadableGlyphFallback(text, size, renderColor);
     drawn = true;
@@ -3612,6 +3891,13 @@ function formationForUnit(unit) {
 }
 
 function pointerDown(event) {
+  pointer = { id: event.pointerId };
+  if (bossEntrance.active) {
+    audioEngine.unlock();
+    bossEntrance.skip();
+    event.preventDefault();
+    return;
+  }
   event.preventDefault();
   audioEngine.unlock();
   const p = eventPoint(event);
@@ -3775,6 +4061,7 @@ function pointerUp(event) {
       // Pointer capture may already be released by the browser.
     }
   }
+  pointer = null;
 }
 
 canvas.addEventListener("pointerdown", pointerDown);
@@ -3786,7 +4073,10 @@ document.addEventListener("visibilitychange", () => {
 });
 window.addEventListener("keydown", (event) => {
   audioEngine.unlock();
-  if (event.key === "Escape" && state.mode === "play") {
+  if ((event.key === " " || event.code === "Space") && bossEntrance.active) {
+    bossEntrance.skip();
+    event.preventDefault();
+  } else if (event.key === "Escape" && state.mode === "play") {
     state.paused = !state.paused;
     audioEngine.play(state.paused ? "btn_down" : "popup_notification", 0.14, 0.1);
     event.preventDefault();
@@ -4064,7 +4354,7 @@ function cellCenter(r, c) {
 }
 
 function campSlotRect(i) {
-  return { x: layout.campX + i * (layout.slot + 10), y: layout.campY + 6, w: layout.slot, h: layout.slot };
+  return { x: layout.campX + i * (layout.slot + (layout.campGap ?? 10)), y: layout.campY + 6, w: layout.slot, h: layout.slot };
 }
 
 function campSlotCenter(i) {
@@ -4547,6 +4837,7 @@ function syncOriginalGeneralLayer() {
 
 function syncOriginalEnemyLayer() {
   syncEnemyAnimations([], layout.cell);
+  syncBossEntranceAnimation(bossEntranceActor);
 }
 
 function syncOriginalADouLayer() {

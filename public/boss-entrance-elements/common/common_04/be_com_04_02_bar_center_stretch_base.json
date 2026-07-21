@@ -1,0 +1,12 @@
+{
+  "id": "be_com_04_02_bar_center_stretch_base",
+  "width": 128,
+  "height": 96,
+  "pivot": {
+    "x": 64,
+    "y": 48
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

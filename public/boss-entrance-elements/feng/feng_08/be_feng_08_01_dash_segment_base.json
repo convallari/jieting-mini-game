@@ -1,0 +1,12 @@
+{
+  "id": "be_feng_08_01_dash_segment_base",
+  "width": 64,
+  "height": 24,
+  "pivot": {
+    "x": 32,
+    "y": 12
+  },
+  "tintable": true,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

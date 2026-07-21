@@ -1,0 +1,12 @@
+{
+  "id": "be_feng_06_02_stop_ground_mark_base",
+  "width": 224,
+  "height": 80,
+  "pivot": {
+    "x": 216,
+    "y": 72
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

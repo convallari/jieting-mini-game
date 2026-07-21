@@ -1,0 +1,12 @@
+{
+  "id": "be_smy_01_02_cloud_curl_a_base",
+  "width": 128,
+  "height": 128,
+  "pivot": {
+    "x": 64,
+    "y": 64
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

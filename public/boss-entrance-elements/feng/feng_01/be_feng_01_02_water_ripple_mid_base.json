@@ -1,0 +1,12 @@
+{
+  "id": "be_feng_01_02_water_ripple_mid_base",
+  "width": 176,
+  "height": 56,
+  "pivot": {
+    "x": 88,
+    "y": 28
+  },
+  "tintable": true,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

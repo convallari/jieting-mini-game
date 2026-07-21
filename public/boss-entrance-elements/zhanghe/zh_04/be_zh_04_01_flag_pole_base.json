@@ -1,0 +1,12 @@
+{
+  "id": "be_zh_04_01_flag_pole_base",
+  "width": 64,
+  "height": 448,
+  "pivot": {
+    "x": 32,
+    "y": 440
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

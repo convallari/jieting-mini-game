@@ -1,0 +1,12 @@
+{
+  "id": "be_feng_04_03_torn_fiber_base",
+  "width": 64,
+  "height": 64,
+  "pivot": {
+    "x": 8,
+    "y": 56
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

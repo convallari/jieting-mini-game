@@ -1,0 +1,12 @@
+{
+  "id": "be_feng_05_02_river_highlight_tile",
+  "width": 256,
+  "height": 64,
+  "pivot": {
+    "x": 8,
+    "y": 32
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

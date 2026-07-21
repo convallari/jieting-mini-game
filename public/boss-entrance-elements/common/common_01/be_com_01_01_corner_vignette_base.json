@@ -1,0 +1,12 @@
+{
+  "id": "be_com_01_01_corner_vignette_base",
+  "width": 256,
+  "height": 256,
+  "pivot": {
+    "x": 0,
+    "y": 0
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "左上角，程序旋转复制"
+}

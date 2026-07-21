@@ -1,0 +1,12 @@
+{
+  "id": "be_smy_02_04_radial_line_base",
+  "width": 24,
+  "height": 192,
+  "pivot": {
+    "x": 12,
+    "y": 184
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

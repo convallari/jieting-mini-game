@@ -1,0 +1,12 @@
+{
+  "id": "be_zh_04_04_pole_impact_spark_base",
+  "width": 96,
+  "height": 64,
+  "pivot": {
+    "x": 48,
+    "y": 56
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

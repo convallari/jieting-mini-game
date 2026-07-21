@@ -1,0 +1,23 @@
+{
+  "name": "smy_05_boss_rise_from_shadow",
+  "fps": 12,
+  "width": 512,
+  "height": 512,
+  "frames": 16,
+  "loop": false,
+  "pivot": {
+    "x": 256,
+    "y": 400
+  },
+  "mode": "role",
+  "eventFrames": {
+    "reveal": "9"
+  },
+  "assets": [
+    "public/boss-entrance-elements/simayi/smy_05/be_smy_05_01_body_reveal_mask_base.png",
+    "public/boss-entrance-elements/simayi/smy_05/be_smy_05_02_robe_mist_base.png"
+  ],
+  "externalReferences": [
+    "Spine: caoCao / 司马懿"
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "name": "zh_03_name_write",
+  "fps": 12,
+  "width": 1024,
+  "height": 512,
+  "frames": 12,
+  "loop": false,
+  "pivot": {
+    "x": 512,
+    "y": 256
+  },
+  "mode": "write",
+  "eventFrames": {},
+  "assets": [
+    "public/boss-entrance-elements/zhanghe/zh_03/be_zh_03_01_zhang_stroke_01_base.png",
+    "public/boss-entrance-elements/zhanghe/zh_03/be_zh_03_02_zhang_stroke_02_base.png",
+    "public/boss-entrance-elements/zhanghe/zh_03/be_zh_03_03_zhang_stroke_03_base.png",
+    "public/boss-entrance-elements/zhanghe/zh_03/be_zh_03_04_zhang_stroke_04_base.png",
+    "public/boss-entrance-elements/zhanghe/zh_03/be_zh_03_05_zhang_stroke_05_base.png",
+    "public/boss-entrance-elements/zhanghe/zh_03/be_zh_03_06_zhang_stroke_06_base.png",
+    "public/boss-entrance-elements/zhanghe/zh_03/be_zh_03_07_zhang_stroke_07_base.png",
+    "public/boss-entrance-elements/zhanghe/zh_03/be_zh_03_08_he_stroke_01_base.png",
+    "public/boss-entrance-elements/zhanghe/zh_03/be_zh_03_09_he_stroke_02_base.png",
+    "public/boss-entrance-elements/zhanghe/zh_03/be_zh_03_10_he_stroke_03_base.png",
+    "public/boss-entrance-elements/zhanghe/zh_03/be_zh_03_11_he_stroke_04_base.png",
+    "public/boss-entrance-elements/zhanghe/zh_03/be_zh_03_12_he_stroke_05_base.png",
+    "public/boss-entrance-elements/zhanghe/zh_03/be_zh_03_13_he_stroke_06_base.png",
+    "public/boss-entrance-elements/zhanghe/zh_03/be_zh_03_14_he_stroke_07_base.png",
+    "public/boss-entrance-elements/zhanghe/zh_03/be_zh_03_15_he_stroke_08_base.png",
+    "public/boss-entrance-elements/zhanghe/zh_03/be_zh_03_16_he_stroke_09_base.png",
+    "public/boss-entrance-elements/zhanghe/zh_03/be_zh_03_17_he_stroke_10_base.png",
+    "public/boss-entrance-elements/zhanghe/zh_03/be_zh_03_18_he_stroke_11_base.png",
+    "public/boss-entrance-elements/zhanghe/zh_03/be_zh_03_19_name_ink_glow_base.png"
+  ],
+  "externalReferences": []
+}

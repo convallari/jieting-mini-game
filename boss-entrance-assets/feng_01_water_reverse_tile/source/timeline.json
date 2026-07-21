@@ -1,0 +1,21 @@
+{
+  "name": "feng_01_water_reverse_tile",
+  "fps": 12,
+  "width": 512,
+  "height": 512,
+  "frames": 12,
+  "loop": false,
+  "pivot": {
+    "x": 256,
+    "y": 256
+  },
+  "mode": "rise",
+  "eventFrames": {},
+  "assets": [
+    "public/boss-entrance-elements/feng/feng_01/be_feng_01_01_water_ripple_long_base.png",
+    "public/boss-entrance-elements/feng/feng_01/be_feng_01_02_water_ripple_mid_base.png",
+    "public/boss-entrance-elements/feng/feng_01/be_feng_01_03_water_ripple_short_base.png",
+    "public/boss-entrance-elements/feng/feng_01/be_feng_01_04_water_foam_base.png"
+  ],
+  "externalReferences": []
+}

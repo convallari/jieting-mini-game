@@ -1,0 +1,12 @@
+{
+  "id": "be_feng_04_02_torn_edge_lower_base",
+  "width": 768,
+  "height": 128,
+  "pivot": {
+    "x": 8,
+    "y": 64
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

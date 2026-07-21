@@ -1,0 +1,12 @@
+{
+  "id": "be_zh_01_01_boot_print_base",
+  "width": 128,
+  "height": 176,
+  "pivot": {
+    "x": 64,
+    "y": 96
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

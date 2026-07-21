@@ -1,0 +1,12 @@
+{
+  "id": "be_zh_08_03_ground_mist_base",
+  "width": 384,
+  "height": 112,
+  "pivot": {
+    "x": 192,
+    "y": 104
+  },
+  "tintable": false,
+  "defaultOpacity": 1,
+  "notes": "按最小元素资产规范制作"
+}

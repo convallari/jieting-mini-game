@@ -56,7 +56,7 @@ for (const id of ["general.zhaoyun", "general.zhangfei", "general.machao"]) {
 if (SOURCE_DISPLAY_POLICY.allowImplicitSplit || SOURCE_DISPLAY_POLICY.allowImplicitMerge) throw new Error("Source-first display policy allows implicit restructuring");
 
 for (const boss of BOSS_ROSTER) {
-  if (!boss.name || !boss.skill || !boss.spineType) throw new Error(`Incomplete boss config: ${JSON.stringify(boss)}`);
+  if (!boss.name || !boss.skill || (!boss.spineType && boss.displayMode !== "glyph")) throw new Error(`Incomplete boss config: ${JSON.stringify(boss)}`);
 }
 if (BOSS_ROSTER.find((boss) => boss.name === "张郃")?.hp !== 10.8) throw new Error("Invalid Zhang He health multiplier");
 
